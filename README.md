@@ -9,9 +9,5 @@ Esta é a primeira fase do projeto ReUse, uma plataforma digital voltada à econ
 
 ---
 ## 📁 Estrutura do Projeto
-`bash
 
-
-
-`
 ---
