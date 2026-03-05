@@ -1,16 +1,11 @@
-import { Pressable, Image, StyleSheet, ImageSourcePropType } from "react-native";
+import { Pressable, Image, StyleSheet } from "react-native";
 
 const placeholder = require("../../../assets/images/placeholder2.png");
 
-type Props = {
-  image?: ImageSourcePropType;
-  onPress?: () => void;
-};
-
-export function CategoryCard({ image = placeholder, onPress }: Props) {
+export function CategoryCard() {
   return (
-    <Pressable onPress={onPress} style={styles.card}>
-      <Image source={image} style={styles.image} resizeMode="cover" />
+    <Pressable style={styles.card}>
+      <Image source={placeholder} style={styles.image} resizeMode="cover" />
     </Pressable>
   );
 }
