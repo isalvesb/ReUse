@@ -1,6 +1,6 @@
 import { Pressable, Image, StyleSheet, ImageSourcePropType } from "react-native";
 
-const placeholder = require("../../../assets/images/placeholder.jpg");
+const placeholder = require("../../../assets/images/placeholder2.png");
 
 type Props = {
   image?: ImageSourcePropType;
