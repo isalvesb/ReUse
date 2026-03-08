@@ -1,35 +1,42 @@
-import { ScrollView, View, Text, StyleSheet } from "react-native";
+import { ScrollView, View, Text, StyleSheet, Image } from "react-native";
+import Header from "../../components/Header";
 import SearchBar from "../../components/SearchBar";
 import { PromoCard } from "../../components/PromoCard";
 import { CategoryCard } from "../../components/CategoryCard";
 
 export function HomeScreen() {
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View>
+     
+      <ScrollView contentContainerStyle={styles.container}>
+      <Header />
+        <View style={styles.searchWrap}>
+          <SearchBar />
+        </View>
 
-      <Text style={styles.title}>ReUse</Text>
+        <View style={styles.hero}>
+          <Image source={require('../../../assets/images/HeroBannerCTA.png')} style={styles.heroImage} />
+        </View>
 
-      <View style={styles.searchWrap}>
-        <SearchBar />
-      </View>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
+          <View style={styles.promoItem}><PromoCard /></View>
+          <View style={styles.promoItem}><PromoCard /></View>
+          <View style={styles.promoItem}><PromoCard /></View>
+          <View style={styles.promoItem}><PromoCard /></View>
+          <View style={styles.promoItem}><PromoCard /></View>
+        </ScrollView>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
-        <View style={styles.promoItem}><PromoCard /></View>
-        <View style={styles.promoItem}><PromoCard /></View>
-        <View style={styles.promoItem}><PromoCard /></View>
-        <View style={styles.promoItem}><PromoCard /></View>
-        <View style={styles.promoItem}><PromoCard /></View>
+        <Text style={[styles.subtitle, { marginTop: 24 }]}>Descubra por categoria</Text>
+
+        <View style={styles.grid}>
+          <CategoryCard />
+          <CategoryCard />
+          <CategoryCard />
+          <CategoryCard />
+        </View>
+
       </ScrollView>
-
-      <Text style={[styles.subtitle, { marginTop:24 }]}>Descubra por categoria</Text>
-
-      <View style={styles.grid}>
-        <CategoryCard />
-        <CategoryCard />
-        <CategoryCard />
-        <CategoryCard />
-      </View>
-    </ScrollView>
+    </View>
   );
 }
 
@@ -40,5 +47,7 @@ const styles = StyleSheet.create({
   row: { paddingVertical: 6 },
   promoItem: { width: 280, marginRight: 12 },
   grid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" },
-  searchWrap: { marginVertical: 16 }
+  searchWrap: { marginVertical: 16 },
+  hero: { width: '100%', height: 350, overflow: 'hidden', borderRadius: 16 },
+  heroImage: { width: '100%', height: '100%', resizeMode: 'cover' },
 });
