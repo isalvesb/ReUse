@@ -1,16 +1,26 @@
-import { Pressable, Image, StyleSheet } from "react-native";
+import { StyleSheet, Image, ImageSourcePropType, Pressable } from "react-native";
 
-const placeholder = require("../../../assets/images/placeholder2.png");
+type CategoryCardProps = {
+  imageSource: ImageSourcePropType;
+  onPress?: () => void;
+};
 
-export function CategoryCard() {
+export function CategoryCard({ imageSource, onPress }: CategoryCardProps) {
   return (
-    <Pressable style={styles.card}>
-      <Image source={placeholder} style={styles.image} resizeMode="cover" />
+    <Pressable style={styles.card} onPress={onPress}>
+      <Image source={imageSource} style={styles.image} resizeMode="cover" />
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { width: "48%", height: 90, borderRadius: 10, overflow: "hidden", marginBottom: 14 },
-  image: { width: "100%", height: "100%" },
+  card: {
+    width: "48%",
+  },
+
+  image: {
+    width: "100%",
+    height: 120,
+    borderRadius: 18,
+  },
 });
