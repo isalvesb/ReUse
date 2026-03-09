@@ -6,7 +6,38 @@ import { PromoCard } from "../../components/PromoCard";
 import { CategoryCard } from "../../components/CategoryCard";
 import { ItemCard } from "../../components/ItemCard";
 
-const promoCards = [1, 2, 3, 4, 5];
+const promoCards = [
+  {
+    id: 1,
+    title: "Eletrônicos",
+    subtitle: "Usado sim, mas continuam tinindo",
+    imageSource: require("../../../assets/images/promo/notebook.jpg"),
+  },
+  {
+    id: 2,
+    title: "Peças raras",
+    subtitle: "Se apaixone por peças clássicas",
+    imageSource: require("../../../assets/images/promo/fotografia.jpg"),
+  },
+  {
+    id: 3,
+    title: "Sapatos para todos os gostos",
+    subtitle: "Encontre seu par perfeito",
+    imageSource: require("../../../assets/images/promo/sapatos.jpg"),
+  },
+  {
+    id: 4,
+    title: "Livros para sua biblioteca",
+    subtitle: "Aquele livro que falta para a sua coleção",
+    imageSource: require("../../../assets/images/promo/livros.jpg"),
+  },
+  {
+    id: 5,
+    title: "Para sua casa",
+    subtitle: "Decoração com estilo único para você inovar",
+    imageSource: require("../../../assets/images/promo/sofa.jpg"),
+  },
+];
 
 export function HomeScreen() {
   return (
@@ -39,8 +70,19 @@ export function HomeScreen() {
           contentContainerStyle={styles.promoRow}
         >
           {promoCards.map((card, index) => (
-            <View key={card} style={styles.promoItem}>
-              <PromoCard />
+            <View
+              key={card.id}
+              style={[
+                styles.promoItem,
+                index === promoCards.length - 1 && styles.lastPromoItem,
+              ]}
+            >
+              <PromoCard
+                title={card.title}
+                subtitle={card.subtitle}
+                imageSource={card.imageSource}
+                onPress={() => console.log(card.title)}
+              />
             </View>
           ))}
         </ScrollView>
@@ -93,7 +135,8 @@ export function HomeScreen() {
 
       <CtaCard
         title="Impacto coletivo"
-        subtitle="+ 1.240 itens ganharam um novo destino este mês. Tem algo parado em casa? Transforme em oportunidade."
+        highlightText="+ 1.240 itens"
+        subtitle="ganharam um novo destino este mês. Tem algo parado em casa? Transforme em oportunidade."
         imageSource={require("../../../assets/images/ImpactoColetivo.png")}
         buttonTitle="Publicar item"
         onPress={() => console.log("publique seu item!")}
@@ -130,12 +173,11 @@ const styles = StyleSheet.create({
   },
 
   promoRow: {
-    paddingRight: 0,
+    paddingRight: 24,
   },
 
   promoItem: {
-    width: 280,
-    marginRight: 24,
+    marginRight: 16,
   },
 
   lastPromoItem: {
