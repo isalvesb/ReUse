@@ -50,10 +50,18 @@ export function HomeScreen() {
         <Text style={styles.sectionTitle}>Descubra por categoria</Text>
 
         <View style={styles.grid}>
-          <CategoryCard imageSource={require("../../../assets/images/categorias/roupas.jpg")} />
-          <CategoryCard imageSource={require("../../../assets/images/categorias/oculos.jpg")} />
-          <CategoryCard imageSource={require("../../../assets/images/categorias/luminaria.jpg")} />
-          <CategoryCard imageSource={require("../../../assets/images/categorias/infantil.jpg")} />
+          <CategoryCard
+            imageSource={require("../../../assets/images/categorias/roupas.jpg")}
+          />
+          <CategoryCard
+            imageSource={require("../../../assets/images/categorias/oculos.jpg")}
+          />
+          <CategoryCard
+            imageSource={require("../../../assets/images/categorias/luminaria.jpg")}
+          />
+          <CategoryCard
+            imageSource={require("../../../assets/images/categorias/infantil.jpg")}
+          />
         </View>
       </View>
 
