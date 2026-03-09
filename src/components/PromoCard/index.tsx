@@ -1,24 +1,57 @@
-import { View, Text, Image, Pressable, StyleSheet } from "react-native";
+import {
+  Text,
+  Image,
+  Pressable,
+  StyleSheet,
+  ImageSourcePropType,
+} from "react-native";
 
-const placeholder = require("../../../assets/images/placeholder1.png");
+type PromoCardProps = {
+  title: string;
+  subtitle: string;
+  imageSource: ImageSourcePropType;
+  onPress?: () => void;
+};
 
-export function PromoCard() {
+export function PromoCard({
+  title,
+  subtitle,
+  imageSource,
+  onPress,
+}: PromoCardProps) {
   return (
-    <Pressable style={styles.card}>
-      <Text style={styles.title}>Título</Text>
-      <Text style={styles.subtitle}>Texto do subtítulo</Text>
+    <Pressable style={styles.card} onPress={onPress}>
+      <Text style={styles.title}>{title}</Text>
+      <Text style={styles.subtitle}>{subtitle}</Text>
 
-      <View style={styles.imageWrap}>
-        <Image source={placeholder} style={styles.image} resizeMode="cover" />
-      </View>
+      <Image source={imageSource} style={styles.image} resizeMode="cover" />
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { width: "100%" },
-  title: { fontSize: 22, fontWeight: "700" },
-  subtitle: { marginTop: 2, fontSize: 14, fontWeight: "600" },
-  imageWrap: { marginTop: 10, borderRadius: 10, overflow: "hidden", height: 180 },
-  image: { width: "100%", height: "100%" },
+  card: {
+    width: 308,
+  },
+
+  title: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#342A2A",
+  },
+
+  subtitle: {
+    marginTop: 4,
+    fontSize: 14,
+    fontWeight: "400",
+    color: "#584C4C",
+    lineHeight: 20,
+  },
+
+  image: {
+    width: "100%",
+    height: 156,
+    marginTop: 12,
+    borderRadius: 12,
+  },
 });

@@ -1,36 +1,42 @@
-import { View, Image, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet } from "react-native";
 
 export default function Header() {
   return (
     <View style={styles.container}>
-     <View style={{ width: 20 }} />
+      <Text style={styles.logoText}>ReUse</Text>
 
-    <Image source={require('../../../assets/images/ReUse.png')} style={styles.logo} />
-
-    <Image source={require('../../../assets/images/icon.png')} style={styles.icon} />
-
+      <Image
+        source={require("../../../assets/images/icon.png")}
+        style={styles.icon}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    position: "relative",
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     alignItems: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     marginTop: 25,
+    minHeight: 36,
   },
 
-  logo: {
-    height: 36,
-    width: 161,
-    resizeMode: 'contain',
+  logoText: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    textAlign: "center",
+    fontFamily: "Syne_800ExtraBold",
+    fontSize: 30,
+    color: "#342A2A",
   },
 
   icon: {
     width: 36,
     height: 36,
+    resizeMode: "contain",
   },
-
 });
