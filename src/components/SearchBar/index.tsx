@@ -18,7 +18,7 @@ export default function SearchBar() {
         returnKeyType="search"
       />
 
-      <Ionicons name="search" size={24} color="#79747E" style={styles.icon} />
+      <Ionicons name="search" size={24} color="#342A2A" style={styles.icon} />
     </View>
   );
 }

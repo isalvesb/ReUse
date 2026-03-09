@@ -1,4 +1,5 @@
-import { StyleSheet, Image, ImageSourcePropType, Pressable } from "react-native";
+import { Image, ImageSourcePropType, Pressable } from "react-native";
+import styles from "./styles";
 
 type CategoryCardProps = {
   imageSource: ImageSourcePropType;
@@ -12,15 +13,3 @@ export function CategoryCard({ imageSource, onPress }: CategoryCardProps) {
     </Pressable>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    width: "48%",
-  },
-
-  image: {
-    width: "100%",
-    height: 120,
-    borderRadius: 18,
-  },
-});

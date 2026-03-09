@@ -1,4 +1,5 @@
-import { Pressable, Text, StyleSheet, StyleProp, ViewStyle, TextStyle } from "react-native";
+import { Pressable, Text, StyleProp, ViewStyle, TextStyle } from "react-native";
+import styles from "./styles";
 
 type ButtonProps = {
   title: string;
@@ -19,20 +20,3 @@ export default function Button({
     </Pressable>
   );
 }
-
-const styles = StyleSheet.create({
-  button: {
-    backgroundColor: "#EADDFF",
-    borderRadius: 999,
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  text: {
-    color: "#342A2A",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});

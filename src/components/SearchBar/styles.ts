@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 
-export default StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     width: "100%",
     height: 56,
@@ -21,5 +21,6 @@ export default StyleSheet.create({
   icon: {
     marginLeft: 12,
   },
-
 });
+
+export default styles;

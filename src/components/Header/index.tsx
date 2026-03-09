@@ -1,4 +1,5 @@
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image } from "react-native";
+import styles from "./styles";
 
 export default function Header() {
   return (
@@ -12,31 +13,3 @@ export default function Header() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    position: "relative",
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    paddingHorizontal: 24,
-    marginTop: 25,
-    minHeight: 36,
-  },
-
-  logoText: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    textAlign: "center",
-    fontFamily: "Syne_800ExtraBold",
-    fontSize: 30,
-    color: "#342A2A",
-  },
-
-  icon: {
-    width: 36,
-    height: 36,
-    resizeMode: "contain",
-  },
-});

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import styles from "./styles";
 
 const TABS = [
   { name: "home", icon: "home-outline", label: "Home" },
@@ -46,43 +47,3 @@ export default function TabBar() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    alignItems: "flex-end",
-    backgroundColor: "#342A2A",
-    paddingTop: 10,
-    paddingHorizontal: 12,
-  },
-
-  tab: {
-    flex: 1,
-    alignItems: "center",
-  },
-
-  tabContent: {
-    minWidth: 76,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 16,
-  },
-
-  activeTab: {
-    backgroundColor: "#EADDFF",
-  },
-
-  label: {
-    marginTop: 4,
-    fontSize: 10,
-    color: "#F7EFDE",
-    fontWeight: "500",
-  },
-
-  labelActive: {
-    color: "#342A2A",
-    fontWeight: "600",
-  },
-});
