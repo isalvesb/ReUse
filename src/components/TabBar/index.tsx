@@ -26,7 +26,7 @@ export default function TabBar() {
             <View style={[styles.tabContent, isActive && styles.activeTab]}>
               <Ionicons
                 name={tab.icon}
-                size={22}
+                size={24}
                 color={isActive ? "#342A2A" : "#F7EFED"}
               />
 
