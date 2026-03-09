@@ -2,8 +2,8 @@ import React from "react";
 import { useFonts } from "expo-font";
 import { Syne_400Regular, Syne_800ExtraBold } from "@expo-google-fonts/syne";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { View } from "react-native";
 import { HomeScreen } from "./src/screens/Home/index";
-import { View, StyleSheet } from "react-native";
 import TabBar from "./src/components/TabBar";
 
 export default function App() {
@@ -12,29 +12,20 @@ export default function App() {
     Syne_800ExtraBold,
   });
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  if (!fontsLoaded) return null;
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.container}>
+      <SafeAreaView
+        style={{ flex: 1, backgroundColor: "#F7EFDE" }}
+        edges={["top", "left", "right"]}
+      >
+        <View style={{ flex: 1, backgroundColor: "#F7EFDE" }}>
           <HomeScreen />
         </View>
+
         <TabBar />
       </SafeAreaView>
     </SafeAreaProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#F7EFDE",
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "#F7EFDE",
-  },
-});
