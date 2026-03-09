@@ -27,7 +27,7 @@ export default function TabBar() {
               <Ionicons
                 name={tab.icon}
                 size={22}
-                color={isActive ? "#342A2A" : "#EADDFF"}
+                color={isActive ? "#342A2A" : "#F7EFED"}
               />
 
               <Text style={[styles.label, isActive && styles.labelActive]}>
@@ -65,6 +65,7 @@ const styles = StyleSheet.create({
 
   activeTab: {
     backgroundColor: "#EADDFF",
+    borderRadius: 20,
 
     // sombra
     shadowColor: "#000",
