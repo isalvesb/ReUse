@@ -57,7 +57,7 @@ export function HomeScreen() {
         <CtaCard
           title={"Dê um novo\npropósito"}
           subtitle="ao que você não usa mais"
-          imageSource={require("../../../assets/images/HeroBannerCTA.png")}
+          imageSource={require("../../../assets/images/cta/HeroBannerCTA.png")}
           buttonTitle="Publicar item"
           onPress={() => console.log("publique seu item!")}
           variant="hero"
@@ -146,7 +146,7 @@ export function HomeScreen() {
         title="Impacto coletivo"
         highlightText="+ 1.240 itens"
         subtitle="ganharam um novo destino este mês. Tem algo parado em casa? Transforme em oportunidade."
-        imageSource={require("../../../assets/images/ImpactoColetivo.png")}
+        imageSource={require("../../../assets/images/cta/ImpactoColetivo.png")}
         buttonTitle="Publicar item"
         onPress={() => console.log("publique seu item!")}
         variant="compact"
