@@ -165,7 +165,6 @@ A escolha tipográfica combina personalidade e legibilidade, garantindo uma comu
 A fonte Syne é utilizada como tipografia de destaque. Seu desenho mais expressivo e moderno ajuda a construir a identidade visual da plataforma, sendo ideal para títulos e elementos que precisam chamar atenção. Por ora, utilizamos ela apenas no nome da marca.
 Já a Inter, nas variações Regular e Medium, foi escolhida para os textos da interface por sua alta legibilidade em telas.
 É uma tipografia amplamente utilizada em produtos digitais, funcionando bem em diferentes tamanhos de tela e garantindo uma leitura confortável em menus, descrições e conteúdos informativos.
-Ilustrações
 
 
 <img width="1054" height="352" alt="image" src="https://github.com/user-attachments/assets/1a9ffaac-59c8-4980-8b56-0e4ed382e7cb" />  
