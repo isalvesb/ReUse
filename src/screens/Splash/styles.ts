@@ -15,15 +15,15 @@ const styles = StyleSheet.create({
   },
 
   logo: {
-    width: 260,
-    height: 260,
-    marginBottom: 16,
+    width: 280,
+    height: 40,
+    marginBottom: 4,
   },
 
   slogan: {
     fontFamily: "Syne_400Regular",
-    fontSize: 32,
-    lineHeight: 80,
+    fontSize: 18,
+    lineHeight: 18,
     color: "#F7EFDE",
     textAlign: "center",
   },
