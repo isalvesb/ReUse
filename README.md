@@ -38,34 +38,70 @@ Este projeto foi desenvolvido utilizando as seguintes tecnologias:
 ## 📁 Estrutura do Projeto
 
 ```
-ReUse
-│
-├── assets
-├── src
-│   ├── components
-|   |   └── Button
-|   |   └── CategoryCard
-|   |   └── CtaCard
-|   |   └── Header
-|   |   └── ItemCard
-|   |   └── PromoCard
-│   │   └── SearchBar
-|   |   └── TabBar
-│   │
-│   ├── screens
-│   │   ├── Home
-│   │   
-│   │
-│   
-│
+REUSE/
+├── assets/
+│   └── images/
+│       ├── categorias/
+│       │   ├── infantil.jpg
+│       │   ├── luminaria.jpg
+│       │   ├── oculos.jpg
+│       │   └── roupas.jpg
+│       ├── cta/
+│       │   ├── HeroBannerCTA.png
+│       │   └── ImpactoColetivo.png
+│       ├── itens/
+│       │   ├── cadeira.jpg
+│       │   ├── jaqueta.jpg
+│       │   └── teclado.jpg
+│       ├── promo/
+│       │   ├── fotografia.jpg
+│       │   ├── livros.jpg
+│       │   ├── notebook.jpg
+│       │   ├── sapatos.jpg
+│       │   └── sofa.jpg
+│       ├── icon.png
+│       └── logotipo.png
+├── src/
+│   ├── components/
+│   │   ├── Button/
+│   │   │   ├── index.tsx
+│   │   │   └── styles.ts
+│   │   ├── CategoryCard/
+│   │   │   ├── index.tsx
+│   │   │   └── styles.ts
+│   │   ├── CtaCard/
+│   │   │   ├── index.tsx
+│   │   │   └── styles.ts
+│   │   ├── Header/
+│   │   │   ├── index.tsx
+│   │   │   └── styles.ts
+│   │   ├── ItemCard/
+│   │   │   ├── index.tsx
+│   │   │   └── styles.ts
+│   │   ├── PromoCard/
+│   │   │   ├── index.tsx
+│   │   │   └── styles.ts
+│   │   ├── SearchBar/
+│   │   │   ├── index.tsx
+│   │   │   └── styles.ts
+│   │   └── TabBar/
+│   │       ├── index.tsx
+│   │       └── styles.ts
+│   └── screens/
+│       ├── Home/
+│       │   ├── index.tsx
+│       │   └── styles.ts
+│       └── Splash/
+│           ├── index.tsx
+│           └── styles.ts
 ├── .gitignore
-├── App.js
 ├── app.json
+├── App.tsx
 ├── index.ts
 ├── package-lock.json
 ├── package.json
-├── tsconfig.json
-└── README.md
+├── README.md
+└── tsconfig.json
  
 ```
 
