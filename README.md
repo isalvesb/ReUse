@@ -30,7 +30,7 @@ Esta é a primeira fase do projeto ReUse, uma plataforma digital voltada à econ
 ## 🛠️ Tecnologias Utilizadas
 Este projeto foi desenvolvido utilizando as seguintes tecnologias: 
 <p>
-  <img src="https://skillicons.dev/icons?i=react,js,nodejs,git,github,vscode,figma" />
+  <img src="https://skillicons.dev/icons?i=react,js,nodejs,typescript,git,github,vscode,figma" />
 </p>
 
 ---
@@ -192,7 +192,7 @@ Como resultado dessa primeira sprint, temos nossa primeira versão da tela inici
 ---
 
 ## ⚙️ Pré-requisitos
-Antes de rodar o projetom você precisa ter instalado:
+Antes de rodar o projeto você precisa ter instalado:
 - **Node.js**
 - **Git**
 - **Expo CLI**
