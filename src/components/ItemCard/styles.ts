@@ -28,13 +28,14 @@ const styles = StyleSheet.create({
 
   title: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: "Inter_700Bold",
     color: "#342A2A",
   },
 
   caption: {
     fontSize: 14,
-    color: "#584C4C",
+    fontFamily: "Inter_400Regular",
+    color: "#A0947A",
   },
 });
 

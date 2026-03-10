@@ -7,15 +7,15 @@ const styles = StyleSheet.create({
 
   title: {
     fontSize: 18,
-    fontWeight: "700",
+    fontFamily: "Inter_700Bold",
     color: "#342A2A",
   },
 
   subtitle: {
     marginTop: 4,
     fontSize: 14,
-    fontWeight: "400",
-    color: "#584C4C",
+    fontFamily: "Inter_400Regular",
+    color: "#A0947A",
     lineHeight: 20,
   },
 

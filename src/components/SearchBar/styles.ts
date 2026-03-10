@@ -14,7 +14,8 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    color: "#584C4C",
+    fontFamily: "Inter_400Regular",
+    color: "#A0947A",
     marginLeft: 8,
   },
 

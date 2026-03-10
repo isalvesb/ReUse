@@ -9,12 +9,13 @@ const styles = StyleSheet.create({
   image: {},
 
   title: {
-    fontWeight: "700",
+    fontFamily: "Inter_700Bold",
   },
 
   subtitle: {
     fontSize: 16,
     lineHeight: 24,
+    fontFamily: "Inter_400Regular",
   },
 
   button: {
@@ -27,7 +28,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#342A2A",
     fontSize: 16,
-    fontWeight: "600",
+    fontFamily: "Inter_700Bold",
   },
 
   heroCard: {
@@ -48,10 +49,12 @@ const styles = StyleSheet.create({
     color: "#F7EFDE",
     marginBottom: 2,
     marginTop: 16,
+    fontFamily: "Inter_700Bold",
   },
 
   heroSubtitle: {
     color: "#F7EFDE",
+    fontFamily: "Inter_400Regular",
   },
 
   heroImage: {
@@ -87,16 +90,18 @@ const styles = StyleSheet.create({
     lineHeight: 28,
     color: "#342A2A",
     marginBottom: 12,
+    fontFamily: "Inter_700Bold",
   },
 
   compactSubtitle: {
     color: "#342A2A",
+    fontFamily: "Inter_400Regular",
   },
 
   highlightText: {
     fontSize: 18,
-    fontWeight: "700",
     color: "#342A2A",
+    fontFamily: "Inter_700Bold",
   },
 
   compactImage: {

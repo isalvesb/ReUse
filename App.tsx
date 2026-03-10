@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useFonts } from "expo-font";
 import { Syne_400Regular, Syne_800ExtraBold } from "@expo-google-fonts/syne";
+import { Inter_400Regular, Inter_500Medium, Inter_700Bold } from "@expo-google-fonts/inter";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { View } from "react-native";
 import { HomeScreen } from "./src/screens/Home/index";
@@ -11,6 +12,9 @@ export default function App() {
   const [fontsLoaded] = useFonts({
     Syne_400Regular,
     Syne_800ExtraBold,
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_700Bold,
   });
 
   const [showSplash, setShowSplash] = useState(true);

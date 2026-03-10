@@ -31,12 +31,12 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontSize: 10,
     color: "#F7EFDE",
-    fontWeight: "500",
+    fontFamily: "Inter_500Medium",
   },
 
   labelActive: {
     color: "#342A2A",
-    fontWeight: "600",
+    fontFamily: "Inter_500Medium",
   },
 });
 

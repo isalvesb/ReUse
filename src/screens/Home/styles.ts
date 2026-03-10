@@ -48,14 +48,15 @@ const styles = StyleSheet.create({
 
   sectionTitle: {
     fontSize: 20,
-    fontWeight: "700",
+    fontFamily: "Inter_700Bold",
     color: "#342A2A",
     marginBottom: 8,
   },
 
   caption: {
     fontSize: 16,
-    color: "#584C4C",
+    fontFamily: "Inter_400Regular",
+    color: "#A0947A",
     marginBottom: 16,
   },
 

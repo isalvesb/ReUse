@@ -15,8 +15,7 @@ const styles = StyleSheet.create({
 
   text: {
     fontSize: 14,
-    fontWeight: 500,
-    fontFamily: "Roboto",
+    fontFamily: "Inter_500Medium",
     justifyContent: "center",
     color: "#fff",
   },
