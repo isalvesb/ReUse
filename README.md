@@ -234,7 +234,8 @@ O protótipo do aplicativo foi desenvolvido no **Figma** para planejar a interfa
 
 Através do protótipo é possível visualizar o fluxo principal da aplicação, e como tudo foi pensado para chegarmos na entrega do projeto.
 
-Acesse o protótipo completo no link abaixo:  
+Acesse o protótipo completo no link abaixo: 
+
 [![Figma Prototype](https://img.shields.io/badge/Figma-ReUse-EADDFF?flat-rounded&logo=figma&logoColor=342A2A&labelColor=F7EFDE)](https://www.figma.com/design/NaexTrfbA7TNhsVIujyBsh/ReUse?m=auto&t=gwLTGc1gaEc1GZdf-6)
 
 ---
