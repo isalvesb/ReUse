@@ -282,7 +282,7 @@ Acesse o protótipo completo no link abaixo:
 </td>
 
 <td align="center">
-<img src="https://github.com/isalvesb.png" width="120px"><br>  
+<img src="https://github.com/isalvesb.png" width="130px"><br>  
 <b>Isa Alves</b><br><br>
 <a href="https://github.com/isalvesb">
 <img src="https://img.shields.io/badge/GitHub-Profile-EADDFF?style=flat-rounded&logo=github&logoColor=342A2A&labelColor=F7EFDE">
