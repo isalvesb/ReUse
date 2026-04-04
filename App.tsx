@@ -13,6 +13,33 @@ import { SplashScreen } from "./src/screens/Splash/index";
 import TabBar from "./src/components/TabBar";
 import { buscarToken } from "./src/Services/Auth";
 import { Login } from "./src/screens/Login";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
+const Stack = createNativeStackNavigator();
+
+function MainScreen() {
+  return (
+    <View style={{ flex: 1, backgroundColor: "#F7EFDE" }}>
+      <HomeScreen />
+      <TabBar />
+    </View>
+  );
+}
+
+function Routes({ initialRoute }: { initialRoute: "Login" | "HomeScreen" }) {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator
+        initialRouteName={initialRoute}
+        screenOptions={{ headerShown: false }}
+      >
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="HomeScreen" component={MainScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -54,10 +81,8 @@ export default function App() {
     };
   }, []);
 
-  // Aguarda fontes e verificação de login
   if (!fontsLoaded || carregandoLogin) return null;
 
-  // Splash Screen
   if (showSplash) {
     return (
       <SafeAreaProvider>
@@ -70,15 +95,8 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView
-        style={{ flex: 1, backgroundColor: "#F7EFDE" }}
-        edges={["top", "left", "right"]}
-      >
-        <View style={{ flex: 1, backgroundColor: "#F7EFDE" }}>
-          {logado ? <HomeScreen /> : <Login />}
-        </View>
-
-        {logado && <TabBar />}
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#F7EFDE" }}>
+        <Routes initialRoute={logado ? "HomeScreen" : "Login"} />
       </SafeAreaView>
     </SafeAreaProvider>
   );

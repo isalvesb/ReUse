@@ -3,16 +3,18 @@ import Button from "../../components/Button";
 import { useState } from "react";
 import { salvarToken } from "../../Services/Auth";
 import styles from "./styles";
+import { useNavigation } from "@react-navigation/native";
 
 export function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const navigation = useNavigation<any>();
 
   const handleLogin = async () => {
     // simulação de Login
     if (email && senha) {
       await salvarToken("");
-      alert("Login realizado com sucesso!");
+      navigation.navigate("HomeScreen");
     } else {
       alert("Preencha os campos");
     }
