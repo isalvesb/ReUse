@@ -95,7 +95,7 @@ export default function TabBar({ activeTab, onTabPress }: TabBarProps) {
       pointerEvents="box-none"
       style={[
         styles.floatingContainer,
-        { bottom: Math.max(insets.bottom, 10) - 30 },
+        { bottom: Math.max(insets.bottom, 10) -22 },
       ]}
     >
       <View style={styles.bar} onLayout={handleBarLayout}>
