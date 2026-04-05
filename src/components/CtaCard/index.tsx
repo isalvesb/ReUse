@@ -1,12 +1,12 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   Image,
   ImageSourcePropType,
+  Animated,
+  Pressable,
 } from "react-native";
-import Button from "../Button/index";
 import styles from "./styles";
 
 type CtaCardProps = {
@@ -30,6 +30,57 @@ export default function CtaCard({
 }: CtaCardProps) {
   const isHero = variant === "hero";
 
+  const buttonScale = useRef(new Animated.Value(1)).current;
+  const buttonOverlayOpacity = useRef(new Animated.Value(0)).current;
+
+  const animateButton = (toScale: number, toOpacity: number) => {
+    Animated.parallel([
+      Animated.spring(buttonScale, {
+        toValue: toScale,
+        useNativeDriver: true,
+        speed: 24,
+        bounciness: 0,
+      }),
+      Animated.timing(buttonOverlayOpacity, {
+        toValue: toOpacity,
+        duration: 120,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  const renderButton = (buttonStyle: object) => (
+    <Pressable
+      onPress={onPress}
+      onPressIn={() => animateButton(0.97, 0.08)}
+      onLongPress={() => animateButton(0.94, 0.16)}
+      onPressOut={() => animateButton(1, 0)}
+      delayLongPress={180}
+      style={buttonStyle}
+    >
+      <Animated.View
+        style={[
+          styles.button,
+          {
+            transform: [{ scale: buttonScale }],
+          },
+        ]}
+      >
+        <Text style={styles.buttonText}>{buttonTitle}</Text>
+
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            styles.buttonOverlay,
+            {
+              opacity: buttonOverlayOpacity,
+            },
+          ]}
+        />
+      </Animated.View>
+    </Pressable>
+  );
+
   if (isHero) {
     return (
       <View style={[styles.card, styles.heroCard]}>
@@ -44,12 +95,7 @@ export default function CtaCard({
           resizeMode="contain"
         />
 
-        <Button
-          title={buttonTitle}
-          onPress={onPress}
-          style={[styles.button, styles.heroButton]}
-          textStyle={styles.buttonText}
-        />
+        {renderButton(styles.heroButton)}
       </View>
     );
   }
@@ -78,12 +124,7 @@ export default function CtaCard({
           </Text>
         </View>
 
-        <Button
-          title={buttonTitle}
-          onPress={onPress}
-          style={[styles.button, styles.compactButton]}
-          textStyle={styles.buttonText}
-        />
+        {renderButton(styles.compactButton)}
       </View>
     </View>
   );

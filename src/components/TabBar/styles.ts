@@ -39,11 +39,38 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
 
+ tabInner: {
+  height: 58,
+  marginHorizontal: 2,
+  position: "relative",
+  justifyContent: "center",
+  alignItems: "center",
+},
+
   tabContent: {
+    width: 58,
     height: 58,
+    borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 4,
+    zIndex: 1,
+  },
+
+  tabOverlay: {
+    position: "absolute",
+    width: 70,
+    height: 70,
+    borderRadius: 999,
+    alignSelf: "center",
+  },
+
+  tabOverlayActive: {
+    backgroundColor: "#000",
+  },
+
+  tabOverlayInactive: {
+    backgroundColor: "#F7EFDE",
   },
 
   label: {

@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 24,
     paddingTop: 16,
-    paddingBottom: 48,
+    paddingBottom: 96,
   },
 
   searchWrap: {

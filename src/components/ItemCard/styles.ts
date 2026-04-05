@@ -6,6 +6,9 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
     gap: 12,
+    borderRadius: 12,
+    overflow: "hidden",
+    position: "relative",
   },
 
   imageWrap: {
@@ -36,6 +39,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "Inter_400Regular",
     color: "#A0947A",
+  },
+
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "#000",
+    borderRadius: 12,
   },
 });
 

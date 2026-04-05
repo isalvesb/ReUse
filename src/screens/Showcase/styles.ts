@@ -1,6 +1,4 @@
-import { Dimensions, StyleSheet } from "react-native";
-
-const { width } = Dimensions.get("window");
+import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   container: {
@@ -11,11 +9,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
 
-  animation: {
-    width: width * 2.5,
-    height: width * 2.5,
+  title: {
+    fontSize: 32,
+    fontFamily: "Syne_800ExtraBold",
+    color: "#342A2A",
+    textAlign: "center",
   },
-  
 });
 
 export default styles;

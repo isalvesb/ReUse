@@ -1,19 +1,43 @@
-import React from "react";
-import { View, Text, Image } from "react-native";
+import React, { useRef } from "react";
+import { Animated, View } from "react-native";
+import LottieView from "lottie-react-native";
 import styles from "./styles";
 
-export function SplashScreen() {
-  return (
-    <View style={styles.container}>
-      <View style={styles.content}>
-        <Image
-          source={require("../../../assets/images/logotipo.png")}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+type SplashScreenProps = {
+  onFinish: () => void;
+};
 
-        <Text style={styles.slogan}>Reutilizar é transformar</Text>
+export function SplashScreen({ onFinish }: SplashScreenProps) {
+  const opacity = useRef(new Animated.Value(1)).current;
+  const alreadyFinished = useRef(false);
+
+  const handleAnimationFinish = () => {
+    if (alreadyFinished.current) return;
+    alreadyFinished.current = true;
+
+    setTimeout(() => {
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }).start(() => {
+        onFinish();
+      });
+    }, 1000);
+  };
+
+  return (
+    <Animated.View style={[styles.container, { opacity }]}>
+      <View style={styles.animation}>
+        <LottieView
+          source={require("../../../assets/animations/splash.json")}
+          autoPlay
+          loop={false}
+          resizeMode="contain"
+          style={styles.animation}
+          onAnimationFinish={handleAnimationFinish}
+        />
       </View>
-    </View>
+    </Animated.View>
   );
 }

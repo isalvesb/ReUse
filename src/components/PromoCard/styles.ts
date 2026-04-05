@@ -19,10 +19,23 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 
-  image: {
+  imageWrapper: {
     width: "100%",
     height: 156,
     marginTop: 12,
+    borderRadius: 12,
+    overflow: "hidden",
+    position: "relative",
+  },
+
+  image: {
+    width: "100%",
+    height: "100%",
+  },
+
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "#000",
     borderRadius: 12,
   },
 });

@@ -15,12 +15,30 @@ const styles = StyleSheet.create({
     color: "#342A2A",
   },
 
-  icon: {
+  iconButton: {
     position: "absolute",
     right: 0,
+  },
+
+  iconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 999,
+    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  icon: {
     width: 36,
     height: 36,
     resizeMode: "contain",
+  },
+
+  iconOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "#000",
+    borderRadius: 999,
   },
 });
 

@@ -23,12 +23,20 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     paddingHorizontal: 20,
     paddingVertical: 14,
+    overflow: "hidden",
+    position: "relative",
   },
 
   buttonText: {
     color: "#342A2A",
     fontSize: 16,
     fontFamily: "Inter_700Bold",
+  },
+
+  buttonOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "#000",
+    borderRadius: 999,
   },
 
   heroCard: {

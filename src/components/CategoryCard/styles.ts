@@ -5,10 +5,20 @@ const styles = StyleSheet.create({
     width: "48%",
   },
 
+  imageWrapper: {
+    width: "100%",
+    borderRadius: 18,
+    overflow: "hidden",
+  },
+
   image: {
     width: "100%",
     height: 120,
-    borderRadius: 18,
+  },
+
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "#000",
   },
 });
 

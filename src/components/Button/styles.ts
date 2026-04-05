@@ -9,15 +9,34 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     justifyContent: "center",
     alignItems: "center",
-    gap: 8,
     borderRadius: 20,
+    overflow: "hidden",
+    position: "relative",
+  },
+
+  buttonPressed: {
+    transform: [{ scale: 0.97 }],
+  },
+
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "#000",
+    opacity: 0,
+  },
+
+  overlayPressed: {
+    opacity: 0.08,
+  },
+
+  overlayLongPress: {
+    opacity: 0.18,
   },
 
   text: {
     fontSize: 14,
     fontFamily: "Inter_500Medium",
-    justifyContent: "center",
-    color: "#fff",
+    color: "#FFFFFF",
+    zIndex: 1,
   },
 });
 

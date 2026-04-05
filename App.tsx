@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useFonts } from "expo-font";
 import { Syne_400Regular, Syne_800ExtraBold } from "@expo-google-fonts/syne";
 import {
@@ -6,35 +6,68 @@ import {
   Inter_500Medium,
   Inter_700Bold,
 } from "@expo-google-fonts/inter";
+import { StyleSheet, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { View } from "react-native";
-import { HomeScreen } from "./src/screens/Home/index";
-import { SplashScreen } from "./src/screens/Splash/index";
-import TabBar from "./src/components/TabBar";
-import { buscarToken } from "./src/Services/Auth";
-import { Login } from "./src/screens/Login";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-const Stack = createNativeStackNavigator();
+import { SplashScreen } from "./src/screens/Splash";
+import { Login } from "./src/screens/Login0";
+import { ForgotPass } from "./src/screens/ForgotPass";
+import { CreateAccount } from "./src/screens/CreateAccount";
+import { HomeScreen } from "./src/screens/Home";
+import { ChatsScreen } from "./src/screens/Chats";
+import { ShowcaseScreen } from "./src/screens/Showcase";
+import { PublishScreen } from "./src/screens/Publish";
+import TabBar from "./src/components/TabBar";
+
+type RootStackParamList = {
+  Login: undefined;
+  ForgotPass: undefined;
+  CreateAccount: undefined;
+  HomeScreen: undefined;
+};
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
+type TabName = "home" | "publicar" | "vitrine" | "chats";
 
 function MainScreen() {
+  const [activeTab, setActiveTab] = useState<TabName>("home");
+
+  const renderScreen = () => {
+    switch (activeTab) {
+      case "publicar":
+        return <PublishScreen />;
+      case "vitrine":
+        return <ShowcaseScreen />;
+      case "chats":
+        return <ChatsScreen />;
+      case "home":
+      default:
+        return <HomeScreen />;
+    }
+  };
+
   return (
-    <View style={{ flex: 1, backgroundColor: "#F7EFDE" }}>
-      <HomeScreen />
-      <TabBar />
+    <View style={styles.mainScreen}>
+      <View style={{ flex: 1 }}>{renderScreen()}</View>
+
+      <TabBar activeTab={activeTab} onTabPress={setActiveTab} />
     </View>
   );
 }
 
-function Routes({ initialRoute }: { initialRoute: "Login" | "HomeScreen" }) {
+function AppNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName={initialRoute}
+        initialRouteName="Login"
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="ForgotPass" component={ForgotPass} />
+        <Stack.Screen name="CreateAccount" component={CreateAccount} />
         <Stack.Screen name="HomeScreen" component={MainScreen} />
       </Stack.Navigator>
     </NavigationContainer>
@@ -51,53 +84,30 @@ export default function App() {
   });
 
   const [showSplash, setShowSplash] = useState(true);
-  const [logado, setLogado] = useState(false);
-  const [carregandoLogin, setCarregandoLogin] = useState(true);
 
-  useEffect(() => {
-    let timeoutId: ReturnType<typeof setTimeout>;
-
-    const iniciarApp = async () => {
-      try {
-        const token = await buscarToken();
-
-        if (token) {
-          setLogado(true);
-        }
-      } catch (error) {
-        console.log("Erro ao buscar token:", error);
-      } finally {
-        timeoutId = setTimeout(() => {
-          setShowSplash(false);
-          setCarregandoLogin(false);
-        }, 3000);
-      }
-    };
-
-    iniciarApp();
-
-    return () => {
-      if (timeoutId) clearTimeout(timeoutId);
-    };
-  }, []);
-
-  if (!fontsLoaded || carregandoLogin) return null;
-
-  if (showSplash) {
-    return (
-      <SafeAreaProvider>
-        <SafeAreaView style={{ flex: 1, backgroundColor: "#342A2A" }}>
-          <SplashScreen />
-        </SafeAreaView>
-      </SafeAreaProvider>
-    );
-  }
+  if (!fontsLoaded) return null;
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={{ flex: 1, backgroundColor: "#F7EFDE" }}>
-        <Routes initialRoute={logado ? "HomeScreen" : "Login"} />
+      <SafeAreaView style={styles.safeArea}>
+        {showSplash ? (
+          <SplashScreen onFinish={() => setShowSplash(false)} />
+        ) : (
+          <AppNavigator />
+        )}
       </SafeAreaView>
     </SafeAreaProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#F7EFDE",
+  },
+
+  mainScreen: {
+    flex: 1,
+    backgroundColor: "#F7EFDE",
+  },
+});

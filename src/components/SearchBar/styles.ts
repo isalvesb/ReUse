@@ -4,7 +4,6 @@ const styles = StyleSheet.create({
   container: {
     width: "100%",
     height: 56,
-    backgroundColor: "#F3E8D2",
     borderRadius: 28,
     flexDirection: "row",
     alignItems: "center",
@@ -15,7 +14,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontFamily: "Inter_400Regular",
-    color: "#A0947A",
+    color: "#342A2A",
     marginLeft: 8,
   },
 
