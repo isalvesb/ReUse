@@ -36,7 +36,7 @@ export function Login() {
 
       {/* Logo */}
       <Image
-        source={require("../../../assets/images/logotipoLogin")}
+        source={require("../../../assets/images/logotipoLogin.png")}
         style={styles.logoImage}
         resizeMode="contain"
       />
