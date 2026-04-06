@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import { Animated, View } from "react-native";
 import LottieView from "lottie-react-native";
 import styles from "./styles";
@@ -24,6 +24,14 @@ export function SplashScreen({ onFinish }: SplashScreenProps) {
         onFinish();
       });
     }, 1000);
+
+    useEffect(() => {
+      // Timer de segurança: se a animação travar, pula após 4 segundos
+      const timer = setTimeout(() => {
+        handleAnimationFinish();
+      }, 4000);
+      return () => clearTimeout(timer);
+    }, []);
   };
 
   return (

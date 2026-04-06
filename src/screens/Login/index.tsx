@@ -8,8 +8,9 @@ import {
   StatusBar,
   Image,
 } from "react-native";
-import { Ionicons, FontAwesome, AntDesign } from "@expo/vector-icons";
-import Button from "../../components/Button";
+import { Ionicons } from "@expo/vector-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faFacebook } from "@fortawesome/free-brands-svg-icons";
 import { salvarToken } from "../../Services/Auth";
 import styles from "./styles";
 import { useNavigation } from "@react-navigation/native";
@@ -36,7 +37,7 @@ export function Login() {
 
       {/* Logo */}
       <Image
-        source={require("../../../assets/images/logotipoLogin")}
+        source={require("../../../assets/images/logotipoLogin.png")}
         style={styles.logoImage}
         resizeMode="contain"
       />
@@ -44,21 +45,31 @@ export function Login() {
       {/* Botões Sociais */}
       <View style={styles.socialContainer}>
         <TouchableOpacity style={styles.socialButton}>
-          <AntDesign name="google" size={20} style={styles.socialIconG} />
+          <Image
+            source={{
+              uri: "https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg",
+            }}
+            style={{ width: 20, height: 20, marginRight: 10 }}
+          />
           <Text style={styles.socialButtonText}>Continuar com Google</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.socialButton}>
-          <FontAwesome name="facebook" size={20} style={styles.socialIconFb} />
+          <FontAwesomeIcon
+            icon={faFacebook}
+            size={20}
+            color="#1877F2"
+            style={styles.socialIcon}
+          />
           <Text style={styles.socialButtonText}>Continuar com Facebook</Text>
         </TouchableOpacity>
       </View>
 
       {/* Divisor 'ou' */}
       <View style={styles.dividerContainer}>
-        <View style={styles.line} />
+        <View style={styles.line}>_____________________</View>
         <Text style={styles.dividerText}>ou</Text>
-        <View style={styles.line} />
+        <View style={styles.line}>_____________________</View>
       </View>
 
       {/* Formulário */}
@@ -75,7 +86,7 @@ export function Login() {
             autoCapitalize="none"
           />
         </View>
-
+        {/* Input de Senha */}
         <Text style={styles.inputLabel}>Senha</Text>
         <View style={styles.inputWrapper}>
           <Ionicons
@@ -86,15 +97,20 @@ export function Login() {
           <TextInput
             style={styles.input}
             placeholder="........"
-            placeholderTextColor={"#666"}
+            placeholderTextColor={"#342a2a"}
+            value={senha}
+            onChangeText={setSenha}
             secureTextEntry={!passwordVisible}
           />
           <TouchableOpacity
             onPress={() => setPasswordVisible(!passwordVisible)}
+            style={styles.eyeIcon}
           >
             <Ionicons
               name={passwordVisible ? "eye-outline" : "eye-off-outline"}
               style={styles.inputIcon}
+              size={20}
+              color={"#342a2a"}
             />
           </TouchableOpacity>
         </View>
@@ -104,7 +120,7 @@ export function Login() {
         </TouchableOpacity>
 
         {/* Login Button */}
-        <TouchableOpacity style={styles.loginButton}>
+        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
           <Text style={styles.loginButtonText}>Entrar</Text>
         </TouchableOpacity>
 
