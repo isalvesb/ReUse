@@ -12,7 +12,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import { SplashScreen } from "./src/screens/Splash";
-import { Login } from "./src/screens/Login0";
+import { Login } from "./src/screens/Login";
 import { ForgotPass } from "./src/screens/ForgotPass";
 import { CreateAccount } from "./src/screens/CreateAccount";
 import { HomeScreen } from "./src/screens/Home";
