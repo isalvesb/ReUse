@@ -7,7 +7,9 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { salvarToken } from "../../Services/Auth";
 import styles from "./styles";
@@ -20,6 +22,7 @@ export function Login() {
   const [senha, setSenha] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
 
   const handleLogin = async () => {
     if (email && senha) {
@@ -31,7 +34,7 @@ export function Login() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#342A2A" />
 
       <KeyboardAvoidingView
@@ -39,7 +42,13 @@ export function Login() {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[
+            styles.scrollContent,
+            {
+              paddingTop: insets.top + 24,
+              paddingBottom: insets.bottom + 24,
+            },
+          ]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
@@ -164,6 +173,6 @@ export function Login() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }

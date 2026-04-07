@@ -12,10 +12,7 @@ const styles = StyleSheet.create({
 
   scrollContent: {
     flexGrow: 1,
-    justifyContent: "flex-start",
     alignItems: "center",
-    paddingTop: 36,
-    paddingBottom: 32,
     paddingHorizontal: 20,
   },
 
@@ -25,7 +22,7 @@ const styles = StyleSheet.create({
   },
 
   logoText: {
-    fontSize: 74,
+    fontSize: 56,
     lineHeight: 80,
     textAlign: "center",
     color: "#EBBBEB",
