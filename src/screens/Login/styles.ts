@@ -191,6 +191,38 @@ const styles = StyleSheet.create({
     opacity: 0.7,
     transform: [{ scale: 0.92 }],
   },
+
+  loadingLayer: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 20,
+  },
+
+  loadingBackdrop: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    backgroundColor: "#342A2A",
+  },
+
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(247, 239, 222, 0.3)",
+    zIndex: 20,
+  },
 });
 
 export default styles;

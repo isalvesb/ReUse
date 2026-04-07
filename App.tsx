@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useFonts } from "expo-font";
 import { Syne_400Regular, Syne_800ExtraBold } from "@expo-google-fonts/syne";
 import {
@@ -6,7 +6,7 @@ import {
   Inter_500Medium,
   Inter_700Bold,
 } from "@expo-google-fonts/inter";
-import { StyleSheet, View } from "react-native";
+import { Animated, Easing, StyleSheet, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -52,7 +52,6 @@ function MainScreen() {
   return (
     <View style={styles.mainScreen}>
       <View style={{ flex: 1 }}>{renderScreen()}</View>
-
       <TabBar activeTab={activeTab} onTabPress={setActiveTab} />
     </View>
   );
@@ -85,15 +84,48 @@ export default function App() {
 
   const [showSplash, setShowSplash] = useState(true);
 
+  const splashOpacity = useRef(new Animated.Value(1)).current;
+  const appOpacity = useRef(new Animated.Value(0)).current;
+
+  const handleSplashFinish = () => {
+    Animated.parallel([
+      Animated.timing(splashOpacity, {
+        toValue: 0,
+        duration: 450,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: true,
+      }),
+      Animated.timing(appOpacity, {
+        toValue: 1,
+        duration: 450,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: true,
+      }),
+    ]).start(({ finished }) => {
+      if (finished) {
+        setShowSplash(false);
+      }
+    });
+  };
+
   if (!fontsLoaded) return null;
 
   return (
     <SafeAreaProvider style={styles.safeArea}>
-        {showSplash ? (
-          <SplashScreen onFinish={() => setShowSplash(false)} />
-        ) : (
+      <View style={styles.root}>
+        <Animated.View style={[styles.appLayer, { opacity: appOpacity }]}>
           <AppNavigator />
+        </Animated.View>
+
+        {showSplash && (
+          <Animated.View
+            pointerEvents="auto"
+            style={[styles.splashLayer, { opacity: splashOpacity }]}
+          >
+            <SplashScreen onFinish={handleSplashFinish} />
+          </Animated.View>
         )}
+      </View>
     </SafeAreaProvider>
   );
 }
@@ -102,6 +134,24 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#F7EFDE",
+  },
+
+  root: {
+    flex: 1,
+    backgroundColor: "#F7EFDE",
+  },
+
+  appLayer: {
+    flex: 1,
+  },
+
+  splashLayer: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    zIndex: 20,
   },
 
   mainScreen: {

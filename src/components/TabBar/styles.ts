@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
     position: "relative",
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#342A2A",
+    backgroundColor: "hsla(0, 11%, 18%, 0.9)",
     borderRadius: 999,
     paddingVertical: 12,
     minHeight: 80,
@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     top: 10,
     left: 0,
     borderRadius: 999,
-    backgroundColor: "#EADDFF",
+    backgroundColor: "hsla(263, 100%, 93%, 0.9)",
   },
 
   tab: {
@@ -39,13 +39,13 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
 
- tabInner: {
-  height: 58,
-  marginHorizontal: 2,
-  position: "relative",
-  justifyContent: "center",
-  alignItems: "center",
-},
+  tabInner: {
+    height: 58,
+    marginHorizontal: 2,
+    position: "relative",
+    justifyContent: "center",
+    alignItems: "center",
+  },
 
   tabContent: {
     width: 58,

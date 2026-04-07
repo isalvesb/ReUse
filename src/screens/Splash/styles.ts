@@ -5,7 +5,7 @@ const { width } = Dimensions.get("window");
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#342a2a",
+    backgroundColor: "#F7EFDE",
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 24,

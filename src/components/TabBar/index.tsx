@@ -32,13 +32,9 @@ export default function TabBar({ activeTab, onTabPress }: TabBarProps) {
   const insets = useSafeAreaInsets();
   const translateX = useRef(new Animated.Value(0)).current;
 
-  const scaleValues = useRef(
-    TABS.map(() => new Animated.Value(1))
-  ).current;
+  const scaleValues = useRef(TABS.map(() => new Animated.Value(1))).current;
 
-  const overlayValues = useRef(
-    TABS.map(() => new Animated.Value(0))
-  ).current;
+  const overlayValues = useRef(TABS.map(() => new Animated.Value(0))).current;
 
   const activeIndex = TABS.findIndex((tab) => tab.name === activeTab);
   const tabWidth = barWidth > 0 ? barWidth / TABS.length : 0;
@@ -46,8 +42,7 @@ export default function TabBar({ activeTab, onTabPress }: TabBarProps) {
   useEffect(() => {
     if (!tabWidth || activeIndex < 0) return;
 
-    const toValue =
-      activeIndex * tabWidth + (tabWidth - INDICATOR_SIZE) / 2;
+    const toValue = activeIndex * tabWidth + (tabWidth - INDICATOR_SIZE) / 2;
 
     Animated.spring(translateX, {
       toValue,
@@ -95,7 +90,7 @@ export default function TabBar({ activeTab, onTabPress }: TabBarProps) {
       pointerEvents="box-none"
       style={[
         styles.floatingContainer,
-        { bottom: Math.max(insets.bottom, 10) -22 },
+        { bottom: Math.max(insets.bottom, 12) + 8 },
       ]}
     >
       <View style={styles.bar} onLayout={handleBarLayout}>

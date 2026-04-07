@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Animated, Dimensions, ScrollView, View, Text } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Header from "../../components/Header";
 import SearchBar from "../../components/SearchBar";
 import CtaCard from "../../components/CtaCard";
@@ -16,6 +17,7 @@ type RevealOnScrollProps = {
   scrollY: Animated.Value;
   delay?: number;
   offset?: number;
+  animateOnMount?: boolean;
 };
 
 function RevealOnScroll({
@@ -23,6 +25,7 @@ function RevealOnScroll({
   scrollY,
   delay = 0,
   offset = 280,
+  animateOnMount = false,
 }: RevealOnScrollProps) {
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(70)).current;
@@ -76,11 +79,24 @@ function RevealOnScroll({
     };
   }, [scrollY]);
 
+  useEffect(() => {
+    if (!animateOnMount) return;
+
+    const timer = setTimeout(() => {
+      startAnimation();
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [animateOnMount, delay]);
+
   return (
     <Animated.View
       onLayout={(event) => {
         layoutY.current = event.nativeEvent.layout.y;
-        maybeAnimate(0);
+
+        if (!animateOnMount) {
+          maybeAnimate(0);
+        }
       }}
       style={{
         opacity,
@@ -127,6 +143,7 @@ const promoCards = [
 
 export function HomeScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
+  const insets = useSafeAreaInsets();
 
   const [categoriesVisible, setCategoriesVisible] = useState(false);
   const [categoriesSectionY, setCategoriesSectionY] = useState(0);
@@ -263,7 +280,13 @@ export function HomeScreen() {
   return (
     <AnimatedScrollView
       style={styles.screen}
-      contentContainerStyle={styles.container}
+      contentContainerStyle={[
+        styles.container,
+        {
+          paddingTop: insets.top + 16,
+          paddingBottom: insets.bottom + 120,
+        },
+      ]}
       showsVerticalScrollIndicator={false}
       scrollEventThrottle={16}
       onScroll={Animated.event(
@@ -292,7 +315,11 @@ export function HomeScreen() {
         </View>
       </RevealOnScroll>
 
-      <RevealOnScroll scrollY={scrollY}>
+      <RevealOnScroll
+        scrollY={scrollY}
+        delay={120}
+        animateOnMount
+      >
         <View style={styles.promoSection}>
           <ScrollView
             horizontal
@@ -330,25 +357,45 @@ export function HomeScreen() {
         </RevealOnScroll>
 
         <View style={styles.grid}>
-          <Animated.View style={[styles.categoryAnimatedItem, getCategoryAnimatedStyle(categoryAnim1)]} >
+          <Animated.View
+            style={[
+              styles.categoryAnimatedItem,
+              getCategoryAnimatedStyle(categoryAnim1),
+            ]}
+          >
             <CategoryCard
               imageSource={require("../../../assets/images/categorias/roupas.jpg")}
             />
           </Animated.View>
 
-          <Animated.View style={[styles.categoryAnimatedItem, getCategoryAnimatedStyle(categoryAnim2)]} >
+          <Animated.View
+            style={[
+              styles.categoryAnimatedItem,
+              getCategoryAnimatedStyle(categoryAnim2),
+            ]}
+          >
             <CategoryCard
               imageSource={require("../../../assets/images/categorias/oculos.jpg")}
             />
           </Animated.View>
 
-          <Animated.View style={[styles.categoryAnimatedItem, getCategoryAnimatedStyle(categoryAnim3)]}>
+          <Animated.View
+            style={[
+              styles.categoryAnimatedItem,
+              getCategoryAnimatedStyle(categoryAnim3),
+            ]}
+          >
             <CategoryCard
               imageSource={require("../../../assets/images/categorias/luminaria.jpg")}
             />
           </Animated.View>
 
-          <Animated.View style={[styles.categoryAnimatedItem, getCategoryAnimatedStyle(categoryAnim4)]}>
+          <Animated.View
+            style={[
+              styles.categoryAnimatedItem,
+              getCategoryAnimatedStyle(categoryAnim4),
+            ]}
+          >
             <CategoryCard
               imageSource={require("../../../assets/images/categorias/infantil.jpg")}
             />
