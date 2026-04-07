@@ -1,4 +1,4 @@
-# <img width="50" height="50" alt="logo-reuse-marrom-png-150x94" src="https://github.com/user-attachments/assets/c4227434-f998-41f3-bdd5-43254f8434d7" /> ReUse
+# <img width="50" height="50" alt="logo-reuse-marrom-png-150x94" src="https://github.com/isalvesb/ReUse/blob/main/assets/images/logo-reuse-marrom-png-150x94.png" /> ReUse
 O **ReUse** é um aplicativo mobile desenvolvido com **React Native** e **Expo** que tem como objetivo incentivar a reutilização de objetos.
 A aplicação permite que usuários publiquem itens que não utilizam mais para que outras pessoas possam reutilizá-los, contribuindo para a sustentabilidade e redução de desperdício.
 

@@ -3,13 +3,13 @@ import {
   View,
   Text,
   TextInput,
-  Pressable,
+  TouchableOpacity,
+  SafeAreaView,
   StatusBar,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { salvarToken } from "../../Services/Auth";
 import styles from "./styles";
