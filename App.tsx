@@ -7,7 +7,7 @@ import {
   Inter_700Bold,
 } from "@expo-google-fonts/inter";
 import { StyleSheet, View } from "react-native";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
@@ -88,14 +88,12 @@ export default function App() {
   if (!fontsLoaded) return null;
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={styles.safeArea}>
+    <SafeAreaProvider style={styles.safeArea}>
         {showSplash ? (
           <SplashScreen onFinish={() => setShowSplash(false)} />
         ) : (
           <AppNavigator />
         )}
-      </SafeAreaView>
     </SafeAreaProvider>
   );
 }
@@ -103,11 +101,11 @@ export default function App() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#342a2a",
+    backgroundColor: "#F7EFDE",
   },
 
   mainScreen: {
     flex: 1,
-    backgroundColor: "#342a2a",
+    backgroundColor: "#F7EFDE",
   },
 });

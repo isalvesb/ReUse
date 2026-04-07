@@ -70,6 +70,10 @@ const styles = StyleSheet.create({
   itemList: {
     gap: 24,
   },
+
+  categoryAnimatedItem: {
+    width: "48%",
+  },
 });
 
 export default styles;

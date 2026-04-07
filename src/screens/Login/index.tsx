@@ -1,19 +1,21 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
-  SafeAreaView,
+  Pressable,
   StatusBar,
-  Image,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faFacebook } from "@fortawesome/free-brands-svg-icons";
 import { salvarToken } from "../../Services/Auth";
 import styles from "./styles";
 import { useNavigation } from "@react-navigation/native";
+import GoogleIcon from "../../../assets/images/google.svg";
+import FacebookIcon from "../../../assets/images/facebook.svg";
 
 export function Login() {
   const [email, setEmail] = useState("");
@@ -22,7 +24,6 @@ export function Login() {
   const navigation = useNavigation<any>();
 
   const handleLogin = async () => {
-    // simulação de Login
     if (email && senha) {
       await salvarToken("");
       navigation.navigate("HomeScreen");
@@ -33,105 +34,138 @@ export function Login() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle={"light-content"} />
+      <StatusBar barStyle="light-content" backgroundColor="#342A2A" />
 
-      {/* Logo */}
-      <Image
-        source={require("../../../assets/images/logotipoLogin.png")}
-        style={styles.logoImage}
-        resizeMode="contain"
-      />
+      <KeyboardAvoidingView
+        style={styles.keyboardContainer}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.content}>
+            <Text style={styles.logoText}>ReUse</Text>
 
-      {/* Botões Sociais */}
-      <View style={styles.socialContainer}>
-        <TouchableOpacity style={styles.socialButton}>
-          <Image
-            source={{
-              uri: "https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg",
-            }}
-            style={{ width: 20, height: 20, marginRight: 10 }}
-          />
-          <Text style={styles.socialButtonText}>Continuar com Google</Text>
-        </TouchableOpacity>
+            <View style={styles.socialContainer}>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.socialButton,
+                  pressed && styles.buttonPressed,
+                ]}
+              >
+                <View style={styles.socialIconWrapper}>
+                  <GoogleIcon width={18} height={18} />
+                </View>
+                <Text style={styles.socialButtonText}>Continuar com Google</Text>
+              </Pressable>
 
-        <TouchableOpacity style={styles.socialButton}>
-          <FontAwesomeIcon
-            icon={faFacebook}
-            size={20}
-            color="#1877F2"
-            style={styles.socialIcon}
-          />
-          <Text style={styles.socialButtonText}>Continuar com Facebook</Text>
-        </TouchableOpacity>
-      </View>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.socialButton,
+                  pressed && styles.buttonPressed,
+                ]}
+              >
+                <View style={styles.socialIconWrapper}>
+                  <FacebookIcon width={18} height={18} />
+                </View>
+                <Text style={styles.socialButtonText}>
+                  Continuar com Facebook
+                </Text>
+              </Pressable>
+            </View>
 
-      {/* Divisor 'ou' */}
-      <View style={styles.dividerContainer}>
-        <View style={styles.line}>_____________________</View>
-        <Text style={styles.dividerText}>ou</Text>
-        <View style={styles.line}>_____________________</View>
-      </View>
+            <View style={styles.dividerContainer}>
+              <View style={styles.line} />
+              <Text style={styles.dividerText}>ou</Text>
+              <View style={styles.line} />
+            </View>
 
-      {/* Formulário */}
-      <View style={styles.formContainer}>
-        <Text style={styles.inputLabel}>E-mail</Text>
-        <View style={styles.inputWrapper}>
-          <Ionicons name="mail-outline" size={20} style={styles.inputIcon} />
-          <TextInput
-            style={styles.input}
-            placeholder="seu@email.com"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-        </View>
-        {/* Input de Senha */}
-        <Text style={styles.inputLabel}>Senha</Text>
-        <View style={styles.inputWrapper}>
-          <Ionicons
-            name="lock-closed-outline"
-            size={20}
-            style={styles.inputIcon}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="........"
-            placeholderTextColor={"#342a2a"}
-            value={senha}
-            onChangeText={setSenha}
-            secureTextEntry={!passwordVisible}
-          />
-          <TouchableOpacity
-            onPress={() => setPasswordVisible(!passwordVisible)}
-            style={styles.eyeIcon}
-          >
-            <Ionicons
-              name={passwordVisible ? "eye-outline" : "eye-off-outline"}
-              style={styles.inputIcon}
-              size={20}
-              color={"#342a2a"}
-            />
-          </TouchableOpacity>
-        </View>
+            <View style={styles.formContainer}>
+              <Text style={styles.inputLabel}>E-mail</Text>
 
-        <TouchableOpacity style={styles.forgotPassword}>
-          <Text style={styles.forgotPasswordText}>Esqueceu a senha?</Text>
-        </TouchableOpacity>
+              <View style={styles.inputWrapper}>
+                <Ionicons
+                  name="mail-outline"
+                  size={20}
+                  color="#342A2A"
+                  style={styles.inputIcon}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="seu@email.com"
+                  placeholderTextColor="#9B9B9B"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              </View>
 
-        {/* Login Button */}
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Entrar</Text>
-        </TouchableOpacity>
+              <Text style={styles.inputLabel}>Senha</Text>
 
-        {/* Footer */}
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Não tem uma conta?</Text>
-          <TouchableOpacity>
-            <Text style={styles.signUpText}>Criar conta</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+              <View style={styles.inputWrapper}>
+                <Ionicons
+                  name="lock-closed-outline"
+                  size={20}
+                  color="#342A2A"
+                  style={styles.inputIcon}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="••••••••"
+                  placeholderTextColor="#342A2A"
+                  value={senha}
+                  onChangeText={setSenha}
+                  secureTextEntry={!passwordVisible}
+                />
+                <Pressable
+                  onPress={() => setPasswordVisible(!passwordVisible)}
+                  style={({ pressed }) => [
+                    styles.eyeIcon,
+                    pressed && styles.iconPressed,
+                  ]}
+                >
+                  <Ionicons
+                    name={passwordVisible ? "eye-outline" : "eye-off-outline"}
+                    size={20}
+                    color="#342A2A"
+                  />
+                </Pressable>
+              </View>
+
+              <Pressable
+                style={({ pressed }) => [
+                  styles.forgotPassword,
+                  pressed && styles.textButtonPressed,
+                ]}
+              >
+                <Text style={styles.forgotPasswordText}>Esqueceu a senha?</Text>
+              </Pressable>
+
+              <Pressable
+                onPress={handleLogin}
+                style={({ pressed }) => [
+                  styles.loginButton,
+                  pressed && styles.loginButtonPressed,
+                ]}
+              >
+                <Text style={styles.loginButtonText}>Entrar</Text>
+              </Pressable>
+
+              <View style={styles.footer}>
+                <Text style={styles.footerText}>Não tem uma conta?</Text>
+                <Pressable
+                  style={({ pressed }) => pressed && styles.textButtonPressed}
+                >
+                  <Text style={styles.signUpText}>Criar conta</Text>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
