@@ -124,7 +124,9 @@ export function Login() {
                   <View style={styles.socialIconWrapper}>
                     <GoogleIcon width={18} height={18} />
                   </View>
-                  <Text style={styles.socialButtonText}>Continuar com Google</Text>
+                  <Text style={styles.socialButtonText}>
+                    Continuar com Google
+                  </Text>
                 </Pressable>
 
                 <Pressable
@@ -207,12 +209,15 @@ export function Login() {
 
                 <Pressable
                   disabled={isLoading}
+                  onPress={() => navigation.navigate("ForgotPass")}
                   style={({ pressed }) => [
                     styles.forgotPassword,
                     pressed && styles.textButtonPressed,
                   ]}
                 >
-                  <Text style={styles.forgotPasswordText}>Esqueceu a senha?</Text>
+                  <Text style={styles.forgotPasswordText}>
+                    Esqueceu a senha?
+                  </Text>
                 </Pressable>
 
                 <Pressable
