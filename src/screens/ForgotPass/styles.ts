@@ -8,8 +8,8 @@ const styles = StyleSheet.create({
 
   content: {
     flex: 1,
-    // justifyContent: "center",
     paddingHorizontal: 20,
+    marginTop: 12,
   },
 
   back: {

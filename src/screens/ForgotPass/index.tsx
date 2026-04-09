@@ -2,12 +2,18 @@ import React, { useState } from "react";
 import { View, Text, TextInput, Image, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import styles from "./styles";
 
+type RootStackParamList = {
+  ResetEmailSent: { email: string };
+};
+
 export function ForgotPass() {
   const [email, setEmail] = useState("");
-  const navigation = useNavigation();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const insets = useSafeAreaInsets();
 
   const handleSend = () => {
@@ -17,6 +23,7 @@ export function ForgotPass() {
     }
 
     alert("Link enviado para redefinir senha!");
+    navigation.navigate("ResetEmailSent", { email });
   };
 
   return (
@@ -52,6 +59,8 @@ export function ForgotPass() {
           <Ionicons name="mail-outline" size={20} color={"#999"} />
           <TextInput
             placeholder="seu@email.com"
+            keyboardType="email-address"
+            autoCapitalize="none"
             value={email}
             onChangeText={setEmail}
             style={styles.input}

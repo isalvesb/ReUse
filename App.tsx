@@ -10,10 +10,11 @@ import { Animated, Easing, StyleSheet, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-
+import { Ionicons } from "@expo/vector-icons";
 import { SplashScreen } from "./src/screens/Splash";
 import { Login } from "./src/screens/Login";
 import { ForgotPass } from "./src/screens/ForgotPass";
+import { ResetEmailSent } from "./src/screens/ResetEmailSent";
 import { CreateAccount } from "./src/screens/CreateAccount";
 import { HomeScreen } from "./src/screens/Home";
 import { ChatsScreen } from "./src/screens/Chats";
@@ -26,6 +27,7 @@ type RootStackParamList = {
   ForgotPass: undefined;
   CreateAccount: undefined;
   HomeScreen: undefined;
+  ResetEmailSent: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -68,12 +70,15 @@ function AppNavigator() {
         <Stack.Screen name="ForgotPass" component={ForgotPass} />
         <Stack.Screen name="CreateAccount" component={CreateAccount} />
         <Stack.Screen name="HomeScreen" component={MainScreen} />
+        <Stack.Screen name="ResetEmailSent" component={ResetEmailSent} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
 
 export default function App() {
+  Ionicons.loadFont();
+
   const [fontsLoaded] = useFonts({
     Syne_400Regular,
     Syne_800ExtraBold,
