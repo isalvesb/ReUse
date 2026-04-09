@@ -237,7 +237,12 @@ export function Login() {
                     disabled={isLoading}
                     style={({ pressed }) => pressed && styles.textButtonPressed}
                   >
-                    <Text style={styles.signUpText}>Criar conta</Text>
+                    <Text
+                      onPress={() => navigation.navigate("CreateAccount")}
+                      style={styles.signUpText}
+                    >
+                      Criar conta
+                    </Text>
                   </Pressable>
                 </View>
               </View>
