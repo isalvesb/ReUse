@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import {
   View,
   Text,
@@ -16,6 +16,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
+import { salvar, buscar } from "../../Services/Storage";
 import styles from "./styles";
 
 type Condition = "novo" | "como_novo" | "bom_estado" | "regular";
@@ -55,14 +56,46 @@ const CATEGORIES = [
 export function PublishScreen({ navigation, userItemCount = 0 }: any) {
   const insets = useSafeAreaInsets(); 
   const [photos, setPhotos]                       = useState<PhotoItem[]>([]);
-  const [title, setTitle]                         = useState("");
-  const [category, setCategory]                   = useState("");
+  const [title, setTitle]           = useState("");
+  const [category, setCategory]     = useState("");
   const [showCategoryModal, setShowCategoryModal] = useState(false);
-  const [condition, setCondition]                 = useState<Condition | null>(null);
-  const [description, setDescription]             = useState("");
-  const [location, setLocation]                   = useState("");
+  const [condition, setCondition]   = useState<Condition | null>(null);
+  const [description, setDescription] = useState("");
+  const [location, setLocation]     = useState("");
   const [uploading, setUploading]                 = useState(false);
 
+  const salvarTitulo = (v: string) => {
+  setTitle(v);
+  salvar("draft_title", v);
+};
+
+const salvarCategoria = (v: string) => {
+  setCategory(v);
+  salvar("draft_category", v);
+};
+
+const salvarCondicao = (v: Condition) => {
+  setCondition(v);
+  salvar("draft_condition", v);
+};
+
+const salvarDescricao = (v: string) => {
+  setDescription(v);
+  salvar("draft_description", v);
+};
+
+const salvarLocalizacao = (v: string) => {
+  setLocation(v);
+  salvar("draft_location", v);
+};
+
+const limparRascunho = async () => {
+  await salvar("draft_title", "");
+  await salvar("draft_category", "");
+  await salvar("draft_condition", "");
+  await salvar("draft_description", "");
+  await salvar("draft_location", "");
+};
 
   const abrirCamera = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -143,11 +176,12 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
   Alert.alert("Publicado!", "Seu item foi publicado com sucesso. 🎉", [
   { text: "OK", onPress: () => {
     setPhotos([]);
-    setTitle("");
-    setCategory("");
+    salvarTitulo("");
+    salvarCategoria("");
     setCondition(null);
-    setDescription("");
-    setLocation("");
+    salvar("draft_condition", "");
+    salvarDescricao("");
+    salvarLocalizacao("");
     navigation?.goBack();
   }},
 ]);
@@ -157,6 +191,24 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
   setUploading(false);
 }
 };
+
+useEffect(() => {
+  const carregarRascunho = async () => {
+    const t    = await buscar("draft_title");
+    const cat  = await buscar("draft_category");
+    const cond = await buscar("draft_condition");
+    const desc = await buscar("draft_description");
+    const loc  = await buscar("draft_location");
+
+    if (t)    setTitle(t);
+    if (cat)  setCategory(cat);
+    if (cond) setCondition(cond as Condition);
+    if (desc) setDescription(desc);
+    if (loc)  setLocation(loc);
+  };
+
+  carregarRascunho();
+}, []);
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 140 }}>
@@ -250,7 +302,7 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
           style={styles.input}
           placeholder="Ex: Cadeira de escritório ergonômica"
           value={title}
-          onChangeText={setTitle}
+          onChangeText={salvarTitulo}
           placeholderTextColor="#aaa"
         />
 
@@ -272,7 +324,7 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
             <TouchableOpacity
               key={c}
               style={[styles.conditionBtn, condition === c && styles.conditionBtnActive]}
-              onPress={() => setCondition(c)}
+              onPress={() => salvarCondicao(c)}
             >
               <Text style={[styles.conditionText, condition === c && styles.conditionTextActive]}>
                 {c === "novo"        ? "Novo"
@@ -289,7 +341,7 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
           style={[styles.input, { height: 100, textAlignVertical: "top" }]}
           placeholder="Descreva o item, suas características"
           value={description}
-          onChangeText={setDescription}
+          onChangeText={salvarDescricao}
           multiline
           placeholderTextColor="#aaa"
         />
@@ -302,7 +354,7 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
             style={styles.inputRowField}
             placeholder="Ex: Centro, São Paulo - SP"
             value={location}
-            onChangeText={setLocation}
+            onChangeText={salvarLocalizacao}
             placeholderTextColor="#aaa"
           />
         </View>
@@ -352,7 +404,7 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
                 <TouchableOpacity
                   style={[styles.modalItem, category === item && styles.modalItemActive]}
                   onPress={() => {
-                    setCategory(item);
+                    salvarCategoria(item);
                     setShowCategoryModal(false);
                   }}
                 >
