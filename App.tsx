@@ -47,9 +47,10 @@ function MainScreen() {
         return <ChatsScreen />;
       case "home":
       default:
-        return <HomeScreen />;
+        return <HomeScreen onNavigateToPublish={() => setActiveTab("publicar")} />
     }
-  };
+  }
+
 
   return (
     <View style={styles.mainScreen}>

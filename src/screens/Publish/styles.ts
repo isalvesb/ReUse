@@ -69,9 +69,9 @@ const styles = StyleSheet.create({
   },
 
   milestoneIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+    width: 63,
+    height: 94,
+    borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -82,9 +82,9 @@ const styles = StyleSheet.create({
 
   milestoneIconLocked: {
     backgroundColor: "#3D3020",
-    borderWidth: 1,
-    borderColor: "#4A3D28",
-    borderStyle: "dashed",
+    borderWidth: 1.18,
+    borderColor: "#FFFFFF20",
+    borderStyle: "solid",
   },
 
   milestoneLabel: {

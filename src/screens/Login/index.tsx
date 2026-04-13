@@ -10,10 +10,12 @@ import {
   Pressable,
   Animated,
   Easing,
+  Alert,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { salvarToken } from "../../Services/Auth";
+import {buscar} from "../../Services/Storage"
 import styles from "./styles";
 import { useNavigation } from "@react-navigation/native";
 import GoogleIcon from "../../../assets/images/google.svg";
@@ -22,7 +24,7 @@ import { LoadingAnimation } from "../../components/LoadingAnimation";
 
 export function Login() {
   const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
+  const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -32,7 +34,7 @@ export function Login() {
   const overlayProgress = useRef(new Animated.Value(0)).current;
 
   const handleLogin = async () => {
-    if (!email || !senha) {
+    if (!email || !password) {
       alert("Preencha os campos");
       return;
     }
@@ -49,12 +51,25 @@ export function Login() {
     }).start();
 
     try {
-      await salvarToken("");
-
+      const usuarioRaw = await buscar(`user:${email}`);
+ 
+      if (!usuarioRaw) {
+        throw new Error("Usuário não encontrado.");
+      }
+ 
+      const usuario = JSON.parse(usuarioRaw);
+ 
+      if (usuario.password !== password) {
+        throw new Error("Senha incorreta.");
+      }
+ 
+      await salvarToken(email);
+ 
       setTimeout(() => {
         navigation.replace("HomeScreen");
       }, 1200);
-    } catch (error) {
+ 
+    } catch (error: any) {
       Animated.timing(overlayProgress, {
         toValue: 0,
         duration: 180,
@@ -63,10 +78,11 @@ export function Login() {
       }).start(() => {
         setIsLoading(false);
       });
-
-      alert("Não foi possível entrar agora. Tente novamente.");
+ 
+      Alert.alert("Erro ao entrar", error.message || "Tente novamente.");
     }
   };
+ 
 
   const contentOpacity = overlayProgress.interpolate({
     inputRange: [0, 1],
@@ -184,12 +200,10 @@ export function Login() {
                   />
                   <TextInput
                     style={styles.input}
-                    placeholder="••••••••"
-                    placeholderTextColor="#342A2A"
-                    value={senha}
-                    onChangeText={setSenha}
+                    placeholder="Mínimo 8 caracteres"
                     secureTextEntry={!passwordVisible}
-                    editable={!isLoading}
+                    value={password}              
+                    onChangeText={setPassword}    
                   />
                   <Pressable
                     disabled={isLoading}

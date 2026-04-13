@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Animated, Dimensions, ScrollView, View, Text } from "react-native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Header from "../../components/Header";
 import SearchBar from "../../components/SearchBar";
@@ -7,6 +8,9 @@ import CtaCard from "../../components/CtaCard";
 import { PromoCard } from "../../components/PromoCard";
 import { CategoryCard } from "../../components/CategoryCard";
 import { ItemCard } from "../../components/ItemCard";
+import { IncentiveModal } from "../../components/IncentiveCard";
+import { salvar, buscar } from "../../Services/Storage";
+import { buscarToken } from "../../Services/Auth";
 import styles from "./styles";
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
@@ -141,7 +145,33 @@ const promoCards = [
   },
 ];
 
-export function HomeScreen() {
+interface HomeScreenProps {
+  onNavigateToPublish?: () => void;
+}
+
+export function HomeScreen({ onNavigateToPublish }: HomeScreenProps) {
+  const [showIncentive, setShowIncentive] = useState(false);
+
+useFocusEffect(
+  useCallback(() => {
+    let timer: ReturnType<typeof setTimeout>;
+
+    const verificar = async () => {
+      const emailUsuario = await buscarToken();
+      if (!emailUsuario) return;
+
+      const jaViu = await buscar(`incentive_seen:${emailUsuario}`);
+      if (jaViu !== "true") {
+        timer = setTimeout(() => setShowIncentive(true), 2000);
+      }
+    };
+
+    verificar();
+
+    return () => clearTimeout(timer); 
+  }, [])
+);
+
   const scrollY = useRef(new Animated.Value(0)).current;
   const insets = useSafeAreaInsets();
 
@@ -278,6 +308,7 @@ export function HomeScreen() {
   });
 
   return (
+    <>
     <AnimatedScrollView
       style={styles.screen}
       contentContainerStyle={[
@@ -463,7 +494,28 @@ export function HomeScreen() {
           onPress={() => console.log("publique seu item!")}
           variant="compact"
         />
+
       </RevealOnScroll>
+
     </AnimatedScrollView>
-  );
+    <IncentiveModal
+      visible={showIncentive}
+      onClose={async () => {
+        const emailUsuario = await buscarToken();
+        if (emailUsuario) {
+          await salvar(`incentive_seen:${emailUsuario}`, "true");
+        }
+        setShowIncentive(false);
+      }}
+      onPublish={async () => {
+        const emailUsuario = await buscarToken();
+        if (emailUsuario) {
+          await salvar(`incentive_seen:${emailUsuario}`, "true");
+        }
+        setShowIncentive(false);
+        onNavigateToPublish?.();
+      }}
+    />
+        </>
+      );
 }

@@ -17,6 +17,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { salvar, buscar } from "../../Services/Storage";
+import { IncentiveCard } from "../../components/IncentiveCard";
 import styles from "./styles";
 
 type Condition = "novo" | "como_novo" | "bom_estado" | "regular";
@@ -236,7 +237,7 @@ useEffect(() => {
                   done ? styles.milestoneIconDone : styles.milestoneIconLocked,
                 ]}>
                   {done
-                    ? <Ionicons name="leaf"        size={26} color="#FFFFFF" />
+                    ? <Ionicons name="leaf"        size={20} color="#FFFFFF" />
                     : <Ionicons name="lock-closed" size={20} color="#888780" />
                   }
                 </View>
@@ -249,21 +250,7 @@ useEffect(() => {
         </View>
       </View>
 
-      <View style={styles.incentiveCard}>
-        <Ionicons name="sparkles" size={32} color="#F5C542" />
-        <Text style={styles.incentiveTitle}>Publique agora seu primeiro item</Text>
-        <Text style={styles.incentiveBody}>
-          Publique seu primeiro item e desbloqueie benefícios incríveis! Veja o que te aguarda:
-        </Text>
-        {REWARDS.map((r) => (
-          <View key={r.threshold} style={styles.rewardRow}>
-            <View style={styles.rewardIcon}>
-              <Text>{r.icon}</Text>
-            </View>
-            <Text style={styles.rewardText}>{r.text}</Text>
-          </View>
-        ))}
-      </View>
+      <IncentiveCard />
 
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Fotos do Item</Text>
