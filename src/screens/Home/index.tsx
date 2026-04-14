@@ -340,7 +340,7 @@ useFocusEffect(
             subtitle="ao que você não usa mais"
             imageSource={require("../../../assets/images/cta/HeroBannerCTA.png")}
             buttonTitle="Publicar item"
-            onPress={() => console.log("publique seu item!")}
+            onPress={() => onNavigateToPublish?.()}
             variant="hero"
           />
         </View>
@@ -491,7 +491,7 @@ useFocusEffect(
           subtitle="ganharam um novo destino este mês. Tem algo parado em casa? Transforme em oportunidade."
           imageSource={require("../../../assets/images/cta/ImpactoColetivo.png")}
           buttonTitle="Publicar item"
-          onPress={() => console.log("publique seu item!")}
+          onPress={() => onNavigateToPublish?.()}
           variant="compact"
         />
 
