@@ -53,10 +53,14 @@ const styles = StyleSheet.create({
 
   input: {
     flex: 1,
-    paddingVertical: 12,
+    height: 48,
+    paddingVertical: 0,
     marginLeft: 8,
     fontSize: 16,
-    color: "#99A1AF",
+    fontFamily: "Inter_400Regular",
+    color: "#342A2A",
+    textAlignVertical: "center",
+    includeFontPadding: false,
   },
 
   button: {

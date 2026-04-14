@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
- screen: {
+  screen: {
     flex: 1,
     backgroundColor: "#F7EFDE",
   },
@@ -13,20 +13,19 @@ const styles = StyleSheet.create({
   },
 
   navBar: {
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "center",
-  paddingHorizontal: 16,
-  paddingVertical: 14,
-  backgroundColor: "#342A2A",
-},
- 
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    backgroundColor: "#342A2A",
+  },
+
   navTitle: {
     fontSize: 16,
     fontFamily: "Inter_700Bold",
     color: "#FFFFFF",
   },
-
 
   journeyCard: {
     backgroundColor: "#2C2416",
@@ -56,7 +55,6 @@ const styles = StyleSheet.create({
     color: "#888780",
     marginTop: 2,
   },
-
 
   milestoneRow: {
     flexDirection: "row",
@@ -97,7 +95,6 @@ const styles = StyleSheet.create({
   milestoneLabelDone: {
     color: "#A8C89A",
   },
-
 
   incentiveCard: {
     backgroundColor: "#2C2416",
@@ -152,7 +149,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
- 
   card: {
     backgroundColor: "#FFFFFF",
     margin: 16,
@@ -176,7 +172,6 @@ const styles = StyleSheet.create({
     color: "#888780",
     marginBottom: 4,
   },
-
 
   photoThumb: {
     width: 80,
@@ -239,7 +234,6 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
 
-
   label: {
     fontSize: 14,
     fontFamily: "Inter_400Regular",
@@ -257,10 +251,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E0E0E0",
     borderRadius: 10,
-    padding: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
     fontSize: 14,
     fontFamily: "Inter_400Regular",
-    lineHeight: 24,
+    lineHeight: 20,
     color: "#342A2A",
     backgroundColor: "#FAFAFA",
   },
@@ -277,11 +272,14 @@ const styles = StyleSheet.create({
 
   inputRowField: {
     flex: 1,
-    paddingVertical: 12,
+    height: 48,
+    paddingVertical: 0,
     fontSize: 14,
     fontFamily: "Inter_400Regular",
-    lineHeight: 24,
+    lineHeight: 20,
     color: "#342A2A",
+    textAlignVertical: "center",
+    includeFontPadding: false,
   },
 
   inputDropdown: {
@@ -333,7 +331,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#FFFFFF",
-    minHeight: 56
+    minHeight: 56,
   },
 
   conditionBtnActive: {
@@ -353,16 +351,14 @@ const styles = StyleSheet.create({
     color: "#3B6D11",
   },
 
-
-
   tipBox: {
-  marginHorizontal: 16,
-  marginBottom: 16,
-  backgroundColor: "#FFFBEB",
-  borderColor: "#FEE685",
-  borderWidth: 2,
-  borderRadius: 12,
-  padding: 12,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    backgroundColor: "#FFFBEB",
+    borderColor: "#FEE685",
+    borderWidth: 2,
+    borderRadius: 12,
+    padding: 12,
   },
 
   tip: {
@@ -408,7 +404,6 @@ const styles = StyleSheet.create({
     color: "#4A6741",
     textDecorationLine: "underline",
   },
-
 
   modalOverlay: {
     flex: 1,
@@ -470,7 +465,6 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_700Bold",
   },
 
-
   cameraControls: {
     position: "absolute",
     bottom: 40,
@@ -509,33 +503,32 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 
-shutterInner: {
-  width: 56,
-  height: 56,
-  borderRadius: 28,
-  backgroundColor: "#fff",
-},
+  shutterInner: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "#fff",
+  },
 
-sideBtn: {
-  width: 48,
-  height: 48,
-  borderRadius: 24,
-  backgroundColor: "rgba(0,0,0,0.4)",
-  alignItems: "center",
-  justifyContent: "center",
-},
+  sideBtn: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 
-controls: {
-  position: "absolute",
-  bottom: 48,
-  left: 0,
-  right: 0,
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "space-around",
-  paddingHorizontal: 32,
-},
-  
+  controls: {
+    position: "absolute",
+    bottom: 48,
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    paddingHorizontal: 32,
+  },
 });
 
 export default styles;

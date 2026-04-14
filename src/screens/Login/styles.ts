@@ -110,9 +110,13 @@ const styles = StyleSheet.create({
 
   input: {
     flex: 1,
+    height: "100%",
     color: "#342A2A",
     fontSize: 16,
     fontFamily: "Inter_400Regular",
+    paddingVertical: 0,
+    textAlignVertical: "center",
+    includeFontPadding: false,
   },
 
   eyeIcon: {

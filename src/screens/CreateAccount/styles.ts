@@ -96,10 +96,13 @@ const styles = StyleSheet.create({
 
   input: {
     flex: 1,
+    height: "100%",
     color: "#342A2A",
     fontFamily: "Inter_400Regular",
     fontSize: 16,
-    gap: 18,
+    paddingVertical: 0,
+    textAlignVertical: "center",
+    includeFontPadding: false,
   },
 
   createButton: {

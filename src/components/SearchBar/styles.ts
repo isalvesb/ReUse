@@ -16,11 +16,13 @@ const styles = StyleSheet.create({
 
   input: {
     flex: 1,
+    height: "100%",
     fontSize: 16,
     fontFamily: "Inter_400Regular",
     color: "#342A2A",
     marginLeft: 8,
     paddingVertical: 0,
+    textAlignVertical: "center",
     includeFontPadding: false,
   },
 
