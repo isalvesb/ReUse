@@ -10,6 +10,7 @@ import {
   ScrollView,
   Image,
   Alert,
+  Pressable,
 } from "react-native";
 import { KeyboardAvoidingView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -75,7 +76,13 @@ const handleCreateAccount = async () => {
           contentContainerStyle={styles.container}
           showsVerticalScrollIndicator={false}
         >
-          {/* Logo */}
+          <Pressable
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Ionicons name="arrow-back" size={20} color="#342A2A" />
+            <Text style={styles.backText}>Voltar</Text>
+          </Pressable>
           <View style={styles.logoContainer}>
             <Image
               source={require("../../../assets/images/ReUse-logo-marrom.png")}
@@ -159,12 +166,12 @@ const handleCreateAccount = async () => {
                 color={"#342A2A"}
                 style={styles.inputIcon}
               />
-            <TextInput
-            style={styles.input}
-            placeholder="Cidade, Estado"
-            value={location}
-            onChangeText={setLocation}
-          />
+              <TextInput
+                style={styles.input}
+                placeholder="Cidade, Estado"
+                value={location}
+                onChangeText={setLocation}
+              />
             </View>
           </View>
 
@@ -204,13 +211,13 @@ const handleCreateAccount = async () => {
                 color={"#342A2A"}
                 style={styles.inputIcon}
               />
-            <TextInput
-              style={styles.input}
-              placeholder="Digite a senha novamente"
-              secureTextEntry={!showConfirmPass}
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-            />
+              <TextInput
+                style={styles.input}
+                placeholder="Digite a senha novamente"
+                secureTextEntry={!showConfirmPass}
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+              />
               <TouchableOpacity
                 onPress={() => setShowConfirmPass(!showConfirmPass)}
               >
@@ -224,7 +231,10 @@ const handleCreateAccount = async () => {
           </View>
 
           {/* Botão Criar Conta */}
-          <TouchableOpacity style={styles.createButton} onPress={handleCreateAccount}>
+          <TouchableOpacity
+            style={styles.createButton}
+            onPress={handleCreateAccount}
+          >
             <Text style={styles.createButtonText}>Criar Conta</Text>
           </TouchableOpacity>
         </ScrollView>

@@ -28,24 +28,21 @@ export function ForgotPass() {
 
   return (
     <View style={styles.container}>
-      {/* Voltar */}
-      <View style={{ paddingTop: insets.top + 20 }}>
-        <Pressable onPress={() => navigation.goBack()}>
-          <Text style={styles.back}>← Voltar</Text>
+      <View style={[styles.backWrap, { paddingTop: insets.top + 12 }]}>
+        <Pressable style={styles.backButton} onPress={() => navigation.goBack()} >
+          <Ionicons name="arrow-back" size={20} color="#342A2A" />
+          <Text style={styles.back}>Voltar</Text>
         </Pressable>
       </View>
 
-      {/* Título */}
       <View style={styles.content}>
         <Text style={styles.title}>Esqueceu a senha?</Text>
 
-        {/* Descrição */}
         <Text style={styles.subtitle}>
           Não se preocupe! Digite seu e-mail e enviaremos um link para redefinir
           sua senha.
         </Text>
 
-        {/* Ilustração */}
         <Image
           source={require("../../../assets/images/cta/security-shield.png")}
           style={styles.image}

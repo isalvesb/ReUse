@@ -12,13 +12,6 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
 
-  back: {
-    fontSize: 16,
-    marginBottom: 20,
-    color: "#342A2A",
-    gap: 12,
-  },
-
   title: {
     fontSize: 24,
     fontWeight: "medium",
@@ -77,6 +70,29 @@ const styles = StyleSheet.create({
     color: "#342A2A",
     fontSize: 16,
     fontWeight: "medium",
+  },
+
+  backWrap: {
+    marginBottom: 16,
+  },
+
+  backButton: {
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderWidth: 1.18,
+    borderColor: "#342A2A",
+    borderRadius: 14,
+    backgroundColor: "#F7EFDE",
+  },
+
+  back: {
+    fontSize: 16,
+    color: "#342A2A",
+    fontFamily: "Inter_500Medium",
   },
 });
 export default styles;

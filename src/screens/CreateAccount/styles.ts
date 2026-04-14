@@ -5,13 +5,13 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     backgroundColor: "#F7EFDE",
     padding: 24,
-    justifyContent: "center",
+    justifyContent: "flex-start",
   },
 
   logoContainer: {
     alignItems: "center",
-    marginTop: 87,
-    marginBottom: 70,
+    marginTop: 30,
+    marginBottom: 50,
   },
 
   logoImage: {
@@ -116,6 +116,26 @@ const styles = StyleSheet.create({
     color: "#FFF",
     fontFamily: "Inter_500Medium",
     fontSize: 16,
+  },
+
+  backButton: {
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 24,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderWidth: 1.18,
+    borderColor: "#342A2A",
+    borderRadius: 14,
+    backgroundColor: "#F7EFDE",
+  },
+
+  backText: {
+    color: "#342A2A",
+    fontSize: 16,
+    fontFamily: "Inter_500Medium",
   },
 });
 
