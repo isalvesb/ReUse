@@ -56,8 +56,6 @@ Este projeto foi desenvolvido utilizando as seguintes tecnologias:
 
 ## 📁 Estrutura do Projeto
 
-## 📁 Estrutura do Projeto
-
 ```text
 REUSE/
 ├── assets/
