@@ -1,10 +1,5 @@
 import React, { useRef, useState } from "react";
-import {
-  Animated,
-  Pressable,
-  TextInput,
-  TextInputProps,
-} from "react-native";
+import { Animated, Pressable, TextInput, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import styles from "./styles";
 
@@ -15,32 +10,36 @@ export default function SearchBar() {
   const scale = useRef(new Animated.Value(1)).current;
   const backgroundProgress = useRef(new Animated.Value(0)).current;
 
-  const animateFeedback = (toScale: number, toBackground: number) => {
-    Animated.parallel([
-      Animated.spring(scale, {
-        toValue: toScale,
-        useNativeDriver: true,
-        speed: 24,
-        bounciness: 0,
-      }),
-      Animated.timing(backgroundProgress, {
-        toValue: toBackground,
-        duration: 120,
-        useNativeDriver: false,
-      }),
-    ]).start();
+  const animateScale = (toValue: number) => {
+    Animated.spring(scale, {
+      toValue,
+      useNativeDriver: true,
+      speed: 24,
+      bounciness: 0,
+    }).start();
+  };
+
+  const animateBackground = (toValue: number) => {
+    Animated.timing(backgroundProgress, {
+      toValue,
+      duration: 120,
+      useNativeDriver: false,
+    }).start();
   };
 
   const handlePressIn = () => {
-    animateFeedback(0.985, 1);
+    animateScale(0.985);
+    animateBackground(1);
   };
 
   const handleLongPress = () => {
-    animateFeedback(0.975, 2);
+    animateScale(0.975);
+    animateBackground(2);
   };
 
   const handlePressOut = () => {
-    animateFeedback(1, 0);
+    animateScale(1);
+    animateBackground(0);
     inputRef.current?.focus();
   };
 
@@ -58,26 +57,41 @@ export default function SearchBar() {
     >
       <Animated.View
         style={[
-          styles.container,
+          styles.scaleWrapper,
           {
-            backgroundColor: animatedBackgroundColor,
             transform: [{ scale }],
           },
         ]}
       >
-        <TextInput
-          ref={inputRef}
-          style={styles.input}
-          placeholder="Buscar móveis, roupas, eletrônicos..."
-          placeholderTextColor="#A0947A"
-          value={search}
-          onChangeText={setSearch}
-          autoCapitalize="none"
-          autoCorrect={false}
-          returnKeyType="search"
-        />
+        <Animated.View
+          style={[
+            styles.container,
+            {
+              backgroundColor: animatedBackgroundColor,
+            },
+          ]}
+        >
+          <TextInput
+            ref={inputRef}
+            style={styles.input}
+            placeholder="Buscar móveis, roupas, eletrônicos..."
+            placeholderTextColor="#A0947A"
+            value={search}
+            onChangeText={setSearch}
+            autoCapitalize="none"
+            autoCorrect={false}
+            returnKeyType="search"
+          />
 
-        <Ionicons name="search" size={24} color="#342A2A" style={styles.icon} />
+          <View pointerEvents="none">
+            <Ionicons
+              name="search"
+              size={24}
+              color="#342A2A"
+              style={styles.icon}
+            />
+          </View>
+        </Animated.View>
       </Animated.View>
     </Pressable>
   );

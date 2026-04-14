@@ -1,6 +1,10 @@
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
+  scaleWrapper: {
+    width: "100%",
+  },
+
   container: {
     width: "100%",
     height: 56,
@@ -16,6 +20,8 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
     color: "#342A2A",
     marginLeft: 8,
+    paddingVertical: 0,
+    includeFontPadding: false,
   },
 
   icon: {
