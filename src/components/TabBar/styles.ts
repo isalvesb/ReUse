@@ -28,10 +28,10 @@ const styles = StyleSheet.create({
 
   activeIndicator: {
     position: "absolute",
-    top: 10,
+    top: 7,
     left: 0,
     borderRadius: 999,
-    backgroundColor: "hsla(263, 100%, 93%, 0.9)",
+    backgroundColor: "hsla(263, 100%, 93%, 0.95)",
   },
 
   tab: {
@@ -48,8 +48,8 @@ const styles = StyleSheet.create({
   },
 
   tabContent: {
-    width: 58,
-    height: 58,
+    width: 62,
+    height: 62,
     borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
@@ -59,8 +59,8 @@ const styles = StyleSheet.create({
 
   tabOverlay: {
     position: "absolute",
-    width: 70,
-    height: 70,
+    width: 76,
+    height: 76,
     borderRadius: 999,
     alignSelf: "center",
   },

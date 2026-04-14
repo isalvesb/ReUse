@@ -24,7 +24,7 @@ type TabBarProps = {
   onTabPress: (tab: TabName) => void;
 };
 
-const INDICATOR_SIZE = 58;
+const INDICATOR_SIZE = 66;
 
 export default function TabBar({ activeTab, onTabPress }: TabBarProps) {
   const [barWidth, setBarWidth] = useState(0);
