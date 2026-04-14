@@ -13,20 +13,37 @@ Esta é a primeira fase do projeto ReUse, uma plataforma digital voltada à econ
 
 ---
 
-## 📱Funcionalidades
+## 📱 Funcionalidades
 
-- 🏠 **Home**
-  - Visualização de itens disponíveis para reutilização.
- 
-- ⬆️ **Publicar**
-    - Usuários podem publicar itens que desejam disponibilizar para reutilização.
+### ✅ Já implementado
+- Tela de splash animada
+- Tela de login com autenticação local
+- Tela de criação de conta
+- Fluxo de recuperação de senha
+- Home com seções de destaque, categorias e itens
+- Navegação principal por TabBar
+- Tela de publicação com:
+  - formulário do item
+  - seleção de fotos por câmera ou galeria
+  - salvamento automático de rascunho local
+- Modal de incentivo à primeira publicação
 
-- 🏪 **Minha Vitrine**
-  - Área onde o usuário visualiza os itens que publicou.
+### 🚧 Em desenvolvimento
+- Persistência final das publicações
+- Tela “Minha Vitrine” com listagem dos itens publicados
+- Jornada do usuário após a primeira publicação
+- Sistema de conquistas
+- Tela de mensagens/chats
+- Login social com Google e Facebook
  
-- 💬 **Mensagens**
-  - Comunicação entre usuários interessados nos itens publicados.
- 
+---
+
+## 📌 Status do Projeto
+
+O ReUse está em desenvolvimento como projeto acadêmico e atualmente já possui a base visual e funcional do aplicativo mobile em React Native com Expo.
+
+Nesta versão, os fluxos de acesso, navegação principal, recuperação de senha, publicação com rascunho local e parte da experiência da Home já estão implementados. As próximas etapas concentram-se na persistência completa das publicações, na tela Minha Vitrine, na jornada pós-publicação e no sistema de conquistas.
+
 ---
 
 ## 🛠️ Tecnologias Utilizadas
@@ -39,72 +56,43 @@ Este projeto foi desenvolvido utilizando as seguintes tecnologias:
 
 ## 📁 Estrutura do Projeto
 
-```
+## 📁 Estrutura do Projeto
+
+```text
 REUSE/
 ├── assets/
+│   ├── animations/
 │   └── images/
-│       ├── categorias/
-│       │   ├── infantil.jpg
-│       │   ├── luminaria.jpg
-│       │   ├── oculos.jpg
-│       │   └── roupas.jpg
-│       ├── cta/
-│       │   ├── HeroBannerCTA.png
-│       │   └── ImpactoColetivo.png
-│       ├── itens/
-│       │   ├── cadeira.jpg
-│       │   ├── jaqueta.jpg
-│       │   └── teclado.jpg
-│       ├── promo/
-│       │   ├── fotografia.jpg
-│       │   ├── livros.jpg
-│       │   ├── notebook.jpg
-│       │   ├── sapatos.jpg
-│       │   └── sofa.jpg
-│       ├── icon.png
-│       └── logotipo.png
 ├── src/
 │   ├── components/
-│   │   ├── Button/
-│   │   │   ├── index.tsx
-│   │   │   └── styles.ts
 │   │   ├── CategoryCard/
-│   │   │   ├── index.tsx
-│   │   │   └── styles.ts
 │   │   ├── CtaCard/
-│   │   │   ├── index.tsx
-│   │   │   └── styles.ts
 │   │   ├── Header/
-│   │   │   ├── index.tsx
-│   │   │   └── styles.ts
+│   │   ├── IncentiveCard/
 │   │   ├── ItemCard/
-│   │   │   ├── index.tsx
-│   │   │   └── styles.ts
+│   │   ├── LoadingAnimation/
 │   │   ├── PromoCard/
-│   │   │   ├── index.tsx
-│   │   │   └── styles.ts
 │   │   ├── SearchBar/
-│   │   │   ├── index.tsx
-│   │   │   └── styles.ts
 │   │   └── TabBar/
-│   │       ├── index.tsx
-│   │       └── styles.ts
-│   └── screens/
-│       ├── Home/
-│       │   ├── index.tsx
-│       │   └── styles.ts
-│       └── Splash/
-│           ├── index.tsx
-│           └── styles.ts
-├── .gitignore
-├── app.json
+│   ├── screens/
+│   │   ├── Chats/
+│   │   ├── CreateAccount/
+│   │   ├── ForgotPass/
+│   │   ├── Home/
+│   │   ├── Login/
+│   │   ├── Publish/
+│   │   ├── ResetEmailSent/
+│   │   ├── Showcase/
+│   │   └── Splash/
+│   └── Services/
+│       ├── Auth.ts
+│       └── Storage.ts
 ├── App.tsx
+├── app.json
 ├── index.ts
-├── package-lock.json
 ├── package.json
-├── README.md
-└── tsconfig.json
- 
+├── tsconfig.json
+└── README.md
 ```
 
 ---
@@ -190,20 +178,17 @@ Como resultado dessa primeira sprint, temos nossa primeira versão da tela inici
 <img width="411" height="2048" alt="image" src="https://github.com/user-attachments/assets/2a3d71c0-0209-46e7-bb6b-01f9dac8e690" />
 
 
-
 ---
 
 ## ⚙️ Pré-requisitos
-Antes de rodar o projeto você precisa ter instalado:
-- **Node.js**
-- **Git**
-- **Expo CLI**
-- **Android Studio** ou **Emulador Android**
+Antes de rodar o projeto, você precisa ter instalado:
 
-Instalar Expo CLI:
-```bash
-npm install -g expo cli
-```
+- Node.js
+- npm
+- Git
+- Expo Go no celular **ou** um emulador/simulador configurado
+- Android Studio (para Android) **ou** Xcode (para iOS, no macOS)
+
 ---
 
 ## 🚀 Como rodar o projeto
@@ -223,11 +208,22 @@ npm install
 ```
 npx expo start
 ```
-5. Abra no emulador Android pressionando:
+5. Depois disso, você pode:
+- pressionar ```a``` para abrir no emulador Android
+- pressionar ```i``` para abrir no simulador iOS
+- escanear o QR Code com o Expo Go no celular
+
+Caso haja problema de conexão no dispositivo físico, você pode tentar:
 ```
-a
+npx expo start --tunnel
 ```
-ou escaneie o QR Code com o aplicativo Expo Go no celular.
+
+---
+
+## 🎯 Resultado atual
+Até o momento, o ReUse já conta com uma base mobile navegável e funcional construída em React Native com Expo. O projeto possui telas de splash, login, criação de conta, recuperação de senha, home, publicação, vitrine e mensagens, além de componentes reutilizáveis e serviços locais de autenticação e armazenamento.
+
+Nesta etapa, o foco principal foi transformar o planejamento visual da plataforma em interfaces interativas, testando fluxos essenciais de entrada, navegação e publicação. As próximas evoluções do projeto concentram-se na persistência das publicações, exibição real da vitrine, conquistas do usuário e amadurecimento da documentação.
 
 ---
 
