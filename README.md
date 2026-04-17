@@ -120,6 +120,7 @@ Aqui finalizamos a tela inicial adicionando o gatilho de prova social adicionand
 
 ### 📱 Tab Bar
 Na tab bar, optamos por centralizar as tarefas que o usuário utilizará com mais frequência como: Home ( para voltar à página inicial); Publicar ( para criar um novo anúncio); Minha Vitrine ( onde ele irá conferir todos seus anúncios publicados); e Mensagens ( onde ele irá ter acesso às conversas com outros usuários para negociar itens)
+
 ---
 
 ## 🎨 Decisões de UI
