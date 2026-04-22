@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useFonts } from "expo-font";
 import { Syne_400Regular, Syne_800ExtraBold } from "@expo-google-fonts/syne";
 import {
@@ -6,7 +6,13 @@ import {
   Inter_500Medium,
   Inter_700Bold,
 } from "@expo-google-fonts/inter";
-import { Animated, Easing, StyleSheet, View } from "react-native";
+import {
+  ActivityIndicator,
+  Animated,
+  Easing,
+  StyleSheet,
+  View,
+} from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -21,6 +27,7 @@ import { ChatsScreen } from "./src/screens/Chats";
 import { ShowcaseScreen } from "./src/screens/Showcase";
 import { PublishScreen } from "./src/screens/Publish";
 import TabBar from "./src/components/TabBar";
+import { buscarToken } from "./src/Services/Auth";
 
 type RootStackParamList = {
   Login: undefined;
@@ -47,10 +54,11 @@ function MainScreen() {
         return <ChatsScreen />;
       case "home":
       default:
-        return <HomeScreen onNavigateToPublish={() => setActiveTab("publicar")} />
+        return (
+          <HomeScreen onNavigateToPublish={() => setActiveTab("publicar")} />
+        );
     }
-  }
-
+  };
 
   return (
     <View style={styles.mainScreen}>
@@ -61,17 +69,53 @@ function MainScreen() {
 }
 
 function AppNavigator() {
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const verificarSessao = async () => {
+      try {
+        const token = await buscarToken();
+        setIsAuthenticated(!!token);
+      } catch (error) {
+        console.error("Erro ao verificar sessão:", error);
+        setIsAuthenticated(false);
+      } finally {
+        setIsCheckingSession(false);
+      }
+    };
+
+    verificarSessao();
+  }, []);
+
+  if (isCheckingSession) {
+    return (
+      <View style={styles.bootScreen}>
+        <ActivityIndicator size="large" color="#342A2A" />
+      </View>
+    );
+  }
+
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName="Login"
-        screenOptions={{ headerShown: false }}
-      >
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="ForgotPass" component={ForgotPass} />
-        <Stack.Screen name="CreateAccount" component={CreateAccount} />
-        <Stack.Screen name="HomeScreen" component={MainScreen} />
-        <Stack.Screen name="ResetEmailSent" component={ResetEmailSent} />
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {isAuthenticated ? (
+          <>
+            <Stack.Screen name="HomeScreen" component={MainScreen} />
+            <Stack.Screen name="Login" component={Login} />
+            <Stack.Screen name="ForgotPass" component={ForgotPass} />
+            <Stack.Screen name="CreateAccount" component={CreateAccount} />
+            <Stack.Screen name="ResetEmailSent" component={ResetEmailSent} />
+          </>
+        ) : (
+          <>
+            <Stack.Screen name="Login" component={Login} />
+            <Stack.Screen name="ForgotPass" component={ForgotPass} />
+            <Stack.Screen name="CreateAccount" component={CreateAccount} />
+            <Stack.Screen name="HomeScreen" component={MainScreen} />
+            <Stack.Screen name="ResetEmailSent" component={ResetEmailSent} />
+          </>
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -159,9 +203,17 @@ const styles = StyleSheet.create({
     left: 0,
     zIndex: 20,
   },
+  
+  bootScreen: {
+    flex: 1,
+    backgroundColor: "#F7EFDE",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 
   mainScreen: {
     flex: 1,
     backgroundColor: "#F7EFDE",
   },
+
 });
