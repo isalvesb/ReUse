@@ -101,6 +101,23 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
     color: "#6B5B5B",
   },
+
+  cacheWarning: {
+    backgroundColor: "#F2E4C8",
+    borderWidth: 1,
+    borderColor: "#D8C29A",
+    borderRadius: 16,
+    padding: 12,
+    marginBottom: 14,
+  },
+
+  cacheWarningText: {
+    fontSize: 13,
+    fontFamily: "Inter_500Medium",
+    color: "#6B4E16",
+    textAlign: "center",
+    lineHeight: 19,
+  },
 });
 
 export default styles;
