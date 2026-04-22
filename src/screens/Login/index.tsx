@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -15,18 +15,57 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { salvarToken } from "../../Services/Auth";
-import {buscar} from "../../Services/Storage"
+import { buscar } from "../../Services/Storage";
 import styles from "./styles";
 import { useNavigation } from "@react-navigation/native";
 import GoogleIcon from "../../../assets/images/google.svg";
 import FacebookIcon from "../../../assets/images/facebook.svg";
 import { LoadingAnimation } from "../../components/LoadingAnimation";
+import * as WebBrowser from "expo-web-browser";
+import * as Google from "expo-auth-session/providers/google";
+import {
+  getAuth,
+  signInWithCredential,
+  GoogleAuthProvider,
+} from "firebase/auth";
+import app from "../../Services/firebaseConfig";
+
+WebBrowser.maybeCompleteAuthSession();
+
+const auth = getAuth(app);
 
 export function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    expoClientId:
+      "214549799877-ggh6fl3piia4n7kg918eqqkg1hf04bbo.apps.googleusercontent.com",
+  });
+
+  useEffect(() => {
+    if (response?.type === "success") {
+      const { id_token } = response.params;
+
+      const credential = GoogleAuthProvider.credential(id_token);
+
+      setIsLoading(true);
+
+      signInWithCredential(auth, credential)
+        .then(async () => {
+          await salvarToken("google-user");
+
+          setTimeout(() => {
+            navigation.replace("HomeScreen");
+          }, 1200);
+        })
+        .catch(() => {
+          setIsLoading(false);
+          Alert.alert("Erro", "Não foi possível entrar com Google");
+        });
+    }
+  }, [response]);
 
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
@@ -52,23 +91,22 @@ export function Login() {
 
     try {
       const usuarioRaw = await buscar(`user:${email}`);
- 
+
       if (!usuarioRaw) {
         throw new Error("Usuário não encontrado.");
       }
- 
+
       const usuario = JSON.parse(usuarioRaw);
- 
+
       if (usuario.password !== password) {
         throw new Error("Senha incorreta.");
       }
- 
+
       await salvarToken(email);
- 
+
       setTimeout(() => {
         navigation.replace("HomeScreen");
       }, 1200);
- 
     } catch (error: any) {
       Animated.timing(overlayProgress, {
         toValue: 0,
@@ -78,11 +116,10 @@ export function Login() {
       }).start(() => {
         setIsLoading(false);
       });
- 
+
       Alert.alert("Erro ao entrar", error.message || "Tente novamente.");
     }
   };
- 
 
   const contentOpacity = overlayProgress.interpolate({
     inputRange: [0, 1],
@@ -132,6 +169,7 @@ export function Login() {
               <View style={styles.socialContainer}>
                 <Pressable
                   disabled={isLoading}
+                  onPress={() => promptAsync()}
                   style={({ pressed }) => [
                     styles.socialButton,
                     pressed && styles.buttonPressed,
@@ -202,8 +240,8 @@ export function Login() {
                     style={styles.input}
                     placeholder="Mínimo 8 caracteres"
                     secureTextEntry={!passwordVisible}
-                    value={password}              
-                    onChangeText={setPassword}    
+                    value={password}
+                    onChangeText={setPassword}
                   />
                   <Pressable
                     disabled={isLoading}

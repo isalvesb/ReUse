@@ -1,7 +1,7 @@
 import { salvarToken } from "../../Services/Auth";
-import { salvar, buscar } from "../../Services/Storage"
+import { salvar, buscar } from "../../Services/Storage";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -17,7 +17,22 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import GoogleIcon from "../../../assets/images/google.svg";
 import FacebookIcon from "../../../assets/images/facebook.svg";
+import * as WebBrowser from "expo-web-browser";
+import * as Google from "expo-auth-session/providers/google";
+import {
+  getAuth,
+  signInWithCredential,
+  GoogleAuthProvider,
+} from "firebase/auth";
+import app from "../../Services/firebaseConfig";
 import styles from "./styles";
+import * as AuthSession from "expo-auth-session";
+
+console.log(AuthSession.makeRedirectUri({ useProxy: true }));
+
+WebBrowser.maybeCompleteAuthSession();
+
+const auth = getAuth(app);
 
 type RootStackParamList = {
   HomeScreen: undefined;
@@ -27,22 +42,47 @@ type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList>;
 };
 
-export function CreateAccount({ navigation }: Props) {  
-  const [name, setName] = useState("")
+export function CreateAccount({ navigation }: Props) {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [ location, setLocation ] = useState("");
-  const [ password, setPassword] =useState("");
+  const [location, setLocation] = useState("");
+  const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    expoClientId:
+      "214549799877-ggh6fl3piia4n7kg918eqqkg1hf04bbo.apps.googleusercontent.com",
+  });
 
-const handleCreateAccount = async () => {
-    if (!name.trim())          return Alert.alert("Atenção", "Informe seu nome.");
-    if (!email.trim())         return Alert.alert("Atenção", "Informe seu e-mail.");
-    if (!location.trim())   return Alert.alert("Atenção", "Informe sua localização.");
-    if (password.length < 8)      return Alert.alert("Atenção", "A senha deve ter no mínimo 8 caracteres.");
-    if (password !== confirmPassword) return Alert.alert("Atenção", "As senhas não coincidem.");
+  useEffect(() => {
+    if (response?.type === "success") {
+      const { id_token } = response.params;
+
+      const credential = GoogleAuthProvider.credential(id_token);
+
+      signInWithCredential(auth, credential)
+        .then(() => {
+          Alert.alert("Sucesso", "Login com Google realizado!");
+          navigation.replace("HomeScreen");
+        })
+        .catch((error) => {
+          console.log(error);
+          Alert.alert("Erro", "Não foi possível logar com o Google");
+        });
+    }
+  }, [response]);
+
+  const handleCreateAccount = async () => {
+    if (!name.trim()) return Alert.alert("Atenção", "Informe seu nome.");
+    if (!email.trim()) return Alert.alert("Atenção", "Informe seu e-mail.");
+    if (!location.trim())
+      return Alert.alert("Atenção", "Informe sua localização.");
+    if (password.length < 8)
+      return Alert.alert("Atenção", "A senha deve ter no mínimo 8 caracteres.");
+    if (password !== confirmPassword)
+      return Alert.alert("Atenção", "As senhas não coincidem.");
 
     setLoading(true);
     try {
@@ -51,12 +91,12 @@ const handleCreateAccount = async () => {
         Alert.alert("Atenção", "Este e-mail já está cadastrado.");
         return;
       }
- 
+
       const usuario = JSON.stringify({ name, email, location, password });
       await salvar(`user:${email}`, usuario);
- 
+
       await salvarToken(email);
- 
+
       navigation.replace("HomeScreen");
     } catch (error) {
       Alert.alert("Erro", "Não foi possível criar a conta. Tente novamente.");
@@ -64,7 +104,6 @@ const handleCreateAccount = async () => {
       setLoading(false);
     }
   };
-
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#F7EFDE" }}>
@@ -95,7 +134,10 @@ const handleCreateAccount = async () => {
 
           {/* Social Login */}
           <View style={styles.socialContainer}>
-            <TouchableOpacity style={styles.socialButton}>
+            <TouchableOpacity
+              style={styles.socialButton}
+              onPress={() => promptAsync()}
+            >
               <GoogleIcon width={18} height={18} />
               <Text style={styles.socialButtonText}>Continuar com Google</Text>
             </TouchableOpacity>
