@@ -10,6 +10,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { getItems, Item } from "../../Services/Items";
 import { buscar, salvar } from "../../Services/Storage";
+import { buscarToken } from "../../Services/Auth";
 import styles from "./styles";
 
 const ITEMS_CACHE_KEY = "showcase_items_cache";
@@ -21,14 +22,38 @@ export function ShowcaseScreen() {
   const [usingCache, setUsingCache] = useState(false);
   const insets = useSafeAreaInsets();
 
-  const loadCachedItems = async () => {
+  const normalizeEmail = (email?: string | null) => {
+    return email?.trim().toLowerCase() ?? "";
+  };
+
+  const getUserCacheKey = (userEmail: string) => {
+    return `${ITEMS_CACHE_KEY}:${normalizeEmail(userEmail)}`;
+  };
+
+  const filterItemsByUser = (allItems: Item[], userEmail: string) => {
+    const normalizedUserEmail = normalizeEmail(userEmail);
+
+    return allItems.filter(
+      (item) => normalizeEmail(item.user_email) === normalizedUserEmail,
+    );
+  };
+
+  const getLoggedUserEmail = async () => {
+    const token = await buscarToken();
+    return normalizeEmail(token);
+  };
+
+  const loadCachedItems = async (userEmail: string) => {
     try {
-      const cachedItems = await buscar(ITEMS_CACHE_KEY);
+      const cacheKey = getUserCacheKey(userEmail);
+      const cachedItems = await buscar(cacheKey);
 
       if (cachedItems) {
         const parsedItems = JSON.parse(cachedItems) as Item[];
-        setItems(parsedItems);
-        return parsedItems;
+        const userItems = filterItemsByUser(parsedItems, userEmail);
+
+        setItems(userItems);
+        return userItems;
       }
 
       return [];
@@ -38,12 +63,16 @@ export function ShowcaseScreen() {
     }
   };
 
-  const loadItems = async () => {
+  const loadItems = async (userEmail: string) => {
     try {
       const data = await getItems();
-      setItems(data);
+      const userItems = filterItemsByUser(data, userEmail);
+
+      setItems(userItems);
       setUsingCache(false);
-      await salvar(ITEMS_CACHE_KEY, JSON.stringify(data));
+
+      const cacheKey = getUserCacheKey(userEmail);
+      await salvar(cacheKey, JSON.stringify(userItems));
     } catch (error) {
       console.error("Erro ao buscar itens:", error);
 
@@ -59,13 +88,25 @@ export function ShowcaseScreen() {
   useFocusEffect(
     useCallback(() => {
       setLoading(true);
+      setItems([]);
+      setUsingCache(false);
 
       const initialize = async () => {
-        const cached = await loadCachedItems();
+        const userEmail = await getLoggedUserEmail();
+
+        if (!userEmail) {
+          setItems([]);
+          setLoading(false);
+          return;
+        }
+
+        const cached = await loadCachedItems(userEmail);
+
         if (cached.length > 0) {
           setUsingCache(true);
         }
-        await loadItems();
+
+        await loadItems(userEmail);
       };
 
       initialize();
@@ -74,7 +115,16 @@ export function ShowcaseScreen() {
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await loadItems();
+
+    const userEmail = await getLoggedUserEmail();
+
+    if (!userEmail) {
+      setItems([]);
+      setRefreshing(false);
+      return;
+    }
+
+    await loadItems(userEmail);
   };
 
   const formatCondition = (condition: string) => {
@@ -114,7 +164,7 @@ export function ShowcaseScreen() {
         <View style={styles.centerContent}>
           <Text style={styles.emptyTitle}>Nenhum item publicado ainda</Text>
           <Text style={styles.emptyText}>
-            Assim que um item for publicado, ele aparecerá aqui.
+            Assim que você publicar um item, ele aparecerá aqui.
           </Text>
         </View>
       ) : (
@@ -127,14 +177,19 @@ export function ShowcaseScreen() {
               </Text>
             </View>
           )}
+
           {items.map((item) => (
             <View key={item.id} style={styles.card}>
               <Text style={styles.cardTitle}>{item.title}</Text>
+
               <Text style={styles.cardMeta}>
-                {item.category} • {formatCondition(item.item_condition)}{" "}
+                {item.category} • {formatCondition(item.item_condition)}
               </Text>
+
               <Text style={styles.cardDescription}>{item.description}</Text>
+
               <Text style={styles.cardLocation}>{item.location}</Text>
+
               {!!item.user_email && (
                 <Text style={styles.cardUser}>
                   Publicado por: {item.user_email}
