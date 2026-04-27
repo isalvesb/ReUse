@@ -147,30 +147,34 @@ const promoCards = [
 
 interface HomeScreenProps {
   onNavigateToPublish?: () => void;
+  onNavigateToProfile?: () => void;
 }
 
-export function HomeScreen({ onNavigateToPublish }: HomeScreenProps) {
+export function HomeScreen({
+  onNavigateToPublish,
+  onNavigateToProfile,
+}: HomeScreenProps) {
   const [showIncentive, setShowIncentive] = useState(false);
 
-useFocusEffect(
-  useCallback(() => {
-    let timer: ReturnType<typeof setTimeout>;
+  useFocusEffect(
+    useCallback(() => {
+      let timer: ReturnType<typeof setTimeout>;
 
-    const verificar = async () => {
-      const emailUsuario = await buscarToken();
-      if (!emailUsuario) return;
+      const verificar = async () => {
+        const emailUsuario = await buscarToken();
+        if (!emailUsuario) return;
 
-      const jaViu = await buscar(`incentive_seen:${emailUsuario}`);
-      if (jaViu !== "true") {
-        timer = setTimeout(() => setShowIncentive(true), 2000);
-      }
-    };
+        const jaViu = await buscar(`incentive_seen:${emailUsuario}`);
+        if (jaViu !== "true") {
+          timer = setTimeout(() => setShowIncentive(true), 2000);
+        }
+      };
 
-    verificar();
+      verificar();
 
-    return () => clearTimeout(timer); 
-  }, [])
-);
+      return () => clearTimeout(timer);
+    }, []),
+  );
 
   const scrollY = useRef(new Animated.Value(0)).current;
   const insets = useSafeAreaInsets();
@@ -309,213 +313,206 @@ useFocusEffect(
 
   return (
     <>
-    <AnimatedScrollView
-      style={styles.screen}
-      contentContainerStyle={[
-        styles.container,
-        {
-          paddingTop: insets.top + 16,
-          paddingBottom: insets.bottom + 120,
-        },
-      ]}
-      showsVerticalScrollIndicator={false}
-      scrollEventThrottle={16}
-      onScroll={Animated.event(
-        [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-        { useNativeDriver: false },
-      )}
-    >
-      <Header />
+      <AnimatedScrollView
+        style={styles.screen}
+        contentContainerStyle={[
+          styles.container,
+          {
+            paddingTop: insets.top + 16,
+            paddingBottom: insets.bottom + 120,
+          },
+        ]}
+        showsVerticalScrollIndicator={false}
+        scrollEventThrottle={16}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: false },
+        )}
+      >
+        <Header onProfilePress={onNavigateToProfile} />
+        <RevealOnScroll scrollY={scrollY}>
+          <View style={styles.searchWrap}>
+            <SearchBar />
+          </View>
+        </RevealOnScroll>
 
-      <RevealOnScroll scrollY={scrollY}>
-        <View style={styles.searchWrap}>
-          <SearchBar />
+        <RevealOnScroll scrollY={scrollY} delay={40}>
+          <View style={styles.heroSection}>
+            <CtaCard
+              title={"Dê um novo\npropósito"}
+              subtitle="ao que você não usa mais"
+              imageSource={require("../../../assets/images/cta/HeroBannerCTA.png")}
+              buttonTitle="Publicar item"
+              onPress={() => onNavigateToPublish?.()}
+              variant="hero"
+            />
+          </View>
+        </RevealOnScroll>
+
+        <RevealOnScroll scrollY={scrollY} delay={120} animateOnMount>
+          <View style={styles.promoSection}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.promoRow}
+            >
+              {promoCards.map((card, index) => (
+                <View
+                  key={card.id}
+                  style={[
+                    styles.promoItem,
+                    index === promoCards.length - 1 && styles.lastPromoItem,
+                  ]}
+                >
+                  <PromoCard
+                    title={card.title}
+                    subtitle={card.subtitle}
+                    imageSource={card.imageSource}
+                    onPress={() => console.log(card.title)}
+                  />
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+        </RevealOnScroll>
+
+        <View
+          style={styles.categorySection}
+          onLayout={(event) => {
+            setCategoriesSectionY(event.nativeEvent.layout.y);
+          }}
+        >
+          <RevealOnScroll scrollY={scrollY} offset={120}>
+            <Text style={styles.sectionTitle}>Descubra por categoria</Text>
+          </RevealOnScroll>
+
+          <View style={styles.grid}>
+            <Animated.View
+              style={[
+                styles.categoryAnimatedItem,
+                getCategoryAnimatedStyle(categoryAnim1),
+              ]}
+            >
+              <CategoryCard
+                imageSource={require("../../../assets/images/categorias/roupas.jpg")}
+              />
+            </Animated.View>
+
+            <Animated.View
+              style={[
+                styles.categoryAnimatedItem,
+                getCategoryAnimatedStyle(categoryAnim2),
+              ]}
+            >
+              <CategoryCard
+                imageSource={require("../../../assets/images/categorias/oculos.jpg")}
+              />
+            </Animated.View>
+
+            <Animated.View
+              style={[
+                styles.categoryAnimatedItem,
+                getCategoryAnimatedStyle(categoryAnim3),
+              ]}
+            >
+              <CategoryCard
+                imageSource={require("../../../assets/images/categorias/luminaria.jpg")}
+              />
+            </Animated.View>
+
+            <Animated.View
+              style={[
+                styles.categoryAnimatedItem,
+                getCategoryAnimatedStyle(categoryAnim4),
+              ]}
+            >
+              <CategoryCard
+                imageSource={require("../../../assets/images/categorias/infantil.jpg")}
+              />
+            </Animated.View>
+          </View>
         </View>
-      </RevealOnScroll>
 
-      <RevealOnScroll scrollY={scrollY} delay={40}>
-        <View style={styles.heroSection}>
+        <View
+          style={styles.itemsSection}
+          onLayout={(event) => {
+            setItemsSectionY(event.nativeEvent.layout.y);
+          }}
+        >
+          <RevealOnScroll scrollY={scrollY} offset={120}>
+            <Text style={styles.sectionTitle}>Perto de você</Text>
+          </RevealOnScroll>
+
+          <RevealOnScroll scrollY={scrollY} delay={40} offset={120}>
+            <Text style={styles.caption}>Itens disponíveis na sua região</Text>
+          </RevealOnScroll>
+
+          <View style={styles.itemList}>
+            <Animated.View style={getItemAnimatedStyle(itemAnim1)}>
+              <ItemCard
+                title="Cadeira de madeira"
+                condition="Usado"
+                details="Bom estado"
+                distance="1 km de você"
+                transaction="Doação"
+                imageSource={require("../../../assets/images/itens/cadeira.jpg")}
+              />
+            </Animated.View>
+
+            <Animated.View style={getItemAnimatedStyle(itemAnim2)}>
+              <ItemCard
+                title="Jaqueta de couro"
+                condition="Usado"
+                details="Tam 40"
+                distance="1,4 km de você"
+                transaction="Troca"
+                imageSource={require("../../../assets/images/itens/jaqueta.jpg")}
+              />
+            </Animated.View>
+
+            <Animated.View style={getItemAnimatedStyle(itemAnim3)}>
+              <ItemCard
+                title="Teclado gamer"
+                condition="Usado"
+                details="Bom estado"
+                distance="2 km de você"
+                transaction="Venda"
+                imageSource={require("../../../assets/images/itens/teclado.jpg")}
+              />
+            </Animated.View>
+          </View>
+        </View>
+
+        <RevealOnScroll scrollY={scrollY}>
           <CtaCard
-            title={"Dê um novo\npropósito"}
-            subtitle="ao que você não usa mais"
-            imageSource={require("../../../assets/images/cta/HeroBannerCTA.png")}
+            title="Impacto coletivo"
+            highlightText="+ 1.240 itens"
+            subtitle="ganharam um novo destino este mês. Tem algo parado em casa? Transforme em oportunidade."
+            imageSource={require("../../../assets/images/cta/ImpactoColetivo.png")}
             buttonTitle="Publicar item"
             onPress={() => onNavigateToPublish?.()}
-            variant="hero"
+            variant="compact"
           />
-        </View>
-      </RevealOnScroll>
-
-      <RevealOnScroll
-        scrollY={scrollY}
-        delay={120}
-        animateOnMount
-      >
-        <View style={styles.promoSection}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.promoRow}
-          >
-            {promoCards.map((card, index) => (
-              <View
-                key={card.id}
-                style={[
-                  styles.promoItem,
-                  index === promoCards.length - 1 && styles.lastPromoItem,
-                ]}
-              >
-                <PromoCard
-                  title={card.title}
-                  subtitle={card.subtitle}
-                  imageSource={card.imageSource}
-                  onPress={() => console.log(card.title)}
-                />
-              </View>
-            ))}
-          </ScrollView>
-        </View>
-      </RevealOnScroll>
-
-      <View
-        style={styles.categorySection}
-        onLayout={(event) => {
-          setCategoriesSectionY(event.nativeEvent.layout.y);
+        </RevealOnScroll>
+      </AnimatedScrollView>
+      <IncentiveModal
+        visible={showIncentive}
+        onClose={async () => {
+          const emailUsuario = await buscarToken();
+          if (emailUsuario) {
+            await salvar(`incentive_seen:${emailUsuario}`, "true");
+          }
+          setShowIncentive(false);
         }}
-      >
-        <RevealOnScroll scrollY={scrollY} offset={120}>
-          <Text style={styles.sectionTitle}>Descubra por categoria</Text>
-        </RevealOnScroll>
-
-        <View style={styles.grid}>
-          <Animated.View
-            style={[
-              styles.categoryAnimatedItem,
-              getCategoryAnimatedStyle(categoryAnim1),
-            ]}
-          >
-            <CategoryCard
-              imageSource={require("../../../assets/images/categorias/roupas.jpg")}
-            />
-          </Animated.View>
-
-          <Animated.View
-            style={[
-              styles.categoryAnimatedItem,
-              getCategoryAnimatedStyle(categoryAnim2),
-            ]}
-          >
-            <CategoryCard
-              imageSource={require("../../../assets/images/categorias/oculos.jpg")}
-            />
-          </Animated.View>
-
-          <Animated.View
-            style={[
-              styles.categoryAnimatedItem,
-              getCategoryAnimatedStyle(categoryAnim3),
-            ]}
-          >
-            <CategoryCard
-              imageSource={require("../../../assets/images/categorias/luminaria.jpg")}
-            />
-          </Animated.View>
-
-          <Animated.View
-            style={[
-              styles.categoryAnimatedItem,
-              getCategoryAnimatedStyle(categoryAnim4),
-            ]}
-          >
-            <CategoryCard
-              imageSource={require("../../../assets/images/categorias/infantil.jpg")}
-            />
-          </Animated.View>
-        </View>
-      </View>
-
-      <View
-        style={styles.itemsSection}
-        onLayout={(event) => {
-          setItemsSectionY(event.nativeEvent.layout.y);
+        onPublish={async () => {
+          const emailUsuario = await buscarToken();
+          if (emailUsuario) {
+            await salvar(`incentive_seen:${emailUsuario}`, "true");
+          }
+          setShowIncentive(false);
+          onNavigateToPublish?.();
         }}
-      >
-        <RevealOnScroll scrollY={scrollY} offset={120}>
-          <Text style={styles.sectionTitle}>Perto de você</Text>
-        </RevealOnScroll>
-
-        <RevealOnScroll scrollY={scrollY} delay={40} offset={120}>
-          <Text style={styles.caption}>Itens disponíveis na sua região</Text>
-        </RevealOnScroll>
-
-        <View style={styles.itemList}>
-          <Animated.View style={getItemAnimatedStyle(itemAnim1)}>
-            <ItemCard
-              title="Cadeira de madeira"
-              condition="Usado"
-              details="Bom estado"
-              distance="1 km de você"
-              transaction="Doação"
-              imageSource={require("../../../assets/images/itens/cadeira.jpg")}
-            />
-          </Animated.View>
-
-          <Animated.View style={getItemAnimatedStyle(itemAnim2)}>
-            <ItemCard
-              title="Jaqueta de couro"
-              condition="Usado"
-              details="Tam 40"
-              distance="1,4 km de você"
-              transaction="Troca"
-              imageSource={require("../../../assets/images/itens/jaqueta.jpg")}
-            />
-          </Animated.View>
-
-          <Animated.View style={getItemAnimatedStyle(itemAnim3)}>
-            <ItemCard
-              title="Teclado gamer"
-              condition="Usado"
-              details="Bom estado"
-              distance="2 km de você"
-              transaction="Venda"
-              imageSource={require("../../../assets/images/itens/teclado.jpg")}
-            />
-          </Animated.View>
-        </View>
-      </View>
-
-      <RevealOnScroll scrollY={scrollY}>
-        <CtaCard
-          title="Impacto coletivo"
-          highlightText="+ 1.240 itens"
-          subtitle="ganharam um novo destino este mês. Tem algo parado em casa? Transforme em oportunidade."
-          imageSource={require("../../../assets/images/cta/ImpactoColetivo.png")}
-          buttonTitle="Publicar item"
-          onPress={() => onNavigateToPublish?.()}
-          variant="compact"
-        />
-
-      </RevealOnScroll>
-
-    </AnimatedScrollView>
-    <IncentiveModal
-      visible={showIncentive}
-      onClose={async () => {
-        const emailUsuario = await buscarToken();
-        if (emailUsuario) {
-          await salvar(`incentive_seen:${emailUsuario}`, "true");
-        }
-        setShowIncentive(false);
-      }}
-      onPublish={async () => {
-        const emailUsuario = await buscarToken();
-        if (emailUsuario) {
-          await salvar(`incentive_seen:${emailUsuario}`, "true");
-        }
-        setShowIncentive(false);
-        onNavigateToPublish?.();
-      }}
-    />
-        </>
-      );
+      />
+    </>
+  );
 }

@@ -2,7 +2,11 @@ import React, { useEffect, useRef } from "react";
 import { View, Text, Image, Pressable, Animated } from "react-native";
 import styles from "./styles";
 
-export default function Header() {
+type HeaderProps = {
+  onProfilePress?: () => void;
+};
+
+export default function Header({ onProfilePress }: HeaderProps) {
   const headerOpacity = useRef(new Animated.Value(0)).current;
   const headerTranslateY = useRef(new Animated.Value(8)).current;
 
@@ -53,6 +57,7 @@ export default function Header() {
       <Text style={styles.logoText}>ReUse</Text>
 
       <Pressable
+        onPress={onProfilePress}
         onPressIn={() => animateIcon(0.94, 0.08)}
         onLongPress={() => animateIcon(0.9, 0.14)}
         onPressOut={() => animateIcon(1, 0)}
@@ -74,10 +79,7 @@ export default function Header() {
 
           <Animated.View
             pointerEvents="none"
-            style={[
-              styles.iconOverlay,
-              { opacity: iconOverlayOpacity },
-            ]}
+            style={[styles.iconOverlay, { opacity: iconOverlayOpacity }]}
           />
         </Animated.View>
       </Pressable>

@@ -14,7 +14,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Ionicons } from "@expo/vector-icons";
 import { SplashScreen } from "./src/screens/Splash";
@@ -28,12 +28,14 @@ import { ShowcaseScreen } from "./src/screens/Showcase";
 import { PublishScreen } from "./src/screens/Publish";
 import TabBar from "./src/components/TabBar";
 import { buscarToken } from "./src/Services/Auth";
+import { ProfileScreen } from "./src/screens/Profile";
 
 type RootStackParamList = {
   Login: undefined;
   ForgotPass: undefined;
   CreateAccount: undefined;
   HomeScreen: undefined;
+  Profile: undefined;
   ResetEmailSent: undefined;
 };
 
@@ -43,6 +45,7 @@ type TabName = "home" | "publicar" | "vitrine" | "chats";
 
 function MainScreen() {
   const [activeTab, setActiveTab] = useState<TabName>("home");
+  const navigation = useNavigation<any>();
 
   const renderScreen = () => {
     switch (activeTab) {
@@ -55,7 +58,10 @@ function MainScreen() {
       case "home":
       default:
         return (
-          <HomeScreen onNavigateToPublish={() => setActiveTab("publicar")} />
+          <HomeScreen
+            onNavigateToPublish={() => setActiveTab("publicar")}
+            onNavigateToProfile={() => navigation.navigate("Profile")}
+          />
         );
     }
   };
@@ -102,6 +108,7 @@ function AppNavigator() {
         {isAuthenticated ? (
           <>
             <Stack.Screen name="HomeScreen" component={MainScreen} />
+            <Stack.Screen name="Profile" component={ProfileScreen} />
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="ForgotPass" component={ForgotPass} />
             <Stack.Screen name="CreateAccount" component={CreateAccount} />
@@ -113,7 +120,11 @@ function AppNavigator() {
             <Stack.Screen name="ForgotPass" component={ForgotPass} />
             <Stack.Screen name="CreateAccount" component={CreateAccount} />
             <Stack.Screen name="HomeScreen" component={MainScreen} />
-            <Stack.Screen name="ResetEmailSent" component={ResetEmailSent} />
+            <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen
+              name="ResetEmailSent"
+              component={ResetEmailSent}
+            />{" "}
           </>
         )}
       </Stack.Navigator>
@@ -203,7 +214,7 @@ const styles = StyleSheet.create({
     left: 0,
     zIndex: 20,
   },
-  
+
   bootScreen: {
     flex: 1,
     backgroundColor: "#F7EFDE",
@@ -215,5 +226,4 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F7EFDE",
   },
-
 });
