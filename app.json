@@ -2,6 +2,7 @@
   "expo": {
     "name": "ReUse",
     "slug": "ReUse",
+    "scheme": "com.anonymous.reuse",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "",
@@ -12,7 +13,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.guicunhasou.reuse"
     },
     "android": {
       "adaptiveIcon": {
@@ -21,15 +23,12 @@
         "backgroundImage": "",
         "monochromeImage": ""
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.anonymous.reuse"
     },
     "web": {
       "favicon": ""
     },
-    "plugins": [
-      "expo-font",
-      "expo-secure-store",
-      "expo-web-browser"
-    ]
+    "plugins": ["expo-font", "expo-secure-store", "expo-web-browser"]
   }
 }

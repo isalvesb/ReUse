@@ -19,20 +19,14 @@ import GoogleIcon from "../../../assets/images/google.svg";
 import FacebookIcon from "../../../assets/images/facebook.svg";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
-import {
-  getAuth,
-  signInWithCredential,
-  GoogleAuthProvider,
-} from "firebase/auth";
-import app from "../../Services/firebaseConfig";
+import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
+
+// CORREÇÃO: Importar a instância configurada do seu serviço
+import { auth } from "../../Services/firebaseConfig";
 import styles from "./styles";
 import * as AuthSession from "expo-auth-session";
 
-console.log(AuthSession.makeRedirectUri({ useProxy: true }));
-
 WebBrowser.maybeCompleteAuthSession();
-
-const auth = getAuth(app);
 
 type RootStackParamList = {
   HomeScreen: undefined;
@@ -52,24 +46,35 @@ export function CreateAccount({ navigation }: Props) {
   const [showConfirmPass, setShowConfirmPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [request, response, promptAsync] = Google.useAuthRequest({
-    expoClientId:
-      "214549799877-ggh6fl3piia4n7kg918eqqkg1hf04bbo.apps.googleusercontent.com",
-  });
+    androidClientId:
+      "214549799877-pi6pn2k22gk2hg6c5f98j4pn2ekn3c9n.apps.googleusercontent.com",
+    webClientId:
+      "214549799877-1ru8afm8ll7r60q5k686ucf8sbhkara8.apps.googleusercontent.com",
+    iosClientId:"214549799877-0ea19pe65otc84pfhq5ghf66oqn1q8ei.apps.googleusercontent.com",
 
+    redirectUri: AuthSession.makeRedirectUri({
+      scheme: "com.anonymous.reuse",
+    }),
+  });
   useEffect(() => {
     if (response?.type === "success") {
-      const { id_token } = response.params;
+      // CORREÇÃO: No Android nativo, o token costuma vir aqui:
+      const idToken =
+        response.params.id_token || response.authentication?.idToken;
 
-      const credential = GoogleAuthProvider.credential(id_token);
+      if (!idToken) {
+        Alert.alert("Erro", "Token não encontrado.");
+        return;
+      }
 
+      const credential = GoogleAuthProvider.credential(idToken);
       signInWithCredential(auth, credential)
         .then(() => {
-          Alert.alert("Sucesso", "Login com Google realizado!");
           navigation.replace("HomeScreen");
         })
         .catch((error) => {
-          console.log(error);
-          Alert.alert("Erro", "Não foi possível logar com o Google");
+          console.error(error);
+          Alert.alert("Erro no Firebase", error.message);
         });
     }
   }, [response]);
@@ -89,12 +94,12 @@ export function CreateAccount({ navigation }: Props) {
       const usuarioExistente = await buscar(`user:${email}`);
       if (usuarioExistente) {
         Alert.alert("Atenção", "Este e-mail já está cadastrado.");
+        setLoading(false);
         return;
       }
 
       const usuario = JSON.stringify({ name, email, location, password });
       await salvar(`user:${email}`, usuario);
-
       await salvarToken(email);
 
       navigation.replace("HomeScreen");
@@ -114,6 +119,7 @@ export function CreateAccount({ navigation }: Props) {
         <ScrollView
           contentContainerStyle={styles.container}
           showsVerticalScrollIndicator={false}
+          scrollEnabled={!loading}
         >
           <Pressable
             style={styles.backButton}
@@ -122,6 +128,7 @@ export function CreateAccount({ navigation }: Props) {
             <Ionicons name="arrow-back" size={20} color="#342A2A" />
             <Text style={styles.backText}>Voltar</Text>
           </Pressable>
+
           <View style={styles.logoContainer}>
             <Image
               source={require("../../../assets/images/ReUse-logo-marrom.png")}
@@ -132,17 +139,17 @@ export function CreateAccount({ navigation }: Props) {
 
           <Text style={styles.title}>Criar conta</Text>
 
-          {/* Social Login */}
           <View style={styles.socialContainer}>
             <TouchableOpacity
               style={styles.socialButton}
               onPress={() => promptAsync()}
+              disabled={loading || !request}
             >
               <GoogleIcon width={18} height={18} />
               <Text style={styles.socialButtonText}>Continuar com Google</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.socialButton}>
+            <TouchableOpacity style={styles.socialButton} disabled={loading}>
               <FacebookIcon width={18} height={18} />
               <Text style={styles.socialButtonText}>
                 Continuar com Facebook
@@ -150,23 +157,20 @@ export function CreateAccount({ navigation }: Props) {
             </TouchableOpacity>
           </View>
 
-          {/* Divider */}
           <View style={styles.dividirContainer}>
             <View style={styles.line} />
             <Text style={styles.dividerText}>ou</Text>
             <View style={styles.line} />
           </View>
 
-          {/* Form Fields */}
-
-          {/* Nome */}
+          {/* Campos do Formulário */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Nome completo</Text>
             <View style={styles.inputWrapper}>
               <Ionicons
                 name="person-outline"
                 size={20}
-                color={"#342A2A"}
+                color="#342A2A"
                 style={styles.inputIcon}
               />
               <TextInput
@@ -174,38 +178,39 @@ export function CreateAccount({ navigation }: Props) {
                 placeholder="Seu nome"
                 value={name}
                 onChangeText={setName}
+                editable={!loading}
               />
             </View>
           </View>
 
-          {/* E-mail */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>E-mail</Text>
             <View style={styles.inputWrapper}>
               <Ionicons
                 name="mail-outline"
                 size={20}
-                color={"#342A2A"}
+                color="#342A2A"
                 style={styles.inputIcon}
               />
               <TextInput
                 style={styles.input}
                 placeholder="seu@email.com"
                 keyboardType="email-address"
+                autoCapitalize="none"
                 value={email}
                 onChangeText={setEmail}
+                editable={!loading}
               />
             </View>
           </View>
 
-          {/* Localização */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Localização</Text>
             <View style={styles.inputWrapper}>
               <Ionicons
                 name="location-outline"
                 size={20}
-                color={"#342A2A"}
+                color="#342A2A"
                 style={styles.inputIcon}
               />
               <TextInput
@@ -213,18 +218,18 @@ export function CreateAccount({ navigation }: Props) {
                 placeholder="Cidade, Estado"
                 value={location}
                 onChangeText={setLocation}
+                editable={!loading}
               />
             </View>
           </View>
 
-          {/* Senha */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Senha</Text>
             <View style={styles.inputWrapper}>
               <Ionicons
                 name="lock-closed-outline"
                 size={20}
-                color={"#342A2A"}
+                color="#342A2A"
                 style={styles.inputIcon}
               />
               <TextInput
@@ -233,12 +238,13 @@ export function CreateAccount({ navigation }: Props) {
                 secureTextEntry={!showPass}
                 value={password}
                 onChangeText={setPassword}
+                editable={!loading}
               />
               <TouchableOpacity onPress={() => setShowPass(!showPass)}>
                 <Ionicons
                   name={showPass ? "eye-outline" : "eye-off-outline"}
                   size={20}
-                  color={"#342A2A"}
+                  color="#342A2A"
                 />
               </TouchableOpacity>
             </View>
@@ -250,7 +256,7 @@ export function CreateAccount({ navigation }: Props) {
               <Ionicons
                 name="lock-closed-outline"
                 size={20}
-                color={"#342A2A"}
+                color="#342A2A"
                 style={styles.inputIcon}
               />
               <TextInput
@@ -259,6 +265,7 @@ export function CreateAccount({ navigation }: Props) {
                 secureTextEntry={!showConfirmPass}
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
+                editable={!loading}
               />
               <TouchableOpacity
                 onPress={() => setShowConfirmPass(!showConfirmPass)}
@@ -266,18 +273,20 @@ export function CreateAccount({ navigation }: Props) {
                 <Ionicons
                   name={showConfirmPass ? "eye-outline" : "eye-off-outline"}
                   size={20}
-                  color={"#342A2A"}
+                  color="#342A2A"
                 />
               </TouchableOpacity>
             </View>
           </View>
 
-          {/* Botão Criar Conta */}
           <TouchableOpacity
-            style={styles.createButton}
+            style={[styles.createButton, loading && { opacity: 0.7 }]}
             onPress={handleCreateAccount}
+            disabled={loading}
           >
-            <Text style={styles.createButtonText}>Criar Conta</Text>
+            <Text style={styles.createButtonText}>
+              {loading ? "Criando..." : "Criar Conta"}
+            </Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
