@@ -41,6 +41,7 @@ export function Login() {
       "214549799877-pi6pn2k22gk2hg6c5f98j4pn2ekn3c9n.apps.googleusercontent.com",
     webClientId:
       "214549799877-1ru8afm8ll7r60q5k686ucf8sbhkara8.apps.googleusercontent.com",
+    iosClientId:"214549799877-0ea19pe65otc84pfhq5ghf66oqn1q8ei.apps.googleusercontent.com",
 
     redirectUri: AuthSession.makeRedirectUri({
       scheme: "com.anonymous.reuse",
