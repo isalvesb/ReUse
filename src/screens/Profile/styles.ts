@@ -91,6 +91,72 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_700Bold",
     color: "#FFFFFF",
   },
+
+  loadingContent: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 32,
+  },
+
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+    fontFamily: "Inter_400Regular",
+    color: "#5C4B4B",
+  },
+
+  profileHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+
+  profileImage: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    marginRight: 14,
+  },
+
+  profileInfo: {
+    flex: 1,
+  },
+
+  profileName: {
+    fontSize: 22,
+    fontFamily: "Syne_800ExtraBold",
+    color: "#342A2A",
+    marginBottom: 4,
+  },
+
+  profileEmail: {
+    fontSize: 14,
+    fontFamily: "Inter_400Regular",
+    color: "#6B5B5B",
+  },
+
+  infoBox: {
+    backgroundColor: "#F7EFDE",
+    borderRadius: 16,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: "#E8DCC6",
+    marginBottom: 20,
+  },
+
+  infoLabel: {
+    fontSize: 12,
+    fontFamily: "Inter_700Bold",
+    color: "#6B5B5B",
+    marginBottom: 4,
+    textTransform: "uppercase",
+  },
+
+  infoValue: {
+    fontSize: 15,
+    fontFamily: "Inter_500Medium",
+    color: "#342A2A",
+  },
 });
 
 export default styles;
