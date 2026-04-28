@@ -37,11 +37,9 @@ export function Login() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [request, response, promptAsync] = Google.useAuthRequest({
-    androidClientId:
-      "214549799877-pi6pn2k22gk2hg6c5f98j4pn2ekn3c9n.apps.googleusercontent.com",
-    webClientId:
-      "214549799877-1ru8afm8ll7r60q5k686ucf8sbhkara8.apps.googleusercontent.com",
-    iosClientId:"214549799877-0ea19pe65otc84pfhq5ghf66oqn1q8ei.apps.googleusercontent.com",
+    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
+    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
 
     redirectUri: AuthSession.makeRedirectUri({
       scheme: "com.anonymous.reuse",
