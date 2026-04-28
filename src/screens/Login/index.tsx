@@ -23,16 +23,13 @@ import FacebookIcon from "../../../assets/images/facebook.svg";
 import { LoadingAnimation } from "../../components/LoadingAnimation";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
-import {
-  getAuth,
-  signInWithCredential,
-  GoogleAuthProvider,
-} from "firebase/auth";
-import app from "../../Services/firebaseConfig";
+import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
+
+// IMPORTANTE: Importe o auth da sua config, não do firebase/auth diretamente
+import { auth } from "../../Services/firebaseConfig";
+import * as AuthSession from "expo-auth-session";
 
 WebBrowser.maybeCompleteAuthSession();
-
-const auth = getAuth(app);
 
 export function Login() {
   const [email, setEmail] = useState("");
@@ -40,46 +37,50 @@ export function Login() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [request, response, promptAsync] = Google.useAuthRequest({
-    expoClientId:
-      "214549799877-ggh6fl3piia4n7kg918eqqkg1hf04bbo.apps.googleusercontent.com",
+    androidClientId:
+      "214549799877-pi6pn2k22gk2hg6c5f98j4pn2ekn3c9n.apps.googleusercontent.com",
+    webClientId:
+      "214549799877-1ru8afm8ll7r60q5k686ucf8sbhkara8.apps.googleusercontent.com",
+
+    redirectUri: AuthSession.makeRedirectUri({
+      scheme: "com.anonymous.reuse",
+    }),
   });
 
   useEffect(() => {
     if (response?.type === "success") {
-      const { id_token } = response.params;
+      // CORREÇÃO: No Android nativo, o token costuma vir aqui:
+      const idToken =
+        response.params.id_token || response.authentication?.idToken;
 
-      const credential = GoogleAuthProvider.credential(id_token);
+      if (!idToken) {
+        Alert.alert("Erro", "Token não encontrado.");
+        return;
+      }
 
-      setIsLoading(true);
-
+      const credential = GoogleAuthProvider.credential(idToken);
       signInWithCredential(auth, credential)
-        .then(async () => {
-          await salvarToken("google-user");
-
-          setTimeout(() => {
-            navigation.replace("HomeScreen");
-          }, 1200);
+        .then(() => {
+          navigation.replace("HomeScreen");
         })
-        .catch(() => {
-          setIsLoading(false);
-          Alert.alert("Erro", "Não foi possível entrar com Google");
+        .catch((error) => {
+          console.error(error);
+          Alert.alert("Erro no Firebase", error.message);
         });
     }
   }, [response]);
 
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
-
   const overlayProgress = useRef(new Animated.Value(0)).current;
 
   const handleLogin = async () => {
     if (!email || !password) {
-      alert("Preencha os campos");
+      Alert.alert("Atenção", "Preencha os campos");
       return;
     }
 
     if (isLoading) return;
-
     setIsLoading(true);
 
     Animated.timing(overlayProgress, {
@@ -91,19 +92,12 @@ export function Login() {
 
     try {
       const usuarioRaw = await buscar(`user:${email}`);
-
-      if (!usuarioRaw) {
-        throw new Error("Usuário não encontrado.");
-      }
+      if (!usuarioRaw) throw new Error("Usuário não encontrado.");
 
       const usuario = JSON.parse(usuarioRaw);
-
-      if (usuario.password !== password) {
-        throw new Error("Senha incorreta.");
-      }
+      if (usuario.password !== password) throw new Error("Senha incorreta.");
 
       await salvarToken(email);
-
       setTimeout(() => {
         navigation.replace("HomeScreen");
       }, 1200);
@@ -116,7 +110,6 @@ export function Login() {
       }).start(() => {
         setIsLoading(false);
       });
-
       Alert.alert("Erro ao entrar", error.message || "Tente novamente.");
     }
   };
@@ -168,7 +161,7 @@ export function Login() {
 
               <View style={styles.socialContainer}>
                 <Pressable
-                  disabled={isLoading}
+                  disabled={isLoading || !request}
                   onPress={() => promptAsync()}
                   style={({ pressed }) => [
                     styles.socialButton,
@@ -207,7 +200,6 @@ export function Login() {
 
               <View style={styles.formContainer}>
                 <Text style={styles.inputLabel}>E-mail</Text>
-
                 <View style={styles.inputWrapper}>
                   <Ionicons
                     name="mail-outline"
@@ -228,7 +220,6 @@ export function Login() {
                 </View>
 
                 <Text style={styles.inputLabel}>Senha</Text>
-
                 <View style={styles.inputWrapper}>
                   <Ionicons
                     name="lock-closed-outline"
@@ -242,6 +233,7 @@ export function Login() {
                     secureTextEntry={!passwordVisible}
                     value={password}
                     onChangeText={setPassword}
+                    editable={!isLoading}
                   />
                   <Pressable
                     disabled={isLoading}
@@ -287,14 +279,10 @@ export function Login() {
                   <Text style={styles.footerText}>Não tem uma conta?</Text>
                   <Pressable
                     disabled={isLoading}
+                    onPress={() => navigation.navigate("CreateAccount")}
                     style={({ pressed }) => pressed && styles.textButtonPressed}
                   >
-                    <Text
-                      onPress={() => navigation.navigate("CreateAccount")}
-                      style={styles.signUpText}
-                    >
-                      Criar conta
-                    </Text>
+                    <Text style={styles.signUpText}>Criar conta</Text>
                   </Pressable>
                 </View>
               </View>
