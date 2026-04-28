@@ -12,6 +12,15 @@ type UserData = {
   location: string;
 };
 
+const defaultProfileImage = require("../../../assets/images/profiles/default.png");
+
+const profileImagesByEmail: Record<string, any> = {
+  "gui@email.com": require("../../../assets/images/profiles/gui.png"),
+  "isa@email.com": require("../../../assets/images/profiles/isa.png"),
+  "kau@email.com": require("../../../assets/images/profiles/kau.png"),
+  "mir@email.com": require("../../../assets/images/profiles/mir.png"),
+};
+
 export function ProfileScreen() {
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
@@ -19,6 +28,13 @@ export function ProfileScreen() {
   const [isLoadingUser, setIsLoadingUser] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [user, setUser] = useState<UserData | null>(null);
+
+  const normalizedEmail = user?.email?.toLowerCase();
+
+  const profileImageSource =
+    normalizedEmail && profileImagesByEmail[normalizedEmail]
+      ? profileImagesByEmail[normalizedEmail]
+      : defaultProfileImage;
 
   useEffect(() => {
     const carregarUsuario = async () => {
@@ -87,7 +103,10 @@ export function ProfileScreen() {
           },
         ]}
       >
-        <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Pressable
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
           <Text style={styles.backButtonText}>‹</Text>
         </Pressable>
 
@@ -107,7 +126,7 @@ export function ProfileScreen() {
             <>
               <View style={styles.profileHeader}>
                 <Image
-                  source={require("../../../assets/images/icon.png")}
+                  source={profileImageSource}
                   style={styles.profileImage}
                 />
 
@@ -116,17 +135,14 @@ export function ProfileScreen() {
                     {user?.name || "Usuário ReUse"}
                   </Text>
 
-                  <Text style={styles.profileEmail}>
+                  <Text style={styles.profileNote}>
                     {user?.email || "E-mail não encontrado"}
                   </Text>
-                </View>
-              </View>
 
-              <View style={styles.infoBox}>
-                <Text style={styles.infoLabel}>Localização</Text>
-                <Text style={styles.infoValue}>
-                  {user?.location || "Localização não informada"}
-                </Text>
+                  <Text style={styles.profileNote}>
+                    {user?.location || "Localização não informada"}
+                  </Text>
+                </View>
               </View>
 
               <Pressable

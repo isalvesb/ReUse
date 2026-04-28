@@ -21,8 +21,8 @@ const styles = StyleSheet.create({
   },
 
   iconWrap: {
-    width: 36,
-    height: 36,
+    width: 56,
+    height: 56,
     borderRadius: 999,
     overflow: "hidden",
     alignItems: "center",
@@ -30,8 +30,8 @@ const styles = StyleSheet.create({
   },
 
   icon: {
-    width: 36,
-    height: 36,
+    width: 56,
+    height: 56,
     resizeMode: "contain",
   },
 
