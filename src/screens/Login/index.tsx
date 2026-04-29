@@ -28,6 +28,8 @@ import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 // IMPORTANTE: Importe o auth da sua config, não do firebase/auth diretamente
 import { auth } from "../../Services/firebaseConfig";
 import * as AuthSession from "expo-auth-session";
+import * as Facebook from "expo-auth-session/providers/facebook";
+import { FacebookAuthProvider } from "firebase/auth";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -37,9 +39,10 @@ export function Login() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [request, response, promptAsync] = Google.useAuthRequest({
-    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
-    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+    androidClientId:
+      "214549799877-pi6pn2k22gk2hg6c5f98j4pn2ekn3c9n.apps.googleusercontent.com",
+    webClientId:
+      "214549799877-1ru8afm8ll7r60q5k686ucf8sbhkara8.apps.googleusercontent.com",
 
     redirectUri: AuthSession.makeRedirectUri({
       scheme: "com.anonymous.reuse",
@@ -68,6 +71,24 @@ export function Login() {
         });
     }
   }, [response]);
+
+  const [fbRequest, fbResponse, fbPromptAsync] = Facebook.useAuthRequest({
+  clientId: "1650966322512425",
+});
+
+  useEffect(() => {
+    if (fbResponse?.type === "success") {
+      const { access_token } = fbResponse.params;
+      const credential = FacebookAuthProvider.credential(access_token);
+      signInWithCredential(auth, credential)
+        .then(() => {
+          navigation.replace("HomeScreen");
+        })
+        .catch((error) => {
+          Alert.alert("Erro no Facebook", error.message);
+        });
+    }
+  }, [fbResponse]);
 
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
@@ -176,7 +197,8 @@ export function Login() {
                 </Pressable>
 
                 <Pressable
-                  disabled={isLoading}
+                  disabled={isLoading || !fbRequest}
+                  onPress={() => fbPromptAsync()}
                   style={({ pressed }) => [
                     styles.socialButton,
                     pressed && styles.buttonPressed,
@@ -189,7 +211,7 @@ export function Login() {
                     Continuar com Facebook
                   </Text>
                 </Pressable>
-              </View>
+</View>
 
               <View style={styles.dividerContainer}>
                 <View style={styles.line} />
