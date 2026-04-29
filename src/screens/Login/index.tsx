@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -13,130 +13,175 @@ import {
   Alert,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
-import { salvarToken } from "../../Services/Auth";
-import { buscar } from "../../Services/Storage";
-import styles from "./styles";
 import { useNavigation } from "@react-navigation/native";
-import GoogleIcon from "../../../assets/images/google.svg";
-import FacebookIcon from "../../../assets/images/facebook.svg";
-import { LoadingAnimation } from "../../components/LoadingAnimation";
+import { Ionicons } from "@expo/vector-icons";
 import * as WebBrowser from "expo-web-browser";
+import * as AuthSession from "expo-auth-session";
 import * as Google from "expo-auth-session/providers/google";
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 
-// IMPORTANTE: Importe o auth da sua config, não do firebase/auth diretamente
 import { auth } from "../../Services/firebaseConfig";
-import * as AuthSession from "expo-auth-session";
-import * as Facebook from "expo-auth-session/providers/facebook";
-import { FacebookAuthProvider } from "firebase/auth";
+import { salvarToken } from "../../Services/Auth";
+import { buscar, salvar } from "../../Services/Storage";
+import { LoadingAnimation } from "../../components/LoadingAnimation";
+
+import GoogleIcon from "../../../assets/images/google.svg";
+import FacebookIcon from "../../../assets/images/facebook.svg";
+
+import styles from "./styles";
 
 WebBrowser.maybeCompleteAuthSession();
 
+const GOOGLE_REDIRECT_URI = AuthSession.makeRedirectUri({
+  scheme: "com.guicunhasou.reuse",
+});
+
 export function Login() {
+  const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
+
+  const overlayProgress = useRef(new Animated.Value(0)).current;
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    redirectUri: AuthSession.makeRedirectUri({
-      scheme: "com.anonymous.reuse",
-    }),
-    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
-    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
-  });
+
+  const [googleRequest, googleResponse, promptGoogleAsync] =
+    Google.useAuthRequest({
+      redirectUri: GOOGLE_REDIRECT_URI,
+      scopes: ["openid", "profile", "email"],
+      androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
+      iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+      webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    });
 
   useEffect(() => {
-    if (request) {
-      console.log("GOOGLE REQUEST REDIRECT URI:", (request as any).redirectUri);
-    }
-  }, [request]);
+    async function handleGoogleLogin() {
+      if (googleResponse?.type !== "success") return;
 
-  useEffect(() => {
-    if (response?.type === "success") {
-      // CORREÇÃO: No Android nativo, o token costuma vir aqui:
-      const idToken =
-        response.params.id_token || response.authentication?.idToken;
+      try {
+        setIsLoading(true);
+        showLoadingOverlay();
 
-      if (!idToken) {
-        Alert.alert("Erro", "Token não encontrado.");
-        return;
+        const idToken =
+          googleResponse.authentication?.idToken ||
+          googleResponse.params.id_token ||
+          null;
+
+        const accessToken =
+          googleResponse.authentication?.accessToken ||
+          googleResponse.params.access_token ||
+          null;
+
+        if (!idToken && !accessToken) {
+          throw new Error("Token do Google não encontrado.");
+        }
+
+        const credential = GoogleAuthProvider.credential(idToken, accessToken);
+
+        const userCredential = await signInWithCredential(auth, credential);
+        const user = userCredential.user;
+
+        const userKey = user.email ?? user.uid;
+
+        if (user.email) {
+          const existingUser = await buscar(`user:${user.email}`);
+
+          if (!existingUser) {
+            await salvar(
+              `user:${user.email}`,
+              JSON.stringify({
+                name: user.displayName ?? "Usuário ReUse",
+                email: user.email,
+                location: "",
+                password: "",
+                photo: user.photoURL ?? "",
+                provider: "google",
+              }),
+            );
+          }
+        }
+
+        await salvarToken(userKey);
+
+        setTimeout(() => {
+          navigation.replace("HomeScreen");
+        }, 1200);
+      } catch (error: any) {
+        hideLoadingOverlay();
+        Alert.alert(
+          "Erro no login com Google",
+          error.message || "Não foi possível entrar com Google.",
+        );
       }
-
-      const credential = GoogleAuthProvider.credential(idToken);
-      signInWithCredential(auth, credential)
-        .then(() => {
-          navigation.replace("HomeScreen");
-        })
-        .catch((error) => {
-          console.error(error);
-          Alert.alert("Erro no Firebase", error.message);
-        });
-    }
-  }, [response]);
-
-  const [fbRequest, fbResponse, fbPromptAsync] = Facebook.useAuthRequest({
-    clientId: "1650966322512425",
-  });
-
-  useEffect(() => {
-    if (fbResponse?.type === "success") {
-      const { access_token } = fbResponse.params;
-      const credential = FacebookAuthProvider.credential(access_token);
-      signInWithCredential(auth, credential)
-        .then(() => {
-          navigation.replace("HomeScreen");
-        })
-        .catch((error) => {
-          Alert.alert("Erro no Facebook", error.message);
-        });
-    }
-  }, [fbResponse]);
-
-  const navigation = useNavigation<any>();
-  const insets = useSafeAreaInsets();
-  const overlayProgress = useRef(new Animated.Value(0)).current;
-
-  const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert("Atenção", "Preencha os campos");
-      return;
     }
 
-    if (isLoading) return;
-    setIsLoading(true);
+    handleGoogleLogin();
+  }, [googleResponse]);
 
+  function showLoadingOverlay() {
     Animated.timing(overlayProgress, {
       toValue: 1,
       duration: 220,
       easing: Easing.out(Easing.quad),
       useNativeDriver: true,
     }).start();
+  }
+
+  function hideLoadingOverlay() {
+    Animated.timing(overlayProgress, {
+      toValue: 0,
+      duration: 180,
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: true,
+    }).start(() => {
+      setIsLoading(false);
+    });
+  }
+
+  async function handleLogin() {
+    if (!email.trim() || !password.trim()) {
+      Alert.alert("Atenção", "Preencha os campos.");
+      return;
+    }
+
+    if (isLoading) return;
+
+    setIsLoading(true);
+    showLoadingOverlay();
 
     try {
-      const usuarioRaw = await buscar(`user:${email}`);
-      if (!usuarioRaw) throw new Error("Usuário não encontrado.");
+      const formattedEmail = email.trim().toLowerCase();
+      const usuarioRaw = await buscar(`user:${formattedEmail}`);
+
+      if (!usuarioRaw) {
+        throw new Error("Usuário não encontrado.");
+      }
 
       const usuario = JSON.parse(usuarioRaw);
-      if (usuario.password !== password) throw new Error("Senha incorreta.");
 
-      await salvarToken(email);
+      if (usuario.password !== password) {
+        throw new Error("Senha incorreta.");
+      }
+
+      await salvarToken(formattedEmail);
+
       setTimeout(() => {
         navigation.replace("HomeScreen");
       }, 1200);
     } catch (error: any) {
-      Animated.timing(overlayProgress, {
-        toValue: 0,
-        duration: 180,
-        easing: Easing.out(Easing.quad),
-        useNativeDriver: true,
-      }).start(() => {
-        setIsLoading(false);
-      });
+      hideLoadingOverlay();
       Alert.alert("Erro ao entrar", error.message || "Tente novamente.");
     }
-  };
+  }
+
+  function handleFacebookLater() {
+    Alert.alert(
+      "Facebook",
+      "Vamos configurar o login com Facebook depois que o Google estiver funcionando.",
+    );
+  }
 
   const contentOpacity = overlayProgress.interpolate({
     inputRange: [0, 1],
@@ -185,11 +230,12 @@ export function Login() {
 
               <View style={styles.socialContainer}>
                 <Pressable
-                  disabled={isLoading || !request}
-                  onPress={() => promptAsync()}
+                  disabled={isLoading || !googleRequest}
+                  onPress={() => promptGoogleAsync()}
                   style={({ pressed }) => [
                     styles.socialButton,
                     pressed && styles.buttonPressed,
+                    (isLoading || !googleRequest) && { opacity: 0.6 },
                   ]}
                 >
                   <View style={styles.socialIconWrapper}>
@@ -201,11 +247,12 @@ export function Login() {
                 </Pressable>
 
                 <Pressable
-                  disabled={isLoading || !fbRequest}
-                  onPress={() => fbPromptAsync()}
+                  disabled={isLoading}
+                  onPress={handleFacebookLater}
                   style={({ pressed }) => [
                     styles.socialButton,
                     pressed && styles.buttonPressed,
+                    { opacity: 0.65 },
                   ]}
                 >
                   <View style={styles.socialIconWrapper}>
@@ -232,6 +279,7 @@ export function Login() {
                     color="#342A2A"
                     style={styles.inputIcon}
                   />
+
                   <TextInput
                     style={styles.input}
                     placeholder="seu@email.com"
@@ -252,14 +300,17 @@ export function Login() {
                     color="#342A2A"
                     style={styles.inputIcon}
                   />
+
                   <TextInput
                     style={styles.input}
                     placeholder="Mínimo 8 caracteres"
+                    placeholderTextColor="#9B9B9B"
                     secureTextEntry={!passwordVisible}
                     value={password}
                     onChangeText={setPassword}
                     editable={!isLoading}
                   />
+
                   <Pressable
                     disabled={isLoading}
                     onPress={() => setPasswordVisible(!passwordVisible)}
@@ -295,6 +346,7 @@ export function Login() {
                   style={({ pressed }) => [
                     styles.loginButton,
                     pressed && styles.loginButtonPressed,
+                    isLoading && { opacity: 0.7 },
                   ]}
                 >
                   <Text style={styles.loginButtonText}>Entrar</Text>
@@ -302,6 +354,7 @@ export function Login() {
 
                 <View style={styles.footer}>
                   <Text style={styles.footerText}>Não tem uma conta?</Text>
+
                   <Pressable
                     disabled={isLoading}
                     onPress={() => navigation.navigate("CreateAccount")}
