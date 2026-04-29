@@ -7,6 +7,12 @@ export type ItemPayload = {
   description: string;
   location: string;
   user_email?: string;
+
+  cep?: string;
+  street?: string;
+  neighborhood?: string;
+  city?: string;
+  state?: string;
 };
 
 export type Item = {
@@ -18,6 +24,12 @@ export type Item = {
   location: string;
   user_email: string | null;
   created_at: string;
+
+  cep: string | null;
+  street: string | null;
+  neighborhood: string | null;
+  city: string | null;
+  state: string | null;
 };
 
 export async function createItem(item: ItemPayload) {

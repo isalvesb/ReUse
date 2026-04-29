@@ -18,6 +18,8 @@ import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { salvar, buscar } from "../../Services/Storage";
 import { IncentiveCard } from "../../components/IncentiveCard";
+import { CepInput } from "../../components/CepInput";
+import { CepResponse } from "../../Services/Cep";
 import { createItem } from "../../Services/Items";
 import { buscarToken } from "../../Services/Auth";
 import styles from "./styles";
@@ -46,7 +48,11 @@ const REWARDS = [
     text: "3 Itens: Destaque no perfil + Prioridade em itens premium",
     threshold: 3,
   },
-  { icon: "🌿", text: "5 Itens: Badge exclusivo + Frete grátis", threshold: 5 },
+  {
+    icon: "🌿",
+    text: "5 Itens: Badge exclusivo + Frete grátis",
+    threshold: 5,
+  },
 ];
 
 const CATEGORIES = [
@@ -65,13 +71,21 @@ const CATEGORIES = [
 
 export function PublishScreen({ navigation, userItemCount = 0 }: any) {
   const insets = useSafeAreaInsets();
+
   const [photos, setPhotos] = useState<PhotoItem[]>([]);
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [condition, setCondition] = useState<Condition | null>(null);
   const [description, setDescription] = useState("");
+
+  const [cep, setCep] = useState("");
+  const [street, setStreet] = useState("");
+  const [neighborhood, setNeighborhood] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
   const [location, setLocation] = useState("");
+
   const [uploading, setUploading] = useState(false);
 
   const salvarTitulo = (v: string) => {
@@ -94,9 +108,45 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
     salvar("draft_description", v);
   };
 
-  const salvarLocalizacao = (v: string) => {
-    setLocation(v);
-    salvar("draft_location", v);
+  const limparDadosEndereco = () => {
+    setStreet("");
+    setNeighborhood("");
+    setCity("");
+    setState("");
+    setLocation("");
+
+    salvar("draft_street", "");
+    salvar("draft_neighborhood", "");
+    salvar("draft_city", "");
+    salvar("draft_state", "");
+    salvar("draft_location", "");
+  };
+
+  const salvarCep = (v: string) => {
+    setCep(v);
+    salvar("draft_cep", v);
+
+    if (v.length < 8) {
+      limparDadosEndereco();
+    }
+  };
+
+  const handleAddressFound = (address: CepResponse) => {
+    const formattedLocation = address.bairro
+      ? `${address.bairro}, ${address.localidade} - ${address.uf}`
+      : `${address.localidade} - ${address.uf}`;
+
+    setStreet(address.logradouro);
+    setNeighborhood(address.bairro);
+    setCity(address.localidade);
+    setState(address.uf);
+    setLocation(formattedLocation);
+
+    salvar("draft_street", address.logradouro);
+    salvar("draft_neighborhood", address.bairro);
+    salvar("draft_city", address.localidade);
+    salvar("draft_state", address.uf);
+    salvar("draft_location", formattedLocation);
   };
 
   const limparRascunho = async () => {
@@ -104,11 +154,18 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
     await salvar("draft_category", "");
     await salvar("draft_condition", "");
     await salvar("draft_description", "");
+
+    await salvar("draft_cep", "");
+    await salvar("draft_street", "");
+    await salvar("draft_neighborhood", "");
+    await salvar("draft_city", "");
+    await salvar("draft_state", "");
     await salvar("draft_location", "");
   };
 
   const abrirCamera = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
+
     if (status !== "granted") {
       Alert.alert(
         "Permissão necessária",
@@ -116,11 +173,13 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
       );
       return;
     }
+
     try {
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ["images"],
         quality: 0.8,
       });
+
       if (!result.canceled && result.assets.length > 0) {
         setPhotos((prev) =>
           [...prev, { uri: result.assets[0].uri }].slice(0, 5),
@@ -133,6 +192,7 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
 
   const abrirGaleria = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
     if (status !== "granted") {
       Alert.alert(
         "Permissão necessária",
@@ -140,6 +200,7 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
       );
       return;
     }
+
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
@@ -147,6 +208,7 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
         selectionLimit: 5 - photos.length,
         quality: 0.8,
       });
+
       if (!result.canceled) {
         const novasFotos = result.assets.map((a) => ({ uri: a.uri }));
         setPhotos((prev) => [...prev, ...novasFotos].slice(0, 5));
@@ -159,7 +221,10 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
   const handleAddPhoto = () => {
     if (Platform.OS === "ios") {
       ActionSheetIOS.showActionSheetWithOptions(
-        { options: ["Cancelar", "Câmera", "Galeria"], cancelButtonIndex: 0 },
+        {
+          options: ["Cancelar", "Câmera", "Galeria"],
+          cancelButtonIndex: 0,
+        },
         (index) => {
           if (index === 1) abrirCamera();
           if (index === 2) abrirGaleria();
@@ -179,12 +244,25 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
   };
 
   const handlePublish = async () => {
-    if (!title.trim()) return Alert.alert("Atenção!", "Adicione um título!");
-    if (!category) return Alert.alert("Atenção!", "Selecione uma categoria.");
-    if (!condition)
+    if (!title.trim()) {
+      return Alert.alert("Atenção!", "Adicione um título!");
+    }
+
+    if (!category) {
+      return Alert.alert("Atenção!", "Selecione uma categoria.");
+    }
+
+    if (!condition) {
       return Alert.alert("Atenção", "Selecione a condição do item.");
-    if (description.length < 20)
+    }
+
+    if (description.trim().length < 20) {
       return Alert.alert("Atenção!", "Descrição mínima de 20 caracteres.");
+    }
+
+    if (!location.trim()) {
+      return Alert.alert("Atenção!", "Informe um CEP válido.");
+    }
 
     setUploading(true);
 
@@ -198,19 +276,33 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
         description: description.trim(),
         location: location.trim(),
         user_email: userEmail ?? undefined,
+
+        cep,
+        street,
+        neighborhood,
+        city,
+        state,
       });
 
       Alert.alert("Publicado!", "Seu item foi publicado com sucesso.", [
         {
           text: "OK",
-          onPress: () => {
+          onPress: async () => {
             setPhotos([]);
-            salvarTitulo("");
-            salvarCategoria("");
+            setTitle("");
+            setCategory("");
             setCondition(null);
-            salvar("draft_condition", "");
-            salvarDescricao("");
-            salvarLocalizacao("");
+            setDescription("");
+
+            setCep("");
+            setStreet("");
+            setNeighborhood("");
+            setCity("");
+            setState("");
+            setLocation("");
+
+            await limparRascunho();
+
             navigation?.goBack();
           },
         },
@@ -229,13 +321,25 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
       const cat = await buscar("draft_category");
       const cond = await buscar("draft_condition");
       const desc = await buscar("draft_description");
-      const loc = await buscar("draft_location");
+
+      const savedCep = await buscar("draft_cep");
+      const savedStreet = await buscar("draft_street");
+      const savedNeighborhood = await buscar("draft_neighborhood");
+      const savedCity = await buscar("draft_city");
+      const savedState = await buscar("draft_state");
+      const savedLocation = await buscar("draft_location");
 
       if (t) setTitle(t);
       if (cat) setCategory(cat);
       if (cond) setCondition(cond as Condition);
       if (desc) setDescription(desc);
-      if (loc) setLocation(loc);
+
+      if (savedCep) setCep(savedCep);
+      if (savedStreet) setStreet(savedStreet);
+      if (savedNeighborhood) setNeighborhood(savedNeighborhood);
+      if (savedCity) setCity(savedCity);
+      if (savedState) setState(savedState);
+      if (savedLocation) setLocation(savedLocation);
     };
 
     carregarRascunho();
@@ -258,12 +362,14 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
               Publique seu primeiro item!
             </Text>
           </View>
+
           <Ionicons name="trophy" size={28} color="#F5C542" />
         </View>
 
         <View style={styles.milestoneRow}>
           {MILESTONES.map((m) => {
             const done = userItemCount >= m.items;
+
             return (
               <View key={m.items} style={styles.milestoneItem}>
                 <View
@@ -280,6 +386,7 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
                     <Ionicons name="lock-closed" size={20} color="#888780" />
                   )}
                 </View>
+
                 <Text
                   style={[
                     styles.milestoneLabel,
@@ -301,6 +408,7 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
         <Text style={styles.cardSubtitle}>
           Adicione até 5 fotos do seu item. A primeira será a foto de capa.
         </Text>
+
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -309,11 +417,13 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
           {photos.map((p, i) => (
             <View key={i} style={styles.photoThumb}>
               <Image source={{ uri: p.uri }} style={styles.thumbImg} />
+
               {i === 0 && (
                 <View style={styles.coverBadge}>
                   <Text style={styles.coverBadgeText}>Capa</Text>
                 </View>
               )}
+
               <TouchableOpacity
                 style={styles.removeBtn}
                 onPress={() => removePhoto(i)}
@@ -341,6 +451,7 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
         <Text style={styles.label}>
           Título <Text style={styles.required}>*</Text>
         </Text>
+
         <TextInput
           style={styles.input}
           placeholder="Ex: Cadeira de escritório ergonômica"
@@ -352,6 +463,7 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
         <Text style={styles.label}>
           Categoria <Text style={styles.required}>*</Text>
         </Text>
+
         <TouchableOpacity
           style={styles.inputDropdown}
           onPress={() => setShowCategoryModal(true)}
@@ -362,12 +474,14 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
           >
             {category || "Selecione..."}
           </Text>
+
           <Ionicons name="chevron-down" size={16} color="#888780" />
         </TouchableOpacity>
 
         <Text style={styles.label}>
           Condição <Text style={styles.required}>*</Text>
         </Text>
+
         <View style={styles.conditionGrid}>
           {(["novo", "como_novo", "bom_estado", "regular"] as Condition[]).map(
             (c) => (
@@ -401,6 +515,7 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
         <Text style={styles.label}>
           Descrição <Text style={styles.required}>*</Text>
         </Text>
+
         <TextInput
           style={[styles.input, { height: 100, textAlignVertical: "top" }]}
           placeholder="Descreva o item, suas características"
@@ -409,6 +524,7 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
           multiline
           placeholderTextColor="#aaa"
         />
+
         <Text style={styles.charCount}>
           Mínimo 20 caracteres ({description.length}/20)
         </Text>
@@ -416,21 +532,25 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
         <Text style={styles.label}>
           Localização <Text style={styles.required}>*</Text>
         </Text>
-        <View style={styles.inputRow}>
-          <Ionicons
-            name="location-outline"
-            size={16}
-            color="#888780"
-            style={{ marginRight: 8 }}
-          />
-          <TextInput
-            style={styles.inputRowField}
-            placeholder="Ex: Centro, São Paulo - SP"
-            value={location}
-            onChangeText={salvarLocalizacao}
-            placeholderTextColor="#aaa"
-          />
-        </View>
+
+        <CepInput onCepChange={salvarCep} onAddressFound={handleAddressFound} />
+
+        {location ? (
+          <View style={[styles.inputRow, { marginTop: 12 }]}>
+            <Ionicons
+              name="location-outline"
+              size={16}
+              color="#888780"
+              style={{ marginRight: 8 }}
+            />
+
+            <Text style={styles.inputRowField}>{location}</Text>
+          </View>
+        ) : (
+          <Text style={styles.charCount}>
+            Digite um CEP válido para preencher a localização aproximada.
+          </Text>
+        )}
       </View>
 
       <View style={styles.tipBox}>
@@ -471,7 +591,9 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
         >
           <View style={styles.modalSheet}>
             <View style={styles.modalHandle} />
+
             <Text style={styles.modalTitle}>Selecione a categoria</Text>
+
             <FlatList
               data={CATEGORIES}
               keyExtractor={(item) => item}
@@ -494,6 +616,7 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
                   >
                     {item}
                   </Text>
+
                   {category === item && (
                     <Ionicons name="checkmark" size={16} color="#4A6741" />
                   )}
