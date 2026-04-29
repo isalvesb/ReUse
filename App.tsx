@@ -124,7 +124,7 @@ function AppNavigator() {
             <Stack.Screen
               name="ResetEmailSent"
               component={ResetEmailSent}
-            />{" "}
+            />
           </>
         )}
       </Stack.Navigator>
