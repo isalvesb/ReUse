@@ -18,9 +18,14 @@ import { Ionicons } from "@expo/vector-icons";
 import GoogleIcon from "../../../assets/images/google.svg";
 import FacebookIcon from "../../../assets/images/facebook.svg";
 import * as WebBrowser from "expo-web-browser";
+import * as AuthSession from "expo-auth-session";
 import * as Google from "expo-auth-session/providers/google";
 import * as Facebook from "expo-auth-session/providers/facebook";
-import { FacebookAuthProvider, GoogleAuthProvider, signInWithCredential } from "firebase/auth";
+import {
+  FacebookAuthProvider,
+  GoogleAuthProvider,
+  signInWithCredential,
+} from "firebase/auth";
 
 // CORREÇÃO: Importar a instância configurada do seu serviço
 import { auth } from "../../Services/firebaseConfig";
@@ -46,20 +51,12 @@ export function CreateAccount({ navigation }: Props) {
   const [showConfirmPass, setShowConfirmPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [request, response, promptAsync] = Google.useAuthRequest({
-<<<<<<< Updated upstream
-      androidClientId:
-        "214549799877-pi6pn2k22gk2hg6c5f98j4pn2ekn3c9n.apps.googleusercontent.com",
-      webClientId:
-        "214549799877-1ru8afm8ll7r60q5k686ucf8sbhkara8.apps.googleusercontent.com",
-  
-      redirectUri: AuthSession.makeRedirectUri({
-        scheme: "com.anonymous.reuse",
-      }),
-=======
+    redirectUri: AuthSession.makeRedirectUri({
+      scheme: "com.anonymous.reuse",
+    }),
     androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
     webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
     iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
->>>>>>> Stashed changes
   });
 
   useEffect(() => {
@@ -85,24 +82,23 @@ export function CreateAccount({ navigation }: Props) {
     }
   }, [response]);
 
-    const [fbRequest, fbResponse, fbPromptAsync] = Facebook.useAuthRequest({
+  const [fbRequest, fbResponse, fbPromptAsync] = Facebook.useAuthRequest({
     clientId: "1650966322512425",
   });
-  
-    useEffect(() => {
-      if (fbResponse?.type === "success") {
-        const { access_token } = fbResponse.params;
-        const credential = FacebookAuthProvider.credential(access_token);
-        signInWithCredential(auth, credential)
-          .then(() => {
-            navigation.replace("HomeScreen");
-          })
-          .catch((error) => {
-            Alert.alert("Erro no Facebook", error.message);
-          });
-      }
-    }, [fbResponse]);
-  
+
+  useEffect(() => {
+    if (fbResponse?.type === "success") {
+      const { access_token } = fbResponse.params;
+      const credential = FacebookAuthProvider.credential(access_token);
+      signInWithCredential(auth, credential)
+        .then(() => {
+          navigation.replace("HomeScreen");
+        })
+        .catch((error) => {
+          Alert.alert("Erro no Facebook", error.message);
+        });
+    }
+  }, [fbResponse]);
 
   const handleCreateAccount = async () => {
     if (!name.trim()) return Alert.alert("Atenção", "Informe seu nome.");
@@ -175,19 +171,17 @@ export function CreateAccount({ navigation }: Props) {
             </TouchableOpacity>
 
             <View style={styles.socialContainer}>
-            <TouchableOpacity 
-              style={styles.socialButton}  
-              onPress={() => fbPromptAsync()}
-              disabled={loading || !request}
-            >
-
-              <FacebookIcon width={18} height={18} />
-              <Text style={styles.socialButtonText}>
-                Continuar com Facebook
-              </Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.socialButton}
+                onPress={() => fbPromptAsync()}
+                disabled={loading || !request}
+              >
+                <FacebookIcon width={18} height={18} />
+                <Text style={styles.socialButtonText}>
+                  Continuar com Facebook
+                </Text>
+              </TouchableOpacity>
             </View>
-
           </View>
 
           <View style={styles.dividirContainer}>
