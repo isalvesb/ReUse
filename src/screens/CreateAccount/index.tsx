@@ -25,7 +25,6 @@ import { FacebookAuthProvider, GoogleAuthProvider, signInWithCredential } from "
 // CORREÇÃO: Importar a instância configurada do seu serviço
 import { auth } from "../../Services/firebaseConfig";
 import styles from "./styles";
-import * as AuthSession from "expo-auth-session";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -47,6 +46,7 @@ export function CreateAccount({ navigation }: Props) {
   const [showConfirmPass, setShowConfirmPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [request, response, promptAsync] = Google.useAuthRequest({
+<<<<<<< Updated upstream
       androidClientId:
         "214549799877-pi6pn2k22gk2hg6c5f98j4pn2ekn3c9n.apps.googleusercontent.com",
       webClientId:
@@ -55,7 +55,13 @@ export function CreateAccount({ navigation }: Props) {
       redirectUri: AuthSession.makeRedirectUri({
         scheme: "com.anonymous.reuse",
       }),
+=======
+    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
+    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+>>>>>>> Stashed changes
   });
+
   useEffect(() => {
     if (response?.type === "success") {
       // CORREÇÃO: No Android nativo, o token costuma vir aqui:
