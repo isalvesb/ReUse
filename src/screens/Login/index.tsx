@@ -18,7 +18,9 @@ import { Ionicons } from "@expo/vector-icons";
 import * as WebBrowser from "expo-web-browser";
 import * as AuthSession from "expo-auth-session";
 import * as Google from "expo-auth-session/providers/google";
+import * as Facebook from "expo-auth-session/providers/facebook";
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
+import { FacebookAuthProvider } from "firebase/auth";
 
 import { auth } from "../../Services/firebaseConfig";
 import { salvarToken } from "../../Services/Auth";
@@ -54,6 +56,12 @@ export function Login() {
       androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
       iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
       webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    });
+
+  const [facebookRequest, facebookResponse, promptFacebookAsync] =
+    Facebook.useAuthRequest({
+      clientId: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID,
+      scopes: ["public_profile", "email"],
     });
 
   useEffect(() => {
@@ -119,6 +127,65 @@ export function Login() {
 
     handleGoogleLogin();
   }, [googleResponse]);
+
+  useEffect(() => {
+    async function handleFacebookLogin() {
+      if (facebookResponse?.type !== "success") return;
+
+      try {
+        setIsLoading(true);
+        showLoadingOverlay();
+
+        const accessToken =
+          facebookResponse.authentication?.accessToken ||
+          facebookResponse.params.access_token ||
+          null;
+
+        if (!accessToken) {
+          throw new Error("Token do Facebook não encontrado.");
+        }
+
+        const credential = FacebookAuthProvider.credential(accessToken);
+        const userCredential = await signInWithCredential(auth, credential);
+        const user = userCredential.user;
+
+        const userKey = user.email ?? user.uid;
+
+        if (user.email) {
+          const existingUser = await buscar(`user:${user.email}`);
+
+          if (!existingUser) {
+            await salvar(
+              `user:${user.email}`,
+              JSON.stringify({
+                name: user.displayName ?? "Usuário ReUse",
+                email: user.email,
+                location: "",
+                password: "",
+                photo: user.photoURL ?? "",
+                provider: "facebook",
+              }),
+            );
+          }
+        }
+
+        await salvarToken(userKey);
+
+        setTimeout(() => {
+          navigation.replace("HomeScreen");
+        }, 1200);
+      } catch (error: any) {
+        hideLoadingOverlay();
+
+        Alert.alert(
+          "Erro no login com Facebook",
+          error.message || "Não foi possível entrar com Facebook.",
+        );
+      }
+    }
+
+    handleFacebookLogin();
+  }, [facebookResponse]);
 
   function showLoadingOverlay() {
     Animated.timing(overlayProgress, {
@@ -250,12 +317,12 @@ export function Login() {
                 </Pressable>
 
                 <Pressable
-                  disabled={isLoading}
-                  onPress={handleFacebookLater}
+                  disabled={isLoading || !facebookRequest}
+                  onPress={() => promptFacebookAsync()}
                   style={({ pressed }) => [
                     styles.socialButton,
                     pressed && styles.buttonPressed,
-                    { opacity: 0.65 },
+                    (isLoading || !facebookRequest) && { opacity: 0.6 },
                   ]}
                 >
                   <View style={styles.socialIconWrapper}>

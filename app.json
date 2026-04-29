@@ -2,7 +2,7 @@
   "expo": {
     "name": "ReUse",
     "slug": "ReUse",
-    "scheme": "com.guicunhasou.reuse",
+    "scheme": ["com.guicunhasou.reuse", "fb1650966322512425"],
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "",
