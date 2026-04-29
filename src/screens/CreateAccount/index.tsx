@@ -84,7 +84,6 @@ export function CreateAccount({ navigation }: Props) {
         }
 
         const credential = GoogleAuthProvider.credential(idToken, accessToken);
-
         const userCredential = await signInWithCredential(auth, credential);
         const user = userCredential.user;
 
@@ -234,6 +233,7 @@ export function CreateAccount({ navigation }: Props) {
               disabled={loading || !googleRequest}
             >
               <GoogleIcon width={18} height={18} />
+
               <Text style={styles.socialButtonText}>Continuar com Google</Text>
             </TouchableOpacity>
 
@@ -243,6 +243,7 @@ export function CreateAccount({ navigation }: Props) {
               disabled={loading}
             >
               <FacebookIcon width={18} height={18} />
+
               <Text style={styles.socialButtonText}>
                 Continuar com Facebook
               </Text>

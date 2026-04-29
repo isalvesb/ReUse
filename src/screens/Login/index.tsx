@@ -79,7 +79,6 @@ export function Login() {
         }
 
         const credential = GoogleAuthProvider.credential(idToken, accessToken);
-
         const userCredential = await signInWithCredential(auth, credential);
         const user = userCredential.user;
 
@@ -110,6 +109,7 @@ export function Login() {
         }, 1200);
       } catch (error: any) {
         hideLoadingOverlay();
+
         Alert.alert(
           "Erro no login com Google",
           error.message || "Não foi possível entrar com Google.",
@@ -141,7 +141,9 @@ export function Login() {
   }
 
   async function handleLogin() {
-    if (!email.trim() || !password.trim()) {
+    const formattedEmail = email.trim().toLowerCase();
+
+    if (!formattedEmail || !password.trim()) {
       Alert.alert("Atenção", "Preencha os campos.");
       return;
     }
@@ -152,7 +154,6 @@ export function Login() {
     showLoadingOverlay();
 
     try {
-      const formattedEmail = email.trim().toLowerCase();
       const usuarioRaw = await buscar(`user:${formattedEmail}`);
 
       if (!usuarioRaw) {
@@ -172,6 +173,7 @@ export function Login() {
       }, 1200);
     } catch (error: any) {
       hideLoadingOverlay();
+
       Alert.alert("Erro ao entrar", error.message || "Tente novamente.");
     }
   }
@@ -241,6 +243,7 @@ export function Login() {
                   <View style={styles.socialIconWrapper}>
                     <GoogleIcon width={18} height={18} />
                   </View>
+
                   <Text style={styles.socialButtonText}>
                     Continuar com Google
                   </Text>
@@ -258,6 +261,7 @@ export function Login() {
                   <View style={styles.socialIconWrapper}>
                     <FacebookIcon width={18} height={18} />
                   </View>
+
                   <Text style={styles.socialButtonText}>
                     Continuar com Facebook
                   </Text>
@@ -272,6 +276,7 @@ export function Login() {
 
               <View style={styles.formContainer}>
                 <Text style={styles.inputLabel}>E-mail</Text>
+
                 <View style={styles.inputWrapper}>
                   <Ionicons
                     name="mail-outline"
@@ -293,6 +298,7 @@ export function Login() {
                 </View>
 
                 <Text style={styles.inputLabel}>Senha</Text>
+
                 <View style={styles.inputWrapper}>
                   <Ionicons
                     name="lock-closed-outline"
