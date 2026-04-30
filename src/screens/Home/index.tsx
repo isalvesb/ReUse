@@ -368,7 +368,6 @@ export function HomeScreen({
                     title={card.title}
                     subtitle={card.subtitle}
                     imageSource={card.imageSource}
-                    onPress={() => console.log(card.title)}
                   />
                 </View>
               ))}

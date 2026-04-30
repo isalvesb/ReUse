@@ -64,15 +64,6 @@ export function Login() {
       scopes: ["public_profile", "email"],
     });
 
-console.log(
-  "ANDROID CLIENT ID:",
-  process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID
-);
-
-console.log("REQUEST CLIENT ID:", googleRequest?.clientId);
-console.log("REDIRECT URI:", googleRequest?.redirectUri);
-
-
   useEffect(() => {
     async function handleGoogleLogin() {
       if (googleResponse?.type !== "success") return;

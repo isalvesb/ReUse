@@ -132,7 +132,7 @@ export function ProfileScreen() {
 
                 <View style={styles.profileInfo}>
                   <Text style={styles.profileName}>
-                    {user?.name || "Usuário ReUse"}
+                    {user?.name || "Usuário"}
                   </Text>
 
                   <Text style={styles.profileNote}>

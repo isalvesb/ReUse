@@ -22,6 +22,7 @@ import { CepInput } from "../../components/CepInput";
 import { CepResponse } from "../../Services/Cep";
 import { createItem } from "../../Services/Items";
 import { buscarToken } from "../../Services/Auth";
+import { DEV_SKIP_AUTH } from "../../config/devAuth";
 import styles from "./styles";
 
 type Condition = "novo" | "como_novo" | "bom_estado" | "regular";
@@ -267,7 +268,14 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
     setUploading(true);
 
     try {
-      const userEmail = await buscarToken();
+      const savedUserEmail = await buscarToken();
+
+      const userEmail = DEV_SKIP_AUTH
+        ? "dev@reuse.app"
+        : (savedUserEmail ?? undefined);
+
+      console.log("DEV_SKIP_AUTH:", DEV_SKIP_AUTH);
+      console.log("Email usado na publicação:", userEmail);
 
       await createItem({
         title: title.trim(),
@@ -275,7 +283,7 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
         item_condition: condition,
         description: description.trim(),
         location: location.trim(),
-        user_email: userEmail ?? undefined,
+        user_email: userEmail,
 
         cep,
         street,

@@ -8,18 +8,23 @@ import {
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 import { getItems, Item } from "../../Services/Items";
 import { buscar, salvar } from "../../Services/Storage";
 import { buscarToken } from "../../Services/Auth";
+import { DEV_SKIP_AUTH } from "../../config/devAuth";
+
 import styles from "./styles";
 
 const ITEMS_CACHE_KEY = "showcase_items_cache";
+const DEV_USER_EMAIL = "dev@reuse.app";
 
 export function ShowcaseScreen() {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [usingCache, setUsingCache] = useState(false);
+
   const insets = useSafeAreaInsets();
 
   const normalizeEmail = (email?: string | null) => {
@@ -39,6 +44,10 @@ export function ShowcaseScreen() {
   };
 
   const getLoggedUserEmail = async () => {
+    if (DEV_SKIP_AUTH) {
+      return normalizeEmail(DEV_USER_EMAIL);
+    }
+
     const token = await buscarToken();
     return normalizeEmail(token);
   };
@@ -48,15 +57,16 @@ export function ShowcaseScreen() {
       const cacheKey = getUserCacheKey(userEmail);
       const cachedItems = await buscar(cacheKey);
 
-      if (cachedItems) {
-        const parsedItems = JSON.parse(cachedItems) as Item[];
-        const userItems = filterItemsByUser(parsedItems, userEmail);
-
-        setItems(userItems);
-        return userItems;
+      if (!cachedItems) {
+        return [];
       }
 
-      return [];
+      const parsedItems = JSON.parse(cachedItems) as Item[];
+      const userItems = filterItemsByUser(parsedItems, userEmail);
+
+      setItems(userItems);
+
+      return userItems;
     } catch (error) {
       console.error("Erro ao carregar cache da vitrine:", error);
       return [];
@@ -76,40 +86,38 @@ export function ShowcaseScreen() {
     } catch (error) {
       console.error("Erro ao buscar itens:", error);
 
-      if (items.length > 0) {
-        setUsingCache(true);
-      }
+      setUsingCache(items.length > 0);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   };
 
+  const initializeShowcase = async () => {
+    setLoading(true);
+    setItems([]);
+    setUsingCache(false);
+
+    const userEmail = await getLoggedUserEmail();
+
+    if (!userEmail) {
+      setItems([]);
+      setLoading(false);
+      return;
+    }
+
+    const cachedItems = await loadCachedItems(userEmail);
+
+    if (cachedItems.length > 0) {
+      setUsingCache(true);
+    }
+
+    await loadItems(userEmail);
+  };
+
   useFocusEffect(
     useCallback(() => {
-      setLoading(true);
-      setItems([]);
-      setUsingCache(false);
-
-      const initialize = async () => {
-        const userEmail = await getLoggedUserEmail();
-
-        if (!userEmail) {
-          setItems([]);
-          setLoading(false);
-          return;
-        }
-
-        const cached = await loadCachedItems(userEmail);
-
-        if (cached.length > 0) {
-          setUsingCache(true);
-        }
-
-        await loadItems(userEmail);
-      };
-
-      initialize();
+      initializeShowcase();
     }, []),
   );
 
@@ -190,11 +198,6 @@ export function ShowcaseScreen() {
 
               <Text style={styles.cardLocation}>{item.location}</Text>
 
-              {!!item.user_email && (
-                <Text style={styles.cardUser}>
-                  Publicado por: {item.user_email}
-                </Text>
-              )}
             </View>
           ))}
         </View>

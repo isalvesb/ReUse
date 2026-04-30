@@ -29,6 +29,7 @@ import { PublishScreen } from "./src/screens/Publish";
 import TabBar from "./src/components/TabBar";
 import { buscarToken } from "./src/Services/Auth";
 import { ProfileScreen } from "./src/screens/Profile";
+import { DEV_SKIP_AUTH } from "./src/config/devAuth";
 
 type RootStackParamList = {
   Login: undefined;
@@ -76,10 +77,16 @@ function MainScreen() {
 
 function AppNavigator() {
   const [isCheckingSession, setIsCheckingSession] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(DEV_SKIP_AUTH);
 
   useEffect(() => {
     const verificarSessao = async () => {
+      if (DEV_SKIP_AUTH) {
+        setIsAuthenticated(true);
+        setIsCheckingSession(false);
+        return;
+      }
+
       try {
         const token = await buscarToken();
         setIsAuthenticated(!!token);
@@ -121,10 +128,7 @@ function AppNavigator() {
             <Stack.Screen name="CreateAccount" component={CreateAccount} />
             <Stack.Screen name="HomeScreen" component={MainScreen} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
-            <Stack.Screen
-              name="ResetEmailSent"
-              component={ResetEmailSent}
-            />
+            <Stack.Screen name="ResetEmailSent" component={ResetEmailSent} />
           </>
         )}
       </Stack.Navigator>
