@@ -2,8 +2,11 @@ import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Image, Pressable, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 import { buscarToken, logout } from "../../Services/Auth";
 import { buscar } from "../../Services/Storage";
+import { DEV_SKIP_AUTH } from "../../config/devAuth";
+
 import styles from "./styles";
 
 type UserData = {
@@ -35,6 +38,8 @@ export function ProfileScreen() {
     normalizedEmail && profileImagesByEmail[normalizedEmail]
       ? profileImagesByEmail[normalizedEmail]
       : defaultProfileImage;
+
+  const isLogoutDisabled = DEV_SKIP_AUTH || isLoggingOut;
 
   useEffect(() => {
     const carregarUsuario = async () => {
@@ -76,6 +81,11 @@ export function ProfileScreen() {
   }, []);
 
   const handleLogout = async () => {
+    if (DEV_SKIP_AUTH) {
+      console.log("Logout desativado temporariamente no modo desenvolvimento.");
+      return;
+    }
+
     if (isLoggingOut) return;
 
     try {
@@ -147,17 +157,19 @@ export function ProfileScreen() {
 
               <Pressable
                 onPress={handleLogout}
-                disabled={isLoggingOut}
+                disabled={isLogoutDisabled}
                 style={({ pressed }) => [
                   styles.logoutButton,
-                  pressed && !isLoggingOut && styles.logoutButtonPressed,
-                  isLoggingOut && styles.logoutButtonDisabled,
+                  pressed && !isLogoutDisabled && styles.logoutButtonPressed,
+                  isLogoutDisabled && styles.logoutButtonDisabled,
                 ]}
               >
                 {isLoggingOut ? (
                   <ActivityIndicator color="#FFFFFF" />
                 ) : (
-                  <Text style={styles.logoutButtonText}>Logout</Text>
+                  <Text style={styles.logoutButtonText}>
+                    {DEV_SKIP_AUTH ? "Logout desativado" : "Logout"}
+                  </Text>
                 )}
               </Pressable>
             </>
