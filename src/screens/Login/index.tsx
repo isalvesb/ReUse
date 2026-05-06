@@ -18,9 +18,8 @@ import { Ionicons } from "@expo/vector-icons";
 import * as WebBrowser from "expo-web-browser";
 import * as AuthSession from "expo-auth-session";
 import * as Google from "expo-auth-session/providers/google";
-import * as Facebook from "expo-auth-session/providers/facebook";
-import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
-import { FacebookAuthProvider } from "firebase/auth";
+import { LoginManager, AccessToken, Settings } from "react-native-fbsdk-next";
+import { GoogleAuthProvider, FacebookAuthProvider, signInWithCredential } from "firebase/auth";
 
 import { auth } from "../../Services/firebaseConfig";
 import { salvarToken } from "../../Services/Auth";
@@ -56,12 +55,6 @@ export function Login() {
       androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
       iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
       webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-    });
-
-  const [facebookRequest, facebookResponse, promptFacebookAsync] =
-    Facebook.useAuthRequest({
-      clientId: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID,
-      scopes: ["public_profile", "email"],
     });
 
   useEffect(() => {
@@ -117,7 +110,6 @@ export function Login() {
         }, 1200);
       } catch (error: any) {
         hideLoadingOverlay();
-
         Alert.alert(
           "Erro no login com Google",
           error.message || "Não foi possível entrar com Google.",
@@ -128,64 +120,64 @@ export function Login() {
     handleGoogleLogin();
   }, [googleResponse]);
 
-  useEffect(() => {
-    async function handleFacebookLogin() {
-      if (facebookResponse?.type !== "success") return;
+  async function handleFacebookLogin() {
+    try {
+      setIsLoading(true);
+      showLoadingOverlay();
 
-      try {
-        setIsLoading(true);
-        showLoadingOverlay();
+      await Settings.initializeSDK();
 
-        const accessToken =
-          facebookResponse.authentication?.accessToken ||
-          facebookResponse.params.access_token ||
-          null;
+      const result = await LoginManager.logInWithPermissions([
+        "public_profile",
+        "email",
+      ]);
 
-        if (!accessToken) {
-          throw new Error("Token do Facebook não encontrado.");
-        }
-
-        const credential = FacebookAuthProvider.credential(accessToken);
-        const userCredential = await signInWithCredential(auth, credential);
-        const user = userCredential.user;
-
-        const userKey = user.email ?? user.uid;
-
-        if (user.email) {
-          const existingUser = await buscar(`user:${user.email}`);
-
-          if (!existingUser) {
-            await salvar(
-              `user:${user.email}`,
-              JSON.stringify({
-                name: user.displayName ?? "Usuário ReUse",
-                email: user.email,
-                location: "",
-                password: "",
-                photo: user.photoURL ?? "",
-                provider: "facebook",
-              }),
-            );
-          }
-        }
-
-        await salvarToken(userKey);
-
-        setTimeout(() => {
-          navigation.replace("HomeScreen");
-        }, 1200);
-      } catch (error: any) {
-        hideLoadingOverlay();
-
-        Alert.alert(
-          "Erro no login com Facebook",
-          error.message || "Não foi possível entrar com Facebook.",
-        );
+      if (result.isCancelled) {
+        throw new Error("Login cancelado.");
       }
-    }
 
-    handleFacebookLogin();
-  }, [facebookResponse]);
+      const data = await AccessToken.getCurrentAccessToken();
+
+      if (!data?.accessToken) {
+        throw new Error("Token do Facebook não encontrado.");
+      }
+
+      const credential = FacebookAuthProvider.credential(data.accessToken);
+      const userCredential = await signInWithCredential(auth, credential);
+      const user = userCredential.user;
+
+      const userKey = user.email ?? user.uid;
+
+      if (user.email) {
+        const existingUser = await buscar(`user:${user.email}`);
+        if (!existingUser) {
+          await salvar(
+            `user:${user.email}`,
+            JSON.stringify({
+              name: user.displayName ?? "Usuário ReUse",
+              email: user.email,
+              location: "",
+              password: "",
+              photo: user.photoURL ?? "",
+              provider: "facebook",
+            }),
+          );
+        }
+      }
+
+      await salvarToken(userKey);
+
+      setTimeout(() => {
+        navigation.replace("HomeScreen");
+      }, 1200);
+    } catch (error: any) {
+      hideLoadingOverlay();
+      Alert.alert(
+        "Erro no login com Facebook",
+        error.message || "Tente novamente.",
+      );
+    }
+  }
 
   function showLoadingOverlay() {
     Animated.timing(overlayProgress, {
@@ -240,16 +232,8 @@ export function Login() {
       }, 1200);
     } catch (error: any) {
       hideLoadingOverlay();
-
       Alert.alert("Erro ao entrar", error.message || "Tente novamente.");
     }
-  }
-
-  function handleFacebookLater() {
-    Alert.alert(
-      "Facebook",
-      "Vamos configurar o login com Facebook depois que o Google estiver funcionando.",
-    );
   }
 
   const contentOpacity = overlayProgress.interpolate({
@@ -310,25 +294,23 @@ export function Login() {
                   <View style={styles.socialIconWrapper}>
                     <GoogleIcon width={18} height={18} />
                   </View>
-
                   <Text style={styles.socialButtonText}>
                     Continuar com Google
                   </Text>
                 </Pressable>
 
                 <Pressable
-                  disabled={isLoading || !facebookRequest}
-                  onPress={() => promptFacebookAsync()}
+                  disabled={isLoading}
+                  onPress={handleFacebookLogin}
                   style={({ pressed }) => [
                     styles.socialButton,
                     pressed && styles.buttonPressed,
-                    (isLoading || !facebookRequest) && { opacity: 0.6 },
+                    isLoading && { opacity: 0.6 },
                   ]}
                 >
                   <View style={styles.socialIconWrapper}>
                     <FacebookIcon width={18} height={18} />
                   </View>
-
                   <Text style={styles.socialButtonText}>
                     Continuar com Facebook
                   </Text>
@@ -351,7 +333,6 @@ export function Login() {
                     color="#342A2A"
                     style={styles.inputIcon}
                   />
-
                   <TextInput
                     style={styles.input}
                     placeholder="seu@email.com"
@@ -373,7 +354,6 @@ export function Login() {
                     color="#342A2A"
                     style={styles.inputIcon}
                   />
-
                   <TextInput
                     style={styles.input}
                     placeholder="Mínimo 8 caracteres"
@@ -383,7 +363,6 @@ export function Login() {
                     onChangeText={setPassword}
                     editable={!isLoading}
                   />
-
                   <Pressable
                     disabled={isLoading}
                     onPress={() => setPasswordVisible(!passwordVisible)}
@@ -427,7 +406,6 @@ export function Login() {
 
                 <View style={styles.footer}>
                   <Text style={styles.footerText}>Não tem uma conta?</Text>
-
                   <Pressable
                     disabled={isLoading}
                     onPress={() => navigation.navigate("CreateAccount")}

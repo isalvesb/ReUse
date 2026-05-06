@@ -1,1 +1,1 @@
-export const DEV_SKIP_AUTH = true;
+export const DEV_SKIP_AUTH = false;

@@ -1,207 +1,273 @@
-import React, { useCallback, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
+  TouchableOpacity,
   ScrollView,
+  Image,
   ActivityIndicator,
-  RefreshControl,
 } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-import { getItems, Item } from "../../Services/Items";
-import { buscar, salvar } from "../../Services/Storage";
+import { useNavigation } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
 import { buscarToken } from "../../Services/Auth";
-import { DEV_SKIP_AUTH } from "../../config/devAuth";
-
+import { buscar } from "../../Services/Storage";
+import { getItemsByUser, Item } from "../../Services/Items";
 import styles from "./styles";
 
-const ITEMS_CACHE_KEY = "showcase_items_cache";
-const DEV_USER_EMAIL = "dev@reuse.app";
+type ItemType = "Venda" | "Troca" | "Doação";
+
+type ShowcaseItem = {
+  id: number;
+  title: string;
+  condition: string;
+  size?: string;
+  distance: string;
+  type: ItemType;
+  price?: string;
+  image?: string;
+};
+
+type UserData = {
+  name: string;
+  email: string;
+  location: string;
+  avatar?: string | null;
+  avaliacao?: string;
+};
+
+type FilterOption = "Todos" | "Doações" | "Trocas" | "Vendas";
+
+const defaultProfileImage = require("../../../assets/images/profiles/default.png");
+const profileImagesByEmail: Record<string, any> = {
+  "gui@email.com": require("../../../assets/images/profiles/gui.png"),
+  "isa@email.com": require("../../../assets/images/profiles/isa.png"),
+  "kau@email.com": require("../../../assets/images/profiles/kau.png"),
+  "mir@email.com": require("../../../assets/images/profiles/mir.png"),
+};
+
+function getProfileImage(email?: string, avatarUri?: string | null) {
+  if (avatarUri) return { uri: avatarUri };
+  const key = email?.toLowerCase() ?? "";
+  return profileImagesByEmail[key] ?? defaultProfileImage;
+}
+
+function TypeBadge({ type }: { type: ItemType }) {
+  const bg =
+    type === "Venda" ? "#F5C842" :
+    type === "Troca" ? "#C9A8D4" :
+    "#A8D4B0";
+  return (
+    <View style={[styles.typeBadge, { backgroundColor: bg }]}>
+      <Text style={styles.typeBadgeText}>{type}</Text>
+    </View>
+  );
+}
+
+function ItemCard({ item, onPress }: { item: ShowcaseItem; onPress?: () => void }) {
+  return (
+    <TouchableOpacity style={styles.itemCard} onPress={onPress} activeOpacity={0.85}>
+      <View style={styles.itemImageBox}>
+        {item.image ? (
+          <Image source={{ uri: item.image }} style={styles.itemImage} />
+        ) : (
+          <View style={styles.itemImagePlaceholder}>
+            <Ionicons name="image-outline" size={36} color="#CCC" />
+          </View>
+        )}
+      </View>
+      <View style={styles.itemInfo}>
+        <Text style={styles.itemTitle} numberOfLines={2}>{item.title}</Text>
+        <Text style={styles.itemSub}>
+          {item.condition}{item.size ? ` • ${item.size}` : ""}
+        </Text>
+        <Text style={styles.itemDistance}>{item.distance}</Text>
+        <View style={styles.itemFooter}>
+          <TypeBadge type={item.type} />
+          {item.price && <Text style={styles.itemPrice}>{item.price}</Text>}
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+}
 
 export function ShowcaseScreen() {
-  const [items, setItems] = useState<Item[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [usingCache, setUsingCache] = useState(false);
-
+  const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
 
-  const normalizeEmail = (email?: string | null) => {
-    return email?.trim().toLowerCase() ?? "";
+  const [user, setUser] = useState<UserData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [items, setItems] = useState<Item[]>([]);
+  const [filter, setFilter] = useState<FilterOption>("Todos");
+
+  function getItemType(item: Item): ItemType {
+    const cat = item.category?.toLowerCase() ?? "";
+    if (cat.includes("troca")) return "Troca";
+    if (cat.includes("doa")) return "Doação";
+    return "Venda";
+  }
+
+  const filterOptions: FilterOption[] = ["Todos", "Doações", "Trocas", "Vendas"];
+
+  const counts = {
+    Doações: items.filter((i) => getItemType(i) === "Doação").length,
+    Trocas: items.filter((i) => getItemType(i) === "Troca").length,
+    Vendas: items.filter((i) => getItemType(i) === "Venda").length,
   };
 
-  const getUserCacheKey = (userEmail: string) => {
-    return `${ITEMS_CACHE_KEY}:${normalizeEmail(userEmail)}`;
-  };
+  const filtered =
+    filter === "Todos" ? items :
+    filter === "Doações" ? items.filter((i) => getItemType(i) === "Doação") :
+    filter === "Trocas" ? items.filter((i) => getItemType(i) === "Troca") :
+    items.filter((i) => getItemType(i) === "Venda");
 
-  const filterItemsByUser = (allItems: Item[], userEmail: string) => {
-    const normalizedUserEmail = normalizeEmail(userEmail);
+  useEffect(() => {
+    const carregar = async () => {
+      try {
+        const email = await buscarToken();
+        if (!email) return;
 
-    return allItems.filter(
-      (item) => normalizeEmail(item.user_email) === normalizedUserEmail,
-    );
-  };
+        const raw = await buscar(`user:${email}`);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          setUser({
+            name: parsed.name,
+            email: parsed.email,
+            location: parsed.location,
+            avatar: parsed.avatar ?? null,
+            avaliacao: parsed.avaliacao ?? "4.8",
+          });
+        } else {
+          setUser({ name: "Usuário ReUse", email, location: "Localização não informada" });
+        }
 
-  const getLoggedUserEmail = async () => {
-    if (DEV_SKIP_AUTH) {
-      return normalizeEmail(DEV_USER_EMAIL);
-    }
-
-    const token = await buscarToken();
-    return normalizeEmail(token);
-  };
-
-  const loadCachedItems = async (userEmail: string) => {
-    try {
-      const cacheKey = getUserCacheKey(userEmail);
-      const cachedItems = await buscar(cacheKey);
-
-      if (!cachedItems) {
-        return [];
+        const userItems = await getItemsByUser(email);
+        setItems(userItems);
+      } catch (err) {
+        console.error("Erro ao carregar vitrine:", err);
+      } finally {
+        setIsLoading(false);
       }
-
-      const parsedItems = JSON.parse(cachedItems) as Item[];
-      const userItems = filterItemsByUser(parsedItems, userEmail);
-
-      setItems(userItems);
-
-      return userItems;
-    } catch (error) {
-      console.error("Erro ao carregar cache da vitrine:", error);
-      return [];
-    }
-  };
-
-  const loadItems = async (userEmail: string) => {
-    try {
-      const data = await getItems();
-      const userItems = filterItemsByUser(data, userEmail);
-
-      setItems(userItems);
-      setUsingCache(false);
-
-      const cacheKey = getUserCacheKey(userEmail);
-      await salvar(cacheKey, JSON.stringify(userItems));
-    } catch (error) {
-      console.error("Erro ao buscar itens:", error);
-
-      setUsingCache(items.length > 0);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
-
-  const initializeShowcase = async () => {
-    setLoading(true);
-    setItems([]);
-    setUsingCache(false);
-
-    const userEmail = await getLoggedUserEmail();
-
-    if (!userEmail) {
-      setItems([]);
-      setLoading(false);
-      return;
-    }
-
-    const cachedItems = await loadCachedItems(userEmail);
-
-    if (cachedItems.length > 0) {
-      setUsingCache(true);
-    }
-
-    await loadItems(userEmail);
-  };
-
-  useFocusEffect(
-    useCallback(() => {
-      initializeShowcase();
-    }, []),
-  );
-
-  const handleRefresh = async () => {
-    setRefreshing(true);
-
-    const userEmail = await getLoggedUserEmail();
-
-    if (!userEmail) {
-      setItems([]);
-      setRefreshing(false);
-      return;
-    }
-
-    await loadItems(userEmail);
-  };
-
-  const formatCondition = (condition: string) => {
-    const conditionMap: Record<string, string> = {
-      novo: "Novo",
-      como_novo: "Usado - Como Novo",
-      usado: "Usado",
-      regular: "Usado - Estado Regular",
     };
+    carregar();
+  }, []);
 
-    return conditionMap[condition] ?? condition;
-  };
+  if (isLoading) {
+    return (
+      <View style={styles.loadingScreen}>
+        <ActivityIndicator size="large" color="#342A2A" />
+      </View>
+    );
+  }
 
   return (
-    <ScrollView
-      style={styles.screen}
-      contentContainerStyle={{ paddingBottom: 140 }}
-      showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={handleRefresh}
-          tintColor="#342A2A"
-        />
-      }
-    >
+    <View style={styles.screen}>
+      {/* Header */}
       <View style={[styles.navBar, { paddingTop: insets.top + 14 }]}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={20} color="#FFF" />
+          <Text style={styles.backButtonText}>Voltar</Text>
+        </TouchableOpacity>
         <Text style={styles.navTitle}>Minha Vitrine</Text>
+        <View style={styles.placeholder} />
       </View>
 
-      {loading ? (
-        <View style={styles.centerContent}>
-          <ActivityIndicator size="large" color="#342A2A" />
-          <Text style={styles.feedbackText}>Carregando itens...</Text>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Card do usuário */}
+        <View style={styles.userCard}>
+          <View style={styles.userCardLeft}>
+            <Image
+              source={getProfileImage(user?.email, user?.avatar)}
+              style={styles.userAvatar}
+            />
+            <View style={styles.userInfo}>
+              <Text style={styles.userName}>{user?.name ?? "Usuário"}</Text>
+              <View style={styles.userLocationRow}>
+                <Ionicons name="location-outline" size={13} color="#888780" />
+                <Text style={styles.userLocation}>{user?.location ?? "—"}</Text>
+              </View>
+            </View>
+          </View>
+          <View style={styles.ratingBadge}>
+            <Ionicons name="star" size={14} color="#F5C842" />
+            <Text style={styles.ratingText}>{user?.avaliacao ?? "4.8"}</Text>
+          </View>
         </View>
-      ) : items.length === 0 ? (
-        <View style={styles.centerContent}>
-          <Text style={styles.emptyTitle}>Nenhum item publicado ainda</Text>
-          <Text style={styles.emptyText}>
-            Assim que você publicar um item, ele aparecerá aqui.
-          </Text>
+
+        {/* Contadores */}
+        <View style={styles.countersRow}>
+          <View style={styles.counterCard}>
+            <Text style={styles.counterValue}>{counts.Doações}</Text>
+            <Text style={styles.counterLabel}>Doações</Text>
+          </View>
+          <View style={styles.counterCard}>
+            <Text style={styles.counterValue}>{counts.Trocas}</Text>
+            <Text style={styles.counterLabel}>Trocas</Text>
+          </View>
+          <View style={styles.counterCard}>
+            <Text style={styles.counterValue}>{counts.Vendas}</Text>
+            <Text style={styles.counterLabel}>Vendas</Text>
+          </View>
         </View>
-      ) : (
-        <View style={styles.listContent}>
-          {usingCache && (
-            <View style={styles.cacheWarning}>
-              <Text style={styles.cacheWarningText}>
-                Exibindo dados salvos no dispositivo. Atualize quando a conexão
-                voltar.
+
+        {/* Filtros */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.filtersScroll}
+          contentContainerStyle={styles.filtersContent}
+        >
+          {filterOptions.map((f) => (
+            <TouchableOpacity
+              key={f}
+              style={[styles.filterChip, filter === f && styles.filterChipActive]}
+              onPress={() => setFilter(f)}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.filterChipText, filter === f && styles.filterChipTextActive]}>
+                {f}{f !== "Todos" && counts[f as keyof typeof counts] ? ` (${counts[f as keyof typeof counts]})` : ""}
               </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        {/* Contagem total */}
+        <Text style={styles.itemCount}>{filtered.length} {filtered.length === 1 ? "item" : "itens"}</Text>
+
+        {/* Grade de itens */}
+        <View style={styles.grid}>
+          {filtered.length > 0 ? (
+            filtered.map((item) => (
+              <View key={item.id} style={styles.gridCell}>
+                <ItemCard
+                  item={{
+                    id: item.id,
+                    title: item.title,
+                    condition: item.item_condition || "Bom estado",
+                    size: item.size ?? undefined,
+                    distance: item.city
+                      ? `${item.neighborhood ? `${item.neighborhood}, ` : ""}${item.city}`
+                      : item.location || "Localização não informada",
+                    type: getItemType(item),
+                    price: item.price ?? undefined,
+                    image: item.images?.[0] ?? undefined,
+                  }}
+                  onPress={() => navigation.navigate("Product", { itemId: item.id })}
+                />
+              </View>
+            ))
+          ) : (
+            <View style={styles.emptyState}>
+              <Ionicons name="archive-outline" size={48} color="#CCC" />
+              <Text style={styles.emptyStateText}>Nenhum item encontrado</Text>
             </View>
           )}
-
-          {items.map((item) => (
-            <View key={item.id} style={styles.card}>
-              <Text style={styles.cardTitle}>{item.title}</Text>
-
-              <Text style={styles.cardMeta}>
-                {item.category} • {formatCondition(item.item_condition)}
-              </Text>
-
-              <Text style={styles.cardDescription}>{item.description}</Text>
-
-              <Text style={styles.cardLocation}>{item.location}</Text>
-
-            </View>
-          ))}
         </View>
-      )}
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }

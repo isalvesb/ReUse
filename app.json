@@ -2,7 +2,10 @@
   "expo": {
     "name": "ReUse",
     "slug": "ReUse",
-    "scheme": ["com.guicunhasou.reuse", "fb1650966322512425"],
+    "scheme": [
+      "com.guicunhasou.reuse",
+      "fb1650966322512425"
+    ],
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "",
@@ -14,7 +17,17 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.guicunhasou.reuse"
+      "bundleIdentifier": "com.guicunhasou.reuse",
+      "infoPlist": {
+        "SKAdNetworkItems": [
+          {
+            "SKAdNetworkIdentifier": "v9wttpbfk9.skadnetwork"
+          },
+          {
+            "SKAdNetworkIdentifier": "n38lu8286q.skadnetwork"
+          }
+        ]
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -24,11 +37,35 @@
         "monochromeImage": ""
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.guicunhasou.reuse"
+      "package": "com.guicunhasou.reuse",
+      "permissions": [
+        "android.permission.INTERNET"
+      ]
     },
     "web": {
       "favicon": ""
     },
-    "plugins": ["expo-font", "expo-secure-store", "expo-web-browser"]
+    "plugins": [
+      "expo-font",
+      "expo-secure-store",
+      "expo-web-browser",
+      [
+        "react-native-fbsdk-next",
+        {
+          "appID": "1650966322512425",
+          "clientToken": "e15ff146bb98ade1d6c9808d27724b3b",
+          "displayName": "ReUse",
+          "scheme": "fb1650966322512425",
+          "advertiserIDCollectionEnabled": false,
+          "autoLogAppEventsEnabled": false,
+          "isAutoInitEnabled": true
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "2cbc39c3-a17a-489f-beaf-4d4a4113d7eb"
+      }
+    }
   }
 }

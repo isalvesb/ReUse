@@ -148,11 +148,13 @@ const promoCards = [
 interface HomeScreenProps {
   onNavigateToPublish?: () => void;
   onNavigateToProfile?: () => void;
+  onNavigateToProduct?: (itemId: string) => void;
 }
 
 export function HomeScreen({
   onNavigateToPublish,
   onNavigateToProfile,
+  onNavigateToProduct,
 }: HomeScreenProps) {
   const [showIncentive, setShowIncentive] = useState(false);
 
