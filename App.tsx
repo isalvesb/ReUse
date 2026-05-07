@@ -40,6 +40,8 @@ type RootStackParamList = {
   HomeScreen: undefined;
   Profile: undefined;
   ResetEmailSent: undefined;
+  Notifications: undefined;
+  Product: { itemId: number };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -121,6 +123,8 @@ function AppNavigator() {
           <>
             <Stack.Screen name="HomeScreen" component={MainScreen} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name="Product" component={ProductScreen} />
+            <Stack.Screen name="Notifications" component={Notifications} />
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="ForgotPass" component={ForgotPass} />
             <Stack.Screen name="CreateAccount" component={CreateAccount} />
@@ -133,6 +137,8 @@ function AppNavigator() {
             <Stack.Screen name="CreateAccount" component={CreateAccount} />
             <Stack.Screen name="HomeScreen" component={MainScreen} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name="Product" component={ProductScreen} />
+            <Stack.Screen name="Notifications" component={Notifications} />
             <Stack.Screen name="ResetEmailSent" component={ResetEmailSent} />
           </>
         )}
