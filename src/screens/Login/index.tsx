@@ -18,8 +18,13 @@ import { Ionicons } from "@expo/vector-icons";
 import * as WebBrowser from "expo-web-browser";
 import * as AuthSession from "expo-auth-session";
 import * as Google from "expo-auth-session/providers/google";
+import { requestTrackingPermissionsAsync } from "expo-tracking-transparency";
 import { LoginManager, AccessToken, Settings } from "react-native-fbsdk-next";
-import { GoogleAuthProvider, FacebookAuthProvider, signInWithCredential } from "firebase/auth";
+import {
+  GoogleAuthProvider,
+  FacebookAuthProvider,
+  signInWithCredential,
+} from "firebase/auth";
 
 import { auth } from "../../Services/firebaseConfig";
 import { salvarToken } from "../../Services/Auth";
@@ -57,6 +62,62 @@ export function Login() {
       webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
     });
 
+  function showLoadingOverlay() {
+    Animated.timing(overlayProgress, {
+      toValue: 1,
+      duration: 220,
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: true,
+    }).start();
+  }
+
+  function hideLoadingOverlay() {
+    Animated.timing(overlayProgress, {
+      toValue: 0,
+      duration: 180,
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: true,
+    }).start(() => {
+      setIsLoading(false);
+    });
+  }
+
+  async function salvarUsuarioSocial({
+    name,
+    email,
+    uid,
+    photo,
+    provider,
+  }: {
+    name: string | null;
+    email: string | null;
+    uid: string;
+    photo: string | null;
+    provider: "google" | "facebook";
+  }) {
+    const userKey = email ?? uid;
+
+    if (email) {
+      const existingUser = await buscar(`user:${email}`);
+
+      if (!existingUser) {
+        await salvar(
+          `user:${email}`,
+          JSON.stringify({
+            name: name ?? "Usuário ReUse",
+            email,
+            location: "",
+            password: "",
+            photo: photo ?? "",
+            provider,
+          }),
+        );
+      }
+    }
+
+    await salvarToken(userKey);
+  }
+
   useEffect(() => {
     async function handleGoogleLogin() {
       if (googleResponse?.type !== "success") return;
@@ -83,33 +144,20 @@ export function Login() {
         const userCredential = await signInWithCredential(auth, credential);
         const user = userCredential.user;
 
-        const userKey = user.email ?? user.uid;
-
-        if (user.email) {
-          const existingUser = await buscar(`user:${user.email}`);
-
-          if (!existingUser) {
-            await salvar(
-              `user:${user.email}`,
-              JSON.stringify({
-                name: user.displayName ?? "Usuário ReUse",
-                email: user.email,
-                location: "",
-                password: "",
-                photo: user.photoURL ?? "",
-                provider: "google",
-              }),
-            );
-          }
-        }
-
-        await salvarToken(userKey);
+        await salvarUsuarioSocial({
+          name: user.displayName,
+          email: user.email,
+          uid: user.uid,
+          photo: user.photoURL,
+          provider: "google",
+        });
 
         setTimeout(() => {
           navigation.replace("HomeScreen");
         }, 1200);
       } catch (error: any) {
         hideLoadingOverlay();
+
         Alert.alert(
           "Erro no login com Google",
           error.message || "Não foi possível entrar com Google.",
@@ -121,16 +169,36 @@ export function Login() {
   }, [googleResponse]);
 
   async function handleFacebookLogin() {
+    if (isLoading) return;
+
     try {
       setIsLoading(true);
       showLoadingOverlay();
 
       await Settings.initializeSDK();
 
-      const result = await LoginManager.logInWithPermissions([
-        "public_profile",
-        "email",
-      ]);
+      if (Platform.OS === "ios") {
+        const { status } = await requestTrackingPermissionsAsync();
+
+        if (status !== "granted") {
+          throw new Error(
+            "Para entrar com Facebook neste app, permita o rastreamento nas configurações do iOS ou use o login com Google.",
+          );
+        }
+
+        await Settings.setAdvertiserTrackingEnabled(true);
+      }
+
+      const result =
+        Platform.OS === "ios"
+          ? await LoginManager.logInWithPermissions(
+              ["public_profile", "email"],
+              "enabled",
+            )
+          : await LoginManager.logInWithPermissions([
+              "public_profile",
+              "email",
+            ]);
 
       if (result.isCancelled) {
         throw new Error("Login cancelado.");
@@ -139,64 +207,32 @@ export function Login() {
       const data = await AccessToken.getCurrentAccessToken();
 
       if (!data?.accessToken) {
-        throw new Error("Token do Facebook não encontrado.");
+        throw new Error("Access token do Facebook não encontrado.");
       }
 
       const credential = FacebookAuthProvider.credential(data.accessToken);
       const userCredential = await signInWithCredential(auth, credential);
       const user = userCredential.user;
 
-      const userKey = user.email ?? user.uid;
-
-      if (user.email) {
-        const existingUser = await buscar(`user:${user.email}`);
-        if (!existingUser) {
-          await salvar(
-            `user:${user.email}`,
-            JSON.stringify({
-              name: user.displayName ?? "Usuário ReUse",
-              email: user.email,
-              location: "",
-              password: "",
-              photo: user.photoURL ?? "",
-              provider: "facebook",
-            }),
-          );
-        }
-      }
-
-      await salvarToken(userKey);
+      await salvarUsuarioSocial({
+        name: user.displayName,
+        email: user.email,
+        uid: user.uid,
+        photo: user.photoURL,
+        provider: "facebook",
+      });
 
       setTimeout(() => {
         navigation.replace("HomeScreen");
       }, 1200);
     } catch (error: any) {
       hideLoadingOverlay();
+
       Alert.alert(
         "Erro no login com Facebook",
         error.message || "Tente novamente.",
       );
     }
-  }
-
-  function showLoadingOverlay() {
-    Animated.timing(overlayProgress, {
-      toValue: 1,
-      duration: 220,
-      easing: Easing.out(Easing.quad),
-      useNativeDriver: true,
-    }).start();
-  }
-
-  function hideLoadingOverlay() {
-    Animated.timing(overlayProgress, {
-      toValue: 0,
-      duration: 180,
-      easing: Easing.out(Easing.quad),
-      useNativeDriver: true,
-    }).start(() => {
-      setIsLoading(false);
-    });
   }
 
   async function handleLogin() {
@@ -232,6 +268,7 @@ export function Login() {
       }, 1200);
     } catch (error: any) {
       hideLoadingOverlay();
+
       Alert.alert("Erro ao entrar", error.message || "Tente novamente.");
     }
   }
@@ -294,6 +331,7 @@ export function Login() {
                   <View style={styles.socialIconWrapper}>
                     <GoogleIcon width={18} height={18} />
                   </View>
+
                   <Text style={styles.socialButtonText}>
                     Continuar com Google
                   </Text>
@@ -311,6 +349,7 @@ export function Login() {
                   <View style={styles.socialIconWrapper}>
                     <FacebookIcon width={18} height={18} />
                   </View>
+
                   <Text style={styles.socialButtonText}>
                     Continuar com Facebook
                   </Text>
@@ -333,6 +372,7 @@ export function Login() {
                     color="#342A2A"
                     style={styles.inputIcon}
                   />
+
                   <TextInput
                     style={styles.input}
                     placeholder="seu@email.com"
@@ -354,6 +394,7 @@ export function Login() {
                     color="#342A2A"
                     style={styles.inputIcon}
                   />
+
                   <TextInput
                     style={styles.input}
                     placeholder="Mínimo 8 caracteres"
@@ -363,6 +404,7 @@ export function Login() {
                     onChangeText={setPassword}
                     editable={!isLoading}
                   />
+
                   <Pressable
                     disabled={isLoading}
                     onPress={() => setPasswordVisible(!passwordVisible)}
@@ -406,6 +448,7 @@ export function Login() {
 
                 <View style={styles.footer}>
                   <Text style={styles.footerText}>Não tem uma conta?</Text>
+
                   <Pressable
                     disabled={isLoading}
                     onPress={() => navigation.navigate("CreateAccount")}
