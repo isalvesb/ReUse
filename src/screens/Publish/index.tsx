@@ -21,7 +21,7 @@ import { IncentiveCard } from "../../components/IncentiveCard";
 import { CepInput } from "../../components/CepInput";
 import { CepResponse } from "../../Services/Cep";
 import { createItem, uploadItemImages } from "../../Services/Items";
-import { buscarToken } from "../../Services/Auth";
+import { auth } from "../../Services/firebaseConfig";
 import { DEV_SKIP_AUTH } from "../../config/devAuth";
 import styles from "./styles";
 
@@ -164,7 +164,10 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
   const abrirCamera = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert("Permissão necessária", "Autorize o acesso à câmera nas configurações.");
+      Alert.alert(
+        "Permissão necessária",
+        "Autorize o acesso à câmera nas configurações.",
+      );
       return;
     }
     try {
@@ -173,7 +176,9 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
         quality: 0.8,
       });
       if (!result.canceled && result.assets.length > 0) {
-        setPhotos((prev) => [...prev, { uri: result.assets[0].uri }].slice(0, 5));
+        setPhotos((prev) =>
+          [...prev, { uri: result.assets[0].uri }].slice(0, 5),
+        );
       }
     } catch (error) {
       Alert.alert("Erro", "Não foi possível abrir a câmera. Tente novamente.");
@@ -183,7 +188,10 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
   const abrirGaleria = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert("Permissão necessária", "Autorize o acesso à galeria nas configurações.");
+      Alert.alert(
+        "Permissão necessária",
+        "Autorize o acesso à galeria nas configurações.",
+      );
       return;
     }
     try {
@@ -209,7 +217,7 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
         (index) => {
           if (index === 1) abrirCamera();
           if (index === 2) abrirGaleria();
-        }
+        },
       );
     } else {
       Alert.alert("Adicionar foto", "Escolha uma opção:", [
@@ -244,17 +252,26 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
     setUploading(true);
 
     try {
-      const savedUserEmail = await buscarToken();
+      const firebaseUser = auth.currentUser;
+
       const userEmail = DEV_SKIP_AUTH
         ? "dev@reuse.app"
-        : (savedUserEmail ?? undefined);
+        : (firebaseUser?.email ?? undefined);
+
+      if (!userEmail) {
+        Alert.alert(
+          "Login necessário",
+          "Entre na sua conta antes de publicar um item.",
+        );
+        return;
+      }
 
       // Faz upload das fotos e pega as URLs públicas
       let imageUrls: string[] = [];
       if (photos.length > 0 && userEmail) {
         imageUrls = await uploadItemImages(
           photos.map((p) => p.uri),
-          userEmail
+          userEmail,
         );
       }
 
@@ -330,7 +347,10 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
   }, []);
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 140 }}>
+    <ScrollView
+      style={styles.screen}
+      contentContainerStyle={{ paddingBottom: 140 }}
+    >
       <View style={[styles.navBar, { paddingTop: insets.top + 14 }]}>
         <Text style={styles.navTitle}>Publicar Item</Text>
       </View>
@@ -339,7 +359,9 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
         <View style={styles.journeyHeader}>
           <View>
             <Text style={styles.journeyTitle}>Sua Jornada Sustentável</Text>
-            <Text style={styles.journeySubtitle}>Publique seu primeiro item!</Text>
+            <Text style={styles.journeySubtitle}>
+              Publique seu primeiro item!
+            </Text>
           </View>
           <Ionicons name="trophy" size={28} color="#F5C542" />
         </View>
@@ -349,14 +371,26 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
             const done = userItemCount >= m.items;
             return (
               <View key={m.items} style={styles.milestoneItem}>
-                <View style={[styles.milestoneIcon, done ? styles.milestoneIconDone : styles.milestoneIconLocked]}>
+                <View
+                  style={[
+                    styles.milestoneIcon,
+                    done
+                      ? styles.milestoneIconDone
+                      : styles.milestoneIconLocked,
+                  ]}
+                >
                   {done ? (
                     <Ionicons name="leaf" size={20} color="#FFFFFF" />
                   ) : (
                     <Ionicons name="lock-closed" size={20} color="#888780" />
                   )}
                 </View>
-                <Text style={[styles.milestoneLabel, done && styles.milestoneLabelDone]}>
+                <Text
+                  style={[
+                    styles.milestoneLabel,
+                    done && styles.milestoneLabelDone,
+                  ]}
+                >
                   {m.label}
                 </Text>
               </View>
@@ -373,7 +407,11 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
           Adicione até 5 fotos do seu item. A primeira será a foto de capa.
         </Text>
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 12 }}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={{ marginTop: 12 }}
+        >
           {photos.map((p, i) => (
             <View key={i} style={styles.photoThumb}>
               <Image source={{ uri: p.uri }} style={styles.thumbImg} />
@@ -382,14 +420,20 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
                   <Text style={styles.coverBadgeText}>Capa</Text>
                 </View>
               )}
-              <TouchableOpacity style={styles.removeBtn} onPress={() => removePhoto(i)}>
+              <TouchableOpacity
+                style={styles.removeBtn}
+                onPress={() => removePhoto(i)}
+              >
                 <Text style={{ color: "#fff", fontSize: 12 }}>✕</Text>
               </TouchableOpacity>
             </View>
           ))}
 
           {photos.length < 5 && (
-            <TouchableOpacity style={styles.addPhotoBtn} onPress={handleAddPhoto}>
+            <TouchableOpacity
+              style={styles.addPhotoBtn}
+              onPress={handleAddPhoto}
+            >
               <Ionicons name="camera-outline" size={28} color="#888780" />
               <Text style={styles.addPhotoText}>Adicionar</Text>
             </TouchableOpacity>
@@ -419,7 +463,9 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
           onPress={() => setShowCategoryModal(true)}
           activeOpacity={0.7}
         >
-          <Text style={[styles.inputDropdownField, !category && { color: "#aaa" }]}>
+          <Text
+            style={[styles.inputDropdownField, !category && { color: "#aaa" }]}
+          >
             {category || "Selecione..."}
           </Text>
           <Ionicons name="chevron-down" size={16} color="#888780" />
@@ -429,23 +475,33 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
           Condição <Text style={styles.required}>*</Text>
         </Text>
         <View style={styles.conditionGrid}>
-          {(["novo", "como_novo", "bom_estado", "regular"] as Condition[]).map((c) => (
-            <TouchableOpacity
-              key={c}
-              style={[styles.conditionBtn, condition === c && styles.conditionBtnActive]}
-              onPress={() => salvarCondicao(c)}
-            >
-              <Text style={[styles.conditionText, condition === c && styles.conditionTextActive]}>
-                {c === "novo"
-                  ? "Novo"
-                  : c === "como_novo"
-                  ? "Usado -\nComo Novo"
-                  : c === "bom_estado"
-                  ? "Usado -\nBom Estado"
-                  : "Usado - Estado\nRegular"}
-              </Text>
-            </TouchableOpacity>
-          ))}
+          {(["novo", "como_novo", "bom_estado", "regular"] as Condition[]).map(
+            (c) => (
+              <TouchableOpacity
+                key={c}
+                style={[
+                  styles.conditionBtn,
+                  condition === c && styles.conditionBtnActive,
+                ]}
+                onPress={() => salvarCondicao(c)}
+              >
+                <Text
+                  style={[
+                    styles.conditionText,
+                    condition === c && styles.conditionTextActive,
+                  ]}
+                >
+                  {c === "novo"
+                    ? "Novo"
+                    : c === "como_novo"
+                      ? "Usado -\nComo Novo"
+                      : c === "bom_estado"
+                        ? "Usado -\nBom Estado"
+                        : "Usado - Estado\nRegular"}
+                </Text>
+              </TouchableOpacity>
+            ),
+          )}
         </View>
 
         <Text style={styles.label}>
@@ -470,7 +526,12 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
 
         {location ? (
           <View style={[styles.inputRow, { marginTop: 12 }]}>
-            <Ionicons name="location-outline" size={16} color="#888780" style={{ marginRight: 8 }} />
+            <Ionicons
+              name="location-outline"
+              size={16}
+              color="#888780"
+              style={{ marginRight: 8 }}
+            />
             <Text style={styles.inputRowField}>{location}</Text>
           </View>
         ) : (
@@ -482,12 +543,17 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
 
       <View style={styles.tipBox}>
         <Text style={styles.tip}>
-          <Text style={styles.tipBold}>Dica:</Text> Itens com fotos claras e descrições detalhadas
-          têm até 3x mais chances de serem doados rapidamente!
+          <Text style={styles.tipBold}>Dica:</Text> Itens com fotos claras e
+          descrições detalhadas têm até 3x mais chances de serem doados
+          rapidamente!
         </Text>
       </View>
 
-      <TouchableOpacity style={styles.publishBtn} onPress={handlePublish} disabled={uploading}>
+      <TouchableOpacity
+        style={styles.publishBtn}
+        onPress={handlePublish}
+        disabled={uploading}
+      >
         {uploading ? (
           <ActivityIndicator color="#fff" />
         ) : (
@@ -519,13 +585,21 @@ export function PublishScreen({ navigation, userItemCount = 0 }: any) {
               keyExtractor={(item) => item}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  style={[styles.modalItem, category === item && styles.modalItemActive]}
+                  style={[
+                    styles.modalItem,
+                    category === item && styles.modalItemActive,
+                  ]}
                   onPress={() => {
                     salvarCategoria(item);
                     setShowCategoryModal(false);
                   }}
                 >
-                  <Text style={[styles.modalItemText, category === item && styles.modalItemTextActive]}>
+                  <Text
+                    style={[
+                      styles.modalItemText,
+                      category === item && styles.modalItemTextActive,
+                    ]}
+                  >
                     {item}
                   </Text>
                   {category === item && (

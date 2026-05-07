@@ -24,6 +24,7 @@ import {
   GoogleAuthProvider,
   FacebookAuthProvider,
   signInWithCredential,
+  signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "../../Services/firebaseConfig";
 import { salvarToken } from "../../Services/Auth";
@@ -247,19 +248,16 @@ export function Login() {
     showLoadingOverlay();
 
     try {
-      const usuarioRaw = await buscar(`user:${formattedEmail}`);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        formattedEmail,
+        password,
+      );
 
-      if (!usuarioRaw) {
-        throw new Error("Usuário não encontrado.");
-      }
+      const user = userCredential.user;
+      const userKey = user.email ?? user.uid;
 
-      const usuario = JSON.parse(usuarioRaw);
-
-      if (usuario.password !== password) {
-        throw new Error("Senha incorreta.");
-      }
-
-      await salvarToken(formattedEmail);
+      await salvarToken(userKey);
 
       setTimeout(() => {
         navigation.replace("HomeScreen");
@@ -267,7 +265,25 @@ export function Login() {
     } catch (error: any) {
       hideLoadingOverlay();
 
-      Alert.alert("Erro ao entrar", error.message || "Tente novamente.");
+      let message = "Não foi possível entrar. Verifique seu e-mail e senha.";
+
+      if (error.code === "auth/invalid-email") {
+        message = "O e-mail informado não é válido.";
+      }
+
+      if (
+        error.code === "auth/invalid-credential" ||
+        error.code === "auth/wrong-password" ||
+        error.code === "auth/user-not-found"
+      ) {
+        message = "E-mail ou senha incorretos.";
+      }
+
+      if (error.code === "auth/too-many-requests") {
+        message = "Muitas tentativas. Aguarde um pouco e tente novamente.";
+      }
+
+      Alert.alert("Erro ao entrar", message);
     }
   }
 

@@ -17,11 +17,18 @@ import { Ionicons } from "@expo/vector-icons";
 import * as WebBrowser from "expo-web-browser";
 import * as AuthSession from "expo-auth-session";
 import * as Google from "expo-auth-session/providers/google";
-import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
-
+import {
+  GoogleAuthProvider,
+  FacebookAuthProvider,
+  signInWithCredential,
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
 import { auth } from "../../Services/firebaseConfig";
 import { salvarToken } from "../../Services/Auth";
 import { salvar, buscar } from "../../Services/Storage";
+import { requestTrackingPermissionsAsync } from "expo-tracking-transparency";
+import { LoginManager, AccessToken, Settings } from "react-native-fbsdk-next";
 
 import GoogleIcon from "../../../assets/images/google.svg";
 import FacebookIcon from "../../../assets/images/facebook.svg";
@@ -156,12 +163,17 @@ export function CreateAccount({ navigation }: Props) {
     setLoading(true);
 
     try {
-      const existingUser = await buscar(`user:${formattedEmail}`);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        formattedEmail,
+        password,
+      );
 
-      if (existingUser) {
-        Alert.alert("Atenção", "Este e-mail já está cadastrado.");
-        return;
-      }
+      const user = userCredential.user;
+
+      await updateProfile(user, {
+        displayName: formattedName,
+      });
 
       await salvar(
         `user:${formattedEmail}`,
@@ -169,27 +181,112 @@ export function CreateAccount({ navigation }: Props) {
           name: formattedName,
           email: formattedEmail,
           location: formattedLocation,
-          password,
+          password: "",
           photo: "",
-          provider: "local",
+          provider: "email",
         }),
       );
 
-      await salvarToken(formattedEmail);
+      await salvarToken(user.email ?? user.uid);
 
       navigation.replace("HomeScreen");
-    } catch {
-      Alert.alert("Erro", "Não foi possível criar a conta. Tente novamente.");
+    } catch (error: any) {
+      let message = "Não foi possível criar a conta. Tente novamente.";
+
+      if (error.code === "auth/email-already-in-use") {
+        message = "Este e-mail já está cadastrado.";
+      }
+
+      if (error.code === "auth/invalid-email") {
+        message = "O e-mail informado não é válido.";
+      }
+
+      if (error.code === "auth/weak-password") {
+        message = "A senha é muito fraca. Use pelo menos 8 caracteres.";
+      }
+
+      Alert.alert("Erro ao criar conta", message);
     } finally {
       setLoading(false);
     }
   }
 
-  function handleFacebookLater() {
-    Alert.alert(
-      "Facebook",
-      "Vamos configurar o login com Facebook depois que o Google estiver funcionando.",
-    );
+  async function handleFacebookCreateAccount() {
+    if (loading) return;
+
+    try {
+      setLoading(true);
+
+      await Settings.initializeSDK();
+
+      if (Platform.OS === "ios") {
+        const { status } = await requestTrackingPermissionsAsync();
+
+        if (status !== "granted") {
+          throw new Error(
+            "Para criar conta com Facebook neste app, permita o rastreamento nas configurações do iOS ou use o login com Google.",
+          );
+        }
+
+        await Settings.setAdvertiserTrackingEnabled(true);
+      }
+
+      const result =
+        Platform.OS === "ios"
+          ? await LoginManager.logInWithPermissions(
+              ["public_profile", "email"],
+              "enabled",
+            )
+          : await LoginManager.logInWithPermissions([
+              "public_profile",
+              "email",
+            ]);
+
+      if (result.isCancelled) {
+        throw new Error("Cadastro cancelado.");
+      }
+
+      const data = await AccessToken.getCurrentAccessToken();
+
+      if (!data?.accessToken) {
+        throw new Error("Access token do Facebook não encontrado.");
+      }
+
+      const credential = FacebookAuthProvider.credential(data.accessToken);
+      const userCredential = await signInWithCredential(auth, credential);
+      const user = userCredential.user;
+
+      const userKey = user.email ?? user.uid;
+
+      if (user.email) {
+        const existingUser = await buscar(`user:${user.email}`);
+
+        if (!existingUser) {
+          await salvar(
+            `user:${user.email}`,
+            JSON.stringify({
+              name: user.displayName ?? "Usuário ReUse",
+              email: user.email,
+              location: "",
+              password: "",
+              photo: user.photoURL ?? "",
+              provider: "facebook",
+            }),
+          );
+        }
+      }
+
+      await salvarToken(userKey);
+
+      navigation.replace("HomeScreen");
+    } catch (error: any) {
+      Alert.alert(
+        "Erro no cadastro com Facebook",
+        error.message || "Não foi possível criar a conta com Facebook.",
+      );
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -238,8 +335,8 @@ export function CreateAccount({ navigation }: Props) {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.socialButton, { opacity: 0.65 }]}
-              onPress={handleFacebookLater}
+              style={[styles.socialButton, loading && { opacity: 0.65 }]}
+              onPress={handleFacebookCreateAccount}
               disabled={loading}
             >
               <FacebookIcon width={18} height={18} />
