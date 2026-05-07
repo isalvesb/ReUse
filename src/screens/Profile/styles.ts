@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 
-const styles = StyleSheet.create({
+export default StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: "#F7EFDE",
@@ -8,134 +8,174 @@ const styles = StyleSheet.create({
 
   navBar: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingBottom: 14,
+    alignItems: "center",
+    padding: 16,
     backgroundColor: "#342A2A",
   },
 
   backButton: {
-    width: 40,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
+    fontSize: 18,
+    color: "#fff",
+    gap: 7,
   },
 
-  backButtonText: {
-    fontSize: 36,
-    lineHeight: 38,
-    fontFamily: "Inter_500Medium",
-    color: "#FFFFFF",
-  },
-
-  navTitle: {
+  backText: {
     fontSize: 16,
-    fontFamily: "Inter_700Bold",
-    color: "#FFFFFF",
-  },
-
-  placeholder: {
-    width: 40,
-    height: 40,
+    alignItems: "flex-start",
+    color: "#fff",
+    marginLeft: 7,
   },
 
   content: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    alignItems: "center",
+    padding: 20,
   },
 
-  card: {
-    backgroundColor: "#FFF8EC",
-    borderRadius: 20,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: "#E8DCC6",
+  avatarContainer: {
+    marginTop: 10,
+    marginBottom: 10,
   },
 
-  cardTitle: {
-    fontSize: 22,
-    fontFamily: "Syne_800ExtraBold",
+  avatar: {
+    width: 120,
+    height: 120,
+    borderRadius: 100,
+    borderColor: "#FFF",
+    borderWidth: 3.54,
+  },
+
+  name: {
+    fontSize: 24,
     color: "#342A2A",
+    fontWeight: "bold",
+    marginTop: 10,
+  },
+
+  infoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    marginTop: 4,
+  },
+
+  infoText: {
+    fontSize: 16,
+    color: "#342A2A",
+    gap: 8,
+  },
+
+  statsContainer: {
+    flexDirection: "row",
+    backgroundColor: "#FFFFFF66",
+    padding: 20,
+    borderRadius: 28,
+    gap: 12,
+    marginTop: 20,
+    borderColor: "#ffffff99",
+    borderWidth: 1.35,
+  },
+
+  statCard: {
+    backgroundColor: "#EBBBEB",
+    borderColor: "#ffffff99",
+    padding: 14,
+    borderRadius: 14,
+    alignItems: "center",
+    width: 97,
+  },
+
+  statCard2: {
+    backgroundColor: "#FBCFE8",
+    borderColor: "#ffffff99",
+    padding: 14,
+    borderRadius: 14,
+    alignItems: "center",
+    width: 97,
+  },
+
+  statCard3: {
+    backgroundColor: "#F2D5AB",
+    borderColor: "#ffffff99",
+    padding: 14,
+    borderRadius: 14,
+    alignItems: "center",
+    width: 97,
+  },
+
+  statNumber: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginTop: 4,
+  },
+
+  statLabel: {
+    fontSize: 10,
+    color: "#342A2A",
+  },
+
+  icon: {
+    color: "#342A2A",
+    backgroundColor: "#FFFFFF99",
+    borderColor: "#fff",
+    padding: 10,
+    borderRadius: 50,
+  },
+
+  aboutCard: {
+    width: "90%",
+    backgroundColor: "#F3E8D2",
+    padding: 16,
+    borderRadius: 14,
+    marginTop: 20,
+  },
+
+  aboutTitle: {
+    fontSize: 16,
+    color: "#342A2A",
+    fontWeight: "bold",
     marginBottom: 8,
   },
 
-  cardDescription: {
+  aboutInput: {
     fontSize: 14,
-    fontFamily: "Inter_400Regular",
-    color: "#342A2A",
-    lineHeight: 21,
-    marginBottom: 20,
+    color: "#3A2D2D",
+    minHeight: 80,
+    textAlignVertical: "top",
+  },
+
+  editButton: {
+    backgroundColor: "#3A2D2D",
+    padding: 14,
+    borderRadius: 12,
+    width: "90%",
+    alignItems: "center",
+    marginTop: 20,
+  },
+
+  editButtonText: {
+    color: "#fff",
+    fontWeight: "medium",
   },
 
   logoutButton: {
-    height: 52,
-    borderRadius: 16,
-    backgroundColor: "#342A2A",
+    borderWidth: 1,
+    borderColor: "#3A2D2D",
+    padding: 14,
+    borderRadius: 12,
+    width: "90%",
     alignItems: "center",
-    justifyContent: "center",
-  },
-
-  logoutButtonPressed: {
-    opacity: 0.86,
-    transform: [{ scale: 0.98 }],
-  },
-
-  logoutButtonDisabled: {
-    opacity: 0.7,
+    marginTop: 10,
   },
 
   logoutButtonText: {
-    fontSize: 15,
-    fontFamily: "Inter_700Bold",
-    color: "#FFFFFF",
+    color: "#3A2D2D",
+    fontWeight: "medium",
   },
 
   loadingContent: {
     alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 32,
+    marginTop: 40,
   },
-
-  loadingText: {
-    marginTop: 12,
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
-    color: "#5C4B4B",
-  },
-
-  profileHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-
-  profileImage: {
-    width: 108,
-    height: 108,
-    borderRadius: 54,
-    marginRight: 18,
-  },
-
-  profileInfo: {
-    flex: 1,
-  },
-
-  profileName: {
-    fontSize: 22,
-    fontFamily: "Syne_800ExtraBold",
-    color: "#342A2A",
-    marginBottom: 4,
-  },
-
-  profileNote: {
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
-    color: "#6B5B5B",
-    marginBottom: 4,
-  },
-
 });
-
-export default styles;

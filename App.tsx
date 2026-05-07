@@ -31,6 +31,7 @@ import { buscarToken } from "./src/Services/Auth";
 import { ProfileScreen } from "./src/screens/Profile";
 import { ProductScreen } from "./src/screens/Product";
 import { DEV_SKIP_AUTH } from "./src/config/devAuth";
+import Notifications from "./src/screens/Notifications";
 
 type RootStackParamList = {
   Login: undefined;
@@ -39,7 +40,6 @@ type RootStackParamList = {
   HomeScreen: undefined;
   Profile: undefined;
   ResetEmailSent: undefined;
-  Product: { itemId: number };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -64,7 +64,9 @@ function MainScreen() {
           <HomeScreen
             onNavigateToPublish={() => setActiveTab("publicar")}
             onNavigateToProfile={() => navigation.navigate("Profile")}
-            onNavigateToProduct={(itemId) => navigation.navigate("Product", { itemId })}
+            onNavigateToProduct={(itemId) =>
+              navigation.navigate("Product", { itemId })
+            }
           />
         );
     }
@@ -119,7 +121,6 @@ function AppNavigator() {
           <>
             <Stack.Screen name="HomeScreen" component={MainScreen} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
-            <Stack.Screen name="Product" component={ProductScreen} /> 
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="ForgotPass" component={ForgotPass} />
             <Stack.Screen name="CreateAccount" component={CreateAccount} />
@@ -132,7 +133,6 @@ function AppNavigator() {
             <Stack.Screen name="CreateAccount" component={CreateAccount} />
             <Stack.Screen name="HomeScreen" component={MainScreen} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
-            <Stack.Screen name="Product" component={ProductScreen} /> 
             <Stack.Screen name="ResetEmailSent" component={ResetEmailSent} />
           </>
         )}

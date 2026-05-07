@@ -27,7 +27,12 @@
     "expo-dev-client": "~55.0.30",
     "expo-file-system": "~55.0.19",
     "expo-font": "~55.0.4",
+<<<<<<< Updated upstream
     "expo-image-picker": "~55.0.19",
+=======
+    "expo-image-picker": "~55.0.18",
+    "expo-linear-gradient": "~55.0.13",
+>>>>>>> Stashed changes
     "expo-secure-store": "~55.0.13",
     "expo-status-bar": "~55.0.4",
     "expo-web-browser": "~55.0.14",

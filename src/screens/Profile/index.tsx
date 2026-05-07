@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Image, Pressable, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  Pressable,
+  Text,
+  View,
+  TextInput,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
+import { Ionicons } from "@expo/vector-icons";
 import { buscarToken, logout } from "../../Services/Auth";
 import { buscar } from "../../Services/Storage";
 import { DEV_SKIP_AUTH } from "../../config/devAuth";
+import { supabase } from "../../lib/supabase";
 
 import styles from "./styles";
 
@@ -31,19 +39,64 @@ export function ProfileScreen() {
   const [isLoadingUser, setIsLoadingUser] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [user, setUser] = useState<UserData | null>(null);
+  const [about, setAbout] = useState("");
 
-  const normalizedEmail = user?.email?.toLowerCase();
+  const [stats, setStats] = useState({
+    trocas: 0,
+    itens: 0,
+    avaliacao: 0,
+  });
 
-  const profileImageSource =
-    normalizedEmail && profileImagesByEmail[normalizedEmail]
-      ? profileImagesByEmail[normalizedEmail]
-      : defaultProfileImage;
+  // 🔥 FUNÇÃO CORRIGIDA DE STATS
+  async function fetchStats(userId: string) {
+    try {
+      const { count: trocas } = await supabase
+        .from("trocas")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", userId);
 
-  const isLogoutDisabled = DEV_SKIP_AUTH || isLoggingOut;
+      const { count: itens } = await supabase
+        .from("itens")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", userId);
 
+      const { data: avaliacoes } = await supabase
+        .from("avaliacoes")
+        .select("rating")
+        .eq("to_user_id", userId); // 🔥 CORRIGIDO AQUI
+
+      const media =
+        avaliacoes && avaliacoes.length > 0
+          ? (
+              avaliacoes.reduce((acc, item) => acc + item.rating, 0) /
+              avaliacoes.length
+            ).toFixed(1)
+          : "0";
+
+      setStats({
+        trocas: trocas || 0,
+        itens: itens || 0,
+        avaliacao: Number(media),
+      });
+    } catch (error) {
+      console.error("Erro ao buscar stats:", error);
+    }
+  }
+
+  // 🔥 CARREGA USUÁRIO + STATS JUNTOS
   useEffect(() => {
-    const carregarUsuario = async () => {
+    const carregarTudo = async () => {
       try {
+        // 🔑 pega usuário do Supabase
+        const {
+          data: { user: authUser },
+        } = await supabase.auth.getUser();
+
+        if (authUser?.id) {
+          await fetchStats(authUser.id);
+        }
+
+        // 🔐 pega usuário local (seu sistema atual)
         const emailAtual = await buscarToken();
 
         if (!emailAtual) {
@@ -69,28 +122,35 @@ export function ProfileScreen() {
           email: parsedUser.email,
           location: parsedUser.location,
         });
+
+        if (parsedUser.about) {
+          setAbout(parsedUser.about);
+        }
       } catch (error) {
-        console.error("Erro ao carregar usuário:", error);
-        setUser(null);
+        console.error("Erro ao carregar dados:", error);
       } finally {
         setIsLoadingUser(false);
       }
     };
 
-    carregarUsuario();
+    carregarTudo();
   }, []);
 
-  const handleLogout = async () => {
-    if (DEV_SKIP_AUTH) {
-      console.log("Logout desativado temporariamente no modo desenvolvimento.");
-      return;
-    }
+  const normalizedEmail = user?.email?.toLowerCase();
 
+  const profileImageSource =
+    normalizedEmail && profileImagesByEmail[normalizedEmail]
+      ? profileImagesByEmail[normalizedEmail]
+      : defaultProfileImage;
+
+  const isLogoutDisabled = DEV_SKIP_AUTH || isLoggingOut;
+
+  const handleLogout = async () => {
+    if (DEV_SKIP_AUTH) return;
     if (isLoggingOut) return;
 
     try {
       setIsLoggingOut(true);
-
       await logout();
 
       navigation.reset({
@@ -105,76 +165,93 @@ export function ProfileScreen() {
 
   return (
     <View style={styles.screen}>
-      <View
-        style={[
-          styles.navBar,
-          {
-            paddingTop: insets.top + 14,
-          },
-        ]}
-      >
+      {/* NAVBAR */}
+      <View style={[styles.navBar, { paddingTop: insets.top + 14 }]}>
         <Pressable
+          style={{ flexDirection: "row", alignItems: "center", padding: 8 }}
           onPress={() => navigation.goBack()}
-          style={styles.backButton}
         >
-          <Text style={styles.backButtonText}>‹</Text>
+          <Ionicons name="arrow-back" size={20} color="#fff" />
+          <Text style={styles.backText}>Voltar</Text>
         </Pressable>
 
-        <Text style={styles.navTitle}>Perfil</Text>
-
-        <View style={styles.placeholder} />
+        <Pressable onPress={() => navigation.navigate("Notifications")}>
+          <Ionicons name="notifications-outline" size={22} color="#342A2A" />
+        </Pressable>
       </View>
 
       <View style={styles.content}>
-        <View style={styles.card}>
-          {isLoadingUser ? (
-            <View style={styles.loadingContent}>
-              <ActivityIndicator size="large" color="#342A2A" />
-              <Text style={styles.loadingText}>Carregando perfil...</Text>
+        {isLoadingUser ? (
+          <View style={styles.loadingContent}>
+            <ActivityIndicator size="large" color="#342A2A" />
+            <Text>Carregando perfil...</Text>
+          </View>
+        ) : (
+          <>
+            <View style={styles.avatarContainer}>
+              <Image source={profileImageSource} style={styles.avatar} />
             </View>
-          ) : (
-            <>
-              <View style={styles.profileHeader}>
-                <Image
-                  source={profileImageSource}
-                  style={styles.profileImage}
-                />
 
-                <View style={styles.profileInfo}>
-                  <Text style={styles.profileName}>
-                    {user?.name || "Usuário"}
-                  </Text>
+            <Text style={styles.name}>{user?.name}</Text>
 
-                  <Text style={styles.profileNote}>
-                    {user?.email || "E-mail não encontrado"}
-                  </Text>
+            <View style={styles.infoRow}>
+              <Ionicons name="mail-outline" size={16} />
+              <Text style={styles.infoText}>{user?.email}</Text>
+            </View>
 
-                  <Text style={styles.profileNote}>
-                    {user?.location || "Localização não informada"}
-                  </Text>
-                </View>
+            <View style={styles.infoRow}>
+              <Ionicons name="location-outline" size={16} />
+              <Text style={styles.infoText}>{user?.location}</Text>
+            </View>
+
+            {/* STATS */}
+            <View style={styles.statsContainer}>
+              <View style={styles.statCard}>
+                <Ionicons name="gift-outline" size={16} style={styles.icon} />
+                <Text style={styles.statNumber}>{stats.trocas}</Text>
+                <Text style={styles.statLabel}>Trocas</Text>
               </View>
 
-              <Pressable
-                onPress={handleLogout}
-                disabled={isLogoutDisabled}
-                style={({ pressed }) => [
-                  styles.logoutButton,
-                  pressed && !isLogoutDisabled && styles.logoutButtonPressed,
-                  isLogoutDisabled && styles.logoutButtonDisabled,
-                ]}
-              >
-                {isLoggingOut ? (
-                  <ActivityIndicator color="#FFFFFF" />
-                ) : (
-                  <Text style={styles.logoutButtonText}>
-                    {DEV_SKIP_AUTH ? "Logout desativado" : "Logout"}
-                  </Text>
-                )}
-              </Pressable>
-            </>
-          )}
-        </View>
+              <View style={styles.statCard2}>
+                <Ionicons name="cube-outline" size={16} style={styles.icon} />
+                <Text style={styles.statNumber}>{stats.itens}</Text>
+                <Text style={styles.statLabel}>Itens</Text>
+              </View>
+
+              <View style={styles.statCard3}>
+                <Ionicons name="star-outline" size={16} style={styles.icon} />
+                <Text style={styles.statNumber}>{stats.avaliacao}</Text>
+                <Text style={styles.statLabel}>Avaliação</Text>
+              </View>
+            </View>
+
+            {/* SOBRE */}
+            <View style={styles.aboutCard}>
+              <Text style={styles.aboutTitle}>Sobre mim</Text>
+
+              <TextInput
+                style={styles.aboutInput}
+                placeholder="Fale sobre você..."
+                placeholderTextColor="#999"
+                value={about}
+                onChangeText={setAbout}
+                multiline
+              />
+            </View>
+
+            <Pressable style={styles.editButton}>
+              <Text style={styles.editButtonText}>Editar</Text>
+            </Pressable>
+
+            <Pressable
+              onPress={handleLogout}
+              disabled={isLogoutDisabled}
+              style={styles.logoutButton}
+            >
+              <Text style={styles.logoutButtonText}>Logout</Text>
+            </Pressable>
+          </>
+        )}
       </View>
     </View>
   );
