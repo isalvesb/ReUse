@@ -14,7 +14,6 @@ import { buscarToken, logout } from "../../Services/Auth";
 import { buscar } from "../../Services/Storage";
 import { DEV_SKIP_AUTH } from "../../config/devAuth";
 import { supabase } from "../../lib/supabase";
-
 import styles from "./styles";
 
 type UserData = {
@@ -47,7 +46,7 @@ export function ProfileScreen() {
     avaliacao: 0,
   });
 
-  // 🔥 FUNÇÃO CORRIGIDA DE STATS
+  // FUNÇÃO CORRIGIDA DE STATS
   async function fetchStats(userId: string) {
     try {
       const { count: trocas } = await supabase
@@ -63,7 +62,7 @@ export function ProfileScreen() {
       const { data: avaliacoes } = await supabase
         .from("avaliacoes")
         .select("rating")
-        .eq("to_user_id", userId); // 🔥 CORRIGIDO AQUI
+        .eq("to_user_id", userId); // CORRIGIDO AQUI
 
       const media =
         avaliacoes && avaliacoes.length > 0
@@ -83,7 +82,7 @@ export function ProfileScreen() {
     }
   }
 
-  // 🔥 CARREGA USUÁRIO + STATS JUNTOS
+  // CARREGA USUÁRIO + STATS JUNTOS
   useEffect(() => {
     const carregarTudo = async () => {
       try {
@@ -96,7 +95,7 @@ export function ProfileScreen() {
           await fetchStats(authUser.id);
         }
 
-        // 🔐 pega usuário local (seu sistema atual)
+        // pega usuário local (seu sistema atual)
         const emailAtual = await buscarToken();
 
         if (!emailAtual) {

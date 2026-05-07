@@ -25,12 +25,10 @@ import {
   FacebookAuthProvider,
   signInWithCredential,
 } from "firebase/auth";
-
 import { auth } from "../../Services/firebaseConfig";
 import { salvarToken } from "../../Services/Auth";
 import { buscar, salvar } from "../../Services/Storage";
 import { LoadingAnimation } from "../../components/LoadingAnimation";
-
 import GoogleIcon from "../../../assets/images/google.svg";
 import FacebookIcon from "../../../assets/images/facebook.svg";
 
