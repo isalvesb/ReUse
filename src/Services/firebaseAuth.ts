@@ -12,12 +12,12 @@ import { auth } from "./firebaseConfig";
 export async function criarContaComEmailSenha(
   nome: string,
   email: string,
-  senha: string
+  senha: string,
 ) {
   const userCredential = await createUserWithEmailAndPassword(
     auth,
     email.trim(),
-    senha
+    senha,
   );
 
   if (nome.trim()) {
@@ -33,7 +33,7 @@ export async function loginComEmailSenha(email: string, senha: string) {
   const userCredential = await signInWithEmailAndPassword(
     auth,
     email.trim(),
-    senha
+    senha,
   );
 
   return userCredential.user;
