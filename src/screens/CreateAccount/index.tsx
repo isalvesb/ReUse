@@ -116,7 +116,6 @@ export function CreateAccount({ navigation }: Props) {
 
         await salvarToken(userKey);
 
-        navigation.replace("HomeScreen");
       } catch (error: any) {
         Alert.alert(
           "Erro no cadastro com Google",
@@ -189,7 +188,6 @@ export function CreateAccount({ navigation }: Props) {
 
       await salvarToken(user.email ?? user.uid);
 
-      navigation.replace("HomeScreen");
     } catch (error: any) {
       let message = "Não foi possível criar a conta. Tente novamente.";
 
@@ -278,7 +276,6 @@ export function CreateAccount({ navigation }: Props) {
 
       await salvarToken(userKey);
 
-      navigation.replace("HomeScreen");
     } catch (error: any) {
       Alert.alert(
         "Erro no cadastro com Facebook",

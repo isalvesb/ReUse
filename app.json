@@ -1,23 +1,24 @@
 {
   "expo": {
     "name": "ReUse",
-    "slug": "ReUse",
+    "slug": "reuse",
     "scheme": [
       "com.guicunhasou.reuse",
       "fb1650966322512425"
     ],
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "",
+    "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "",
+      "image": "./assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#F7EFDE"
     },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.guicunhasou.reuse",
+      "icon": "./assets/images/icon.png",
       "infoPlist": {
         "FacebookDisplayName": "ReUse",
         "SKAdNetworkItems": [
@@ -31,20 +32,19 @@
       }
     },
     "android": {
+      "package": "com.guicunhasou.reuse",
+      "icon": "./assets/images/icon.png",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "",
-        "backgroundImage": "",
-        "monochromeImage": ""
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#F7EFDE"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.guicunhasou.reuse",
       "permissions": [
         "android.permission.INTERNET"
       ]
     },
     "web": {
-      "favicon": ""
+      "favicon": "./assets/images/icon.png"
     },
     "plugins": [
       "expo-font",

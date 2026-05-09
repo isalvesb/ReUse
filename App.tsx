@@ -27,7 +27,7 @@ import { ChatsScreen } from "./src/screens/Chats";
 import { ShowcaseScreen } from "./src/screens/Showcase";
 import { PublishScreen } from "./src/screens/Publish";
 import TabBar from "./src/components/TabBar";
-import { buscarToken } from "./src/Services/Auth";
+import { observarUsuarioLogado } from "./src/Services/firebaseAuth";
 import { ProfileScreen } from "./src/screens/Profile";
 import { ProductScreen } from "./src/screens/Product";
 import { DEV_SKIP_AUTH } from "./src/config/devAuth";
@@ -89,25 +89,18 @@ function AppNavigator() {
   const [isAuthenticated, setIsAuthenticated] = useState(DEV_SKIP_AUTH);
 
   useEffect(() => {
-    const verificarSessao = async () => {
-      if (DEV_SKIP_AUTH) {
-        setIsAuthenticated(true);
-        setIsCheckingSession(false);
-        return;
-      }
+    if (DEV_SKIP_AUTH) {
+      setIsAuthenticated(true);
+      setIsCheckingSession(false);
+      return;
+    }
 
-      try {
-        const token = await buscarToken();
-        setIsAuthenticated(!!token);
-      } catch (error) {
-        console.error("Erro ao verificar sessão:", error);
-        setIsAuthenticated(false);
-      } finally {
-        setIsCheckingSession(false);
-      }
-    };
+    const unsubscribe = observarUsuarioLogado((user) => {
+      setIsAuthenticated(!!user);
+      setIsCheckingSession(false);
+    });
 
-    verificarSessao();
+    return unsubscribe;
   }, []);
 
   if (isCheckingSession) {
@@ -132,21 +125,12 @@ function AppNavigator() {
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />
             <Stack.Screen name="Product" component={ProductScreen} />
             <Stack.Screen name="Notifications" component={Notifications} />
-            <Stack.Screen name="Login" component={Login} />
-            <Stack.Screen name="ForgotPass" component={ForgotPass} />
-            <Stack.Screen name="CreateAccount" component={CreateAccount} />
-            <Stack.Screen name="ResetEmailSent" component={ResetEmailSent} />
           </React.Fragment>
         ) : (
           <React.Fragment>
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="ForgotPass" component={ForgotPass} />
             <Stack.Screen name="CreateAccount" component={CreateAccount} />
-            <Stack.Screen name="HomeScreen" component={MainScreen} />
-            <Stack.Screen name="Profile" component={RenderProfileScreen} />
-            <Stack.Screen name="EditProfile" component={EditProfileScreen} />
-            <Stack.Screen name="Product" component={ProductScreen} />
-            <Stack.Screen name="Notifications" component={Notifications} />
             <Stack.Screen name="ResetEmailSent" component={ResetEmailSent} />
           </React.Fragment>
         )}

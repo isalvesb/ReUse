@@ -150,10 +150,6 @@ export function Login() {
           photo: user.photoURL,
           provider: "google",
         });
-
-        setTimeout(() => {
-          navigation.replace("HomeScreen");
-        }, 1200);
       } catch (error: any) {
         hideLoadingOverlay();
 
@@ -220,10 +216,6 @@ export function Login() {
         photo: user.photoURL,
         provider: "facebook",
       });
-
-      setTimeout(() => {
-        navigation.replace("HomeScreen");
-      }, 1200);
     } catch (error: any) {
       hideLoadingOverlay();
 
@@ -259,9 +251,6 @@ export function Login() {
 
       await salvarToken(userKey);
 
-      setTimeout(() => {
-        navigation.replace("HomeScreen");
-      }, 1200);
     } catch (error: any) {
       hideLoadingOverlay();
 

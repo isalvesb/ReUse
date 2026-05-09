@@ -11,6 +11,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { buscarToken, logout } from "../../Services/Auth";
+import { logoutFirebase } from "../../Services/firebaseAuth";
 import { buscar } from "../../Services/Storage";
 import { DEV_SKIP_AUTH } from "../../config/devAuth";
 import { supabase } from "../../lib/supabase";
@@ -146,25 +147,21 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
   const isLogoutDisabled = DEV_SKIP_AUTH || isLoggingOut;
 
   const handleLogout = async () => {
-    if (DEV_SKIP_AUTH) return;
-    if (isLoggingOut) return;
+  if (DEV_SKIP_AUTH) return;
+  if (isLoggingOut) return;
 
-    try {
-      setIsLoggingOut(true);
+  try {
+    setIsLoggingOut(true);
 
-      await logout();
+    await logoutFirebase();
+    await logout();
 
-      onLogoutComplete?.();
-
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "Login" }],
-      });
-    } catch (error) {
-      console.error("Erro ao fazer logout:", error);
-      setIsLoggingOut(false);
-    }
-  };
+    onLogoutComplete?.();
+  } catch (error) {
+    console.error("Erro ao fazer logout:", error);
+    setIsLoggingOut(false);
+  }
+};
 
   return (
     <View style={styles.screen}>
