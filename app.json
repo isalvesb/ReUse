@@ -19,16 +19,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.guicunhasou.reuse",
       "infoPlist": {
-        "FacebookAppID": "1650966322512425",
-        "FacebookClientToken": "e15ff146bb98ade1d6c9808d27724b3b",
         "FacebookDisplayName": "ReUse",
-        "CFBundleURLTypes": [
-          {
-            "CFBundleURLSchemes": [
-              "fb1650966322512425"
-            ]
-          }
-        ],
         "SKAdNetworkItems": [
           {
             "SKAdNetworkIdentifier": "v9wttpbfk9.skadnetwork"
@@ -59,19 +50,6 @@
       "expo-font",
       "expo-secure-store",
       "expo-web-browser",
-      [
-        "react-native-fbsdk-next",
-        {
-          "appID": "1650966322512425",
-          "clientToken": "e15ff146bb98ade1d6c9808d27724b3b",
-          "displayName": "ReUse",
-          "scheme": "fb1650966322512425",
-          "advertiserIDCollectionEnabled": false,
-          "autoLogAppEventsEnabled": false,
-          "isAutoInitEnabled": true,
-          "iosUserTrackingPermission": "Este identificador será usado para login com Facebook."
-        }
-      ],
       "expo-tracking-transparency"
     ],
     "extra": {
