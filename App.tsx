@@ -43,6 +43,7 @@ type RootStackParamList = {
   ResetEmailSent: undefined;
   Notifications: undefined;
   Product: { itemId: number };
+  EditProfile: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

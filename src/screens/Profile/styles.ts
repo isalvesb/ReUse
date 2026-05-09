@@ -31,6 +31,7 @@ export default StyleSheet.create({
     flex: 1,
     alignItems: "center",
     padding: 20,
+    position: "relative",
   },
 
   avatarContainer: {
@@ -177,5 +178,36 @@ export default StyleSheet.create({
   loadingContent: {
     alignItems: "center",
     marginTop: 40,
+  },
+
+  notificationButton: {
+    position: "absolute",
+    top: 28,
+    right: 34,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: "#342A2A",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 10,
+  },
+
+  notificationBadge: {
+    position: "absolute",
+    top: -5,
+    right: -3,
+    width: 15,
+    height: 15,
+    borderRadius: 8,
+    backgroundColor: "#EBBBEB",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  notificationBadgeText: {
+    fontSize: 10,
+    color: "#342A2A",
+    fontWeight: "700",
   },
 });

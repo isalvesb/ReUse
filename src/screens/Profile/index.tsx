@@ -173,13 +173,20 @@ export function ProfileScreen() {
           <Ionicons name="arrow-back" size={20} color="#fff" />
           <Text style={styles.backText}>Voltar</Text>
         </Pressable>
-
-        <Pressable onPress={() => navigation.navigate("Notifications")}>
-          <Ionicons name="notifications-outline" size={22} color="#342A2A" />
-        </Pressable>
       </View>
 
       <View style={styles.content}>
+        <Pressable
+          style={styles.notificationButton}
+          onPress={() => navigation.navigate("Notifications")}
+          hitSlop={12}
+        >
+          <Ionicons name="notifications-outline" size={22} color="#F7EFDE" />
+
+          <View style={styles.notificationBadge}>
+            <Text style={styles.notificationBadgeText}>1</Text>
+          </View>
+        </Pressable>
         {isLoadingUser ? (
           <View style={styles.loadingContent}>
             <ActivityIndicator size="large" color="#342A2A" />
