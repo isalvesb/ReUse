@@ -146,3 +146,19 @@ export async function getItemById(id: number) {
   if (error) throw error;
   return data as Item;
 }
+
+export async function updateItem(id: number, item: Partial<ItemPayload>) {
+  const { data, error } = await supabase
+    .from("items")
+    .update(item)
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("❌ Erro ao atualizar item:", error.message);
+    throw error;
+  }
+
+  return data as Item;
+}

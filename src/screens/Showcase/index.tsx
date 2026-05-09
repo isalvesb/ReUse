@@ -10,7 +10,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-import { buscarToken } from "../../Services/Auth";
+import { buscarEmailUsuarioAtual } from "../../Services/firebaseAuth";
 import { buscar } from "../../Services/Storage";
 import { getItemsByUser, Item } from "../../Services/Items";
 import styles from "./styles";
@@ -64,9 +64,7 @@ function getItemType(item: Item): ItemType {
 
 function TypeBadge({ type }: { type: ItemType }) {
   const bg =
-    type === "Venda"  ? "#F5C842" :
-    type === "Troca"  ? "#C9A8D4" :
-                        "#A8D4B0";
+    type === "Venda" ? "#F5C842" : type === "Troca" ? "#C9A8D4" : "#A8D4B0";
   return (
     <View style={[styles.typeBadge, { backgroundColor: bg }]}>
       <Text style={styles.typeBadgeText}>{type}</Text>
@@ -74,9 +72,19 @@ function TypeBadge({ type }: { type: ItemType }) {
   );
 }
 
-function ItemCard({ item, onPress }: { item: ShowcaseItem; onPress?: () => void }) {
+function ItemCard({
+  item,
+  onPress,
+}: {
+  item: ShowcaseItem;
+  onPress?: () => void;
+}) {
   return (
-    <TouchableOpacity style={styles.itemCard} onPress={onPress} activeOpacity={0.85}>
+    <TouchableOpacity
+      style={styles.itemCard}
+      onPress={onPress}
+      activeOpacity={0.85}
+    >
       <View style={styles.itemImageBox}>
         {item.image ? (
           <Image source={{ uri: item.image }} style={styles.itemImage} />
@@ -87,9 +95,12 @@ function ItemCard({ item, onPress }: { item: ShowcaseItem; onPress?: () => void 
         )}
       </View>
       <View style={styles.itemInfo}>
-        <Text style={styles.itemTitle} numberOfLines={2}>{item.title}</Text>
+        <Text style={styles.itemTitle} numberOfLines={2}>
+          {item.title}
+        </Text>
         <Text style={styles.itemSub}>
-          {item.condition}{item.size ? ` • ${item.size}` : ""}
+          {item.condition}
+          {item.size ? ` • ${item.size}` : ""}
         </Text>
         <Text style={styles.itemDistance}>{item.distance}</Text>
         <View style={styles.itemFooter}>
@@ -110,25 +121,37 @@ export function ShowcaseScreen() {
   const [items, setItems] = useState<Item[]>([]);
   const [filter, setFilter] = useState<FilterOption>("Todos");
 
-  const filterOptions: FilterOption[] = ["Todos", "Doações", "Trocas", "Vendas"];
+  const filterOptions: FilterOption[] = [
+    "Todos",
+    "Doações",
+    "Trocas",
+    "Vendas",
+  ];
 
   const counts = {
     Doações: items.filter((i) => getItemType(i) === "Doação").length,
-    Trocas:  items.filter((i) => getItemType(i) === "Troca").length,
-    Vendas:  items.filter((i) => getItemType(i) === "Venda").length,
+    Trocas: items.filter((i) => getItemType(i) === "Troca").length,
+    Vendas: items.filter((i) => getItemType(i) === "Venda").length,
   };
 
   const filtered =
-    filter === "Todos"   ? items :
-    filter === "Doações" ? items.filter((i) => getItemType(i) === "Doação") :
-    filter === "Trocas"  ? items.filter((i) => getItemType(i) === "Troca") :
-                           items.filter((i) => getItemType(i) === "Venda");
+    filter === "Todos"
+      ? items
+      : filter === "Doações"
+        ? items.filter((i) => getItemType(i) === "Doação")
+        : filter === "Trocas"
+          ? items.filter((i) => getItemType(i) === "Troca")
+          : items.filter((i) => getItemType(i) === "Venda");
 
   useEffect(() => {
     const carregar = async () => {
       try {
-        const email = await buscarToken();
-        if (!email) return;
+        const email = buscarEmailUsuarioAtual();
+
+        if (!email) {
+          setIsLoading(false);
+          return;
+        }
 
         const raw = await buscar(`user:${email}`);
         if (raw) {
@@ -141,7 +164,11 @@ export function ShowcaseScreen() {
             avaliacao: parsed.avaliacao ?? "4.8",
           });
         } else {
-          setUser({ name: "Usuário ReUse", email, location: "Localização não informada" });
+          setUser({
+            name: "Usuário ReUse",
+            email,
+            location: "Localização não informada",
+          });
         }
 
         const userItems = await getItemsByUser(email);
@@ -165,10 +192,12 @@ export function ShowcaseScreen() {
 
   return (
     <View style={styles.screen}>
-
       {/* ── Bloco escuro fixo (fora do ScrollView) ── */}
       <View style={[styles.navBar, { paddingTop: insets.top + 14 }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
           <Ionicons name="arrow-back" size={20} color="#FFF" />
           <Text style={styles.backButtonText}>Voltar</Text>
         </TouchableOpacity>
@@ -228,11 +257,19 @@ export function ShowcaseScreen() {
           {filterOptions.map((f) => (
             <TouchableOpacity
               key={f}
-              style={[styles.filterChip, filter === f && styles.filterChipActive]}
+              style={[
+                styles.filterChip,
+                filter === f && styles.filterChipActive,
+              ]}
               onPress={() => setFilter(f)}
               activeOpacity={0.7}
             >
-              <Text style={[styles.filterChipText, filter === f && styles.filterChipTextActive]}>
+              <Text
+                style={[
+                  styles.filterChipText,
+                  filter === f && styles.filterChipTextActive,
+                ]}
+              >
                 {f !== "Todos" && counts[f as keyof typeof counts]
                   ? `${f} (${counts[f as keyof typeof counts]})`
                   : f}
@@ -264,7 +301,9 @@ export function ShowcaseScreen() {
                     price: item.price ?? undefined,
                     image: item.images?.[0] ?? undefined,
                   }}
-                  onPress={() => navigation.navigate("Product", { itemId: item.id })}
+                  onPress={() =>
+                    navigation.navigate("Product", { itemId: item.id })
+                  }
                 />
               </View>
             ))

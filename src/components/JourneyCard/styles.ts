@@ -72,7 +72,7 @@ export const styles = StyleSheet.create({
     marginTop: 12,
     textAlign: "center",
     fontFamily: "Inter_400Regular",
-    weight: 400,
+    fontWeight: 400,
     height: 16,
   },
 

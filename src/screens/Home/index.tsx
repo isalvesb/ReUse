@@ -10,7 +10,7 @@ import { CategoryCard } from "../../components/CategoryCard";
 import { ItemCard } from "../../components/ItemCard";
 import { IncentiveModal } from "../../components/IncentiveCard";
 import { salvar, buscar } from "../../Services/Storage";
-import { buscarToken } from "../../Services/Auth";
+import { buscarEmailUsuarioAtual } from "../../Services/firebaseAuth";
 import styles from "./styles";
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
@@ -148,7 +148,7 @@ const promoCards = [
 interface HomeScreenProps {
   onNavigateToPublish?: () => void;
   onNavigateToProfile?: () => void;
-  onNavigateToProduct?: (itemId: string) => void;
+  onNavigateToProduct?: (itemId: number) => void;
 }
 
 export function HomeScreen({
@@ -163,7 +163,7 @@ export function HomeScreen({
       let timer: ReturnType<typeof setTimeout>;
 
       const verificar = async () => {
-        const emailUsuario = await buscarToken();
+        const emailUsuario = buscarEmailUsuarioAtual();
         if (!emailUsuario) return;
 
         const jaViu = await buscar(`incentive_seen:${emailUsuario}`);
@@ -499,14 +499,14 @@ export function HomeScreen({
       <IncentiveModal
         visible={showIncentive}
         onClose={async () => {
-          const emailUsuario = await buscarToken();
+          const emailUsuario = buscarEmailUsuarioAtual();
           if (emailUsuario) {
             await salvar(`incentive_seen:${emailUsuario}`, "true");
           }
           setShowIncentive(false);
         }}
         onPublish={async () => {
-          const emailUsuario = await buscarToken();
+          const emailUsuario = buscarEmailUsuarioAtual();
           if (emailUsuario) {
             await salvar(`incentive_seen:${emailUsuario}`, "true");
           }

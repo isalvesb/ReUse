@@ -9,6 +9,8 @@ import {
 
 import { auth } from "./firebaseConfig";
 
+import { DEV_SKIP_AUTH } from "../config/devAuth";
+
 export async function criarContaComEmailSenha(
   nome: string,
   email: string,
@@ -52,5 +54,9 @@ export function buscarUsuarioAtual() {
 }
 
 export function buscarEmailUsuarioAtual() {
+  if (DEV_SKIP_AUTH) {
+    return "dev@reuse.app";
+  }
+
   return auth.currentUser?.email ?? null;
 }

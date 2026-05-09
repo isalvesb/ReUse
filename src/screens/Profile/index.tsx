@@ -54,38 +54,30 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
     avaliacao: 0,
   });
 
-  async function fetchStats(userId: string) {
+  async function fetchStats(userEmail: string) {
     try {
-      const { count: trocas } = await supabase
-        .from("trocas")
+      const { count: itens, error } = await supabase
+        .from("items")
         .select("*", { count: "exact", head: true })
-        .eq("user_id", userId);
+        .eq("user_email", userEmail);
 
-      const { count: itens } = await supabase
-        .from("itens")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", userId);
-
-      const { data: avaliacoes } = await supabase
-        .from("avaliacoes")
-        .select("rating")
-        .eq("to_user_id", userId); // CORRIGIDO AQUI
-
-      const media =
-        avaliacoes && avaliacoes.length > 0
-          ? (
-              avaliacoes.reduce((acc, item) => acc + item.rating, 0) /
-              avaliacoes.length
-            ).toFixed(1)
-          : "0";
+      if (error) {
+        throw error;
+      }
 
       setStats({
-        trocas: trocas || 0,
+        trocas: 0,
         itens: itens || 0,
-        avaliacao: Number(media),
+        avaliacao: 0,
       });
     } catch (error) {
       console.error("Erro ao buscar stats:", error);
+
+      setStats({
+        trocas: 0,
+        itens: 0,
+        avaliacao: 0,
+      });
     }
   }
 
@@ -102,8 +94,8 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
           ? "Usuário Dev"
           : firebaseUser?.displayName;
 
-        if (userId) {
-          await fetchStats(userId);
+        if (emailAtual) {
+          await fetchStats(emailAtual);
         }
 
         if (!emailAtual) {

@@ -13,7 +13,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-import { buscarToken } from "../../Services/Auth";
+import { buscarEmailUsuarioAtual } from "../../Services/firebaseAuth";
 import { buscar } from "../../Services/Storage";
 import { getItemById, Item } from "../../Services/Items";
 
@@ -116,10 +116,11 @@ export function ProductScreen({ route }: Props) {
           }
         }
 
-        const loggedEmail = await buscarToken();
+        const loggedEmail = buscarEmailUsuarioAtual();
+
         setIsOwner(
           !!loggedEmail &&
-          loggedEmail.toLowerCase() === fetchedItem.user_email?.toLowerCase()
+            loggedEmail.toLowerCase() === fetchedItem.user_email?.toLowerCase(),
         );
       } catch (err) {
         console.error("Erro ao carregar produto:", err);
@@ -135,7 +136,12 @@ export function ProductScreen({ route }: Props) {
 
   if (isLoading || !item) {
     return (
-      <View style={[styles.screen, { justifyContent: "center", alignItems: "center" }]}>
+      <View
+        style={[
+          styles.screen,
+          { justifyContent: "center", alignItems: "center" },
+        ]}
+      >
         <ActivityIndicator size="large" color="#342A2A" />
       </View>
     );
@@ -145,14 +151,18 @@ export function ProductScreen({ route }: Props) {
   const itemType = getItemType(item);
 
   const badgeBg =
-    itemType === "Troca" ? "#C9A8D4" :
-    itemType === "Doação" ? "#A8D4B0" :
-    "#F5C842";
+    itemType === "Troca"
+      ? "#C9A8D4"
+      : itemType === "Doação"
+        ? "#A8D4B0"
+        : "#F5C842";
 
   const badgeTextColor =
-    itemType === "Troca" ? "#3C3489" :
-    itemType === "Doação" ? "#27500A" :
-    "#412402";
+    itemType === "Troca"
+      ? "#3C3489"
+      : itemType === "Doação"
+        ? "#27500A"
+        : "#412402";
 
   const locationLabel = item.city
     ? `${item.neighborhood ? `${item.neighborhood}, ` : ""}${item.city} - ${item.state}`
@@ -162,7 +172,10 @@ export function ProductScreen({ route }: Props) {
     <View style={styles.screen}>
       {/* ── Header ── */}
       <View style={[styles.navBar, { paddingTop: insets.top + 14 }]}>
-        <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Pressable
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
           <Ionicons name="arrow-back" size={20} color="#FFF" />
           <Text style={styles.backButtonText}>Voltar</Text>
         </Pressable>
@@ -192,7 +205,15 @@ export function ProductScreen({ route }: Props) {
             <TouchableOpacity
               style={styles.editBtn}
               activeOpacity={0.85}
-              onPress={() => navigation.navigate("Profile", { mode: "edit", user: owner })}
+              onPress={() =>
+                navigation.navigate("HomeScreen", {
+                  screen: "Publish",
+                  params: {
+                    mode: "edit",
+                    itemId: item.id,
+                  },
+                })
+              }
             >
               <Ionicons name="pencil" size={18} color="#342A2A" />
             </TouchableOpacity>
@@ -212,9 +233,16 @@ export function ProductScreen({ route }: Props) {
                 key={i}
                 onPress={() => setSelectedImage(i)}
                 activeOpacity={0.8}
-                style={[styles.thumb, i === selectedImage && styles.thumbActive]}
+                style={[
+                  styles.thumb,
+                  i === selectedImage && styles.thumbActive,
+                ]}
               >
-                <Image source={{ uri }} style={styles.thumbImage} resizeMode="cover" />
+                <Image
+                  source={{ uri }}
+                  style={styles.thumbImage}
+                  resizeMode="cover"
+                />
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -259,22 +287,24 @@ export function ProductScreen({ route }: Props) {
               <Text style={styles.ownerMeta}>
                 {owner?.trocas ?? 0} trocas realizadas
                 {"  •  "}
-                <Ionicons name="star" size={12} color="#F5C842" />
-                {" "}{owner?.avaliacao ?? "—"}
+                <Ionicons name="star" size={12} color="#F5C842" />{" "}
+                {owner?.avaliacao ?? "—"}
               </Text>
             </View>
           </View>
 
-          {!isOwner && (
+          {isOwner && (
             <TouchableOpacity
-              style={styles.chatBtn}
+              style={styles.editBtn}
               activeOpacity={0.85}
-              onPress={() =>
-                navigation.navigate("Chats", { recipientEmail: owner?.email })
-              }
+              onPress={() => {
+                Alert.alert(
+                  "Edição em breve",
+                  "A edição de itens será ativada em uma próxima versão.",
+                );
+              }}
             >
-              <Ionicons name="chatbox-outline" size={18} color="#FFF" style={{ marginRight: 8 }} />
-              <Text style={styles.chatBtnText}>Conversar</Text>
+              <Ionicons name="pencil" size={18} color="#342A2A" />
             </TouchableOpacity>
           )}
         </View>

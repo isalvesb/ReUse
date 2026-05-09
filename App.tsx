@@ -44,6 +44,7 @@ type RootStackParamList = {
   Notifications: undefined;
   Product: { itemId: number };
   EditProfile: undefined;
+  Chats: { recipientEmail?: string } | undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -57,7 +58,7 @@ function MainScreen() {
   const renderScreen = () => {
     switch (activeTab) {
       case "publicar":
-        return <PublishScreen />;
+        return <PublishScreen navigation={navigation} />;
       case "vitrine":
         return <ShowcaseScreen />;
       case "chats":
@@ -125,6 +126,7 @@ function AppNavigator() {
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />
             <Stack.Screen name="Product" component={ProductScreen} />
             <Stack.Screen name="Notifications" component={Notifications} />
+            <Stack.Screen name="Chats" component={ChatsScreen} />
           </React.Fragment>
         ) : (
           <React.Fragment>

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, Text, Image, Pressable, Animated } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import { buscarToken } from "../../Services/Auth";
+import { buscarEmailUsuarioAtual } from "../../Services/firebaseAuth";
 import styles from "./styles";
 
 const defaultProfileImage = require("../../../assets/images/profiles/default.png");
@@ -32,7 +32,7 @@ export default function Header({ onProfilePress }: HeaderProps) {
 
       const carregarImagemPerfil = async () => {
         try {
-          const emailAtual = await buscarToken();
+          const emailAtual = buscarEmailUsuarioAtual();
           const normalizedEmail = emailAtual?.toLowerCase();
 
           const imageSource =

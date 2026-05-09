@@ -9,13 +9,18 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useRef } from "react";
 
-import styles from "./styles";;
+import styles from "./styles";
 
 const REWARDS = [
     { icon: "🌱", text: '1º Item: Badge "Iniciante Verde" + Acesso a dicas exclusivas', threshold: 1 },
     { icon: "🍃", text: "3 Itens: Destaque no perfil + Prioridade em itens premium", threshold: 3 },
     { icon: "🌿", text: "5 Itens: Badge exclusivo + Frete grátis", threshold: 5 },
 ]
+
+interface IncentiveCardProps {
+  userItemCount: number;
+  onPublish?: () => void;
+}
 
 export function IncentiveCard({
   userItemCount,
