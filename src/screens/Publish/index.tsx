@@ -263,13 +263,13 @@ export function PublishScreen({ navigation }: any) {
 
     try {
       const firebaseUser = auth.currentUser;
-      const userEmail = DEV_SKIP_AUTH ? "dev@reuse.app" : (firebaseUser?.email ?? undefined);
+      const userEmail = auth.currentUser?.email;
 
       if (!userEmail) {
-        Alert.alert("Login necessário", "Entre na sua conta antes de publicar um item.");
+        Alert.alert("Login necessário");
         return;
       }
-
+      
       let imageUrls: string[] = [];
       if (photos.length > 0) {
         imageUrls = await uploadItemImages(photos.map((p) => p.uri), userEmail);

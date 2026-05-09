@@ -1,6 +1,8 @@
 import { supabase } from "../lib/supabase";
 import * as FileSystem from "expo-file-system/legacy";
 
+// ===================== TYPES =====================
+
 export type ItemPayload = {
   title: string;
   category: string;
@@ -39,6 +41,25 @@ export type Item = {
   item_type: "doacao" | "troca" | "venda" | null;
 };
 
+// ===================== CREATE ITEM =====================
+
+export async function createItem(item: ItemPayload) {
+  const { data, error } = await supabase
+    .from("items")
+    .insert([item])
+    .select()
+    .single();
+
+  if (error) {
+    console.error("❌ Erro ao criar item:", error.message);
+    throw error;
+  }
+
+  return data as Item;
+}
+
+// ===================== UPLOAD IMAGES =====================
+
 export async function uploadItemImages(
   uris: string[],
   userEmail: string
@@ -49,70 +70,50 @@ export async function uploadItemImages(
 
   for (const uri of uris) {
     try {
-      const fileName = `${safeEmail}/${Date.now()}_${Math.random().toString(36).slice(2)}.jpg`;
+      const fileName = `${safeEmail}/${Date.now()}_${Math.random()
+        .toString(36)
+        .slice(2)}.jpg`;
 
       console.log("📤 Iniciando upload:", fileName);
 
+      // 🔥 base64 correto
       const base64 = await FileSystem.readAsStringAsync(uri, {
         encoding: FileSystem.EncodingType.Base64,
       });
 
-      const file = await fetch(uri);
-      const blob = await file.blob();
+      const arrayBuffer = Uint8Array.from(atob(base64), (c) =>
+        c.charCodeAt(0)
+      );
 
       const { data, error } = await supabase.storage
-      .from("item-images")
-      .upload(fileName, blob, {
-        contentType: "image/jpeg",
-        upsert: true,
-      });
+        .from("item-images")
+        .upload(fileName, arrayBuffer, {
+          contentType: "image/jpeg",
+          upsert: true,
+        });
 
       if (error) {
         console.error("❌ Upload falhou:", error.message);
-        throw new Error(`Upload failed: ${error.message}`);
+        throw error;
       }
-
-      console.log("✅ Upload bem-sucedido:", data.path);
 
       const { data: publicUrlData } = supabase.storage
         .from("item-images")
         .getPublicUrl(fileName);
 
       uploadedUrls.push(publicUrlData.publicUrl);
-      console.log("✅ Imagem vinculada:", publicUrlData.publicUrl);
+
+      console.log("🔗 URL:", publicUrlData.publicUrl);
     } catch (err) {
       console.error("❌ Erro no upload:", err);
     }
   }
 
-  console.log("📦 Total de imagens vinculadas:", uploadedUrls.length);
+  console.log("📦 Total de imagens:", uploadedUrls.length);
   return uploadedUrls;
 }
 
-export async function createItem(item: ItemPayload) {
-  try {
-    console.log("💾 Criando item com imagens:", item.images?.length ?? 0);
-
-    const { data, error } = await supabase
-      .from("items")
-      .insert([item])
-      .select()
-      .single();
-
-    if (error) {
-      console.error("❌ Erro ao criar item:", error.message);
-      console.error("Detalhes:", error.details);
-      throw error;
-    }
-
-    console.log("✅ Item criado com ID:", data.id);
-    console.log("✅ Imagens salvas:", data.images);
-    return data as Item;
-  } catch (error: any) {
-    console.error("❌ Falha ao criar item:", error);
-    throw new Error(`Falha ao criar item: ${error.message}`);
-  }
-}
+// ===================== GET ITEMS =====================
 
 export async function getItems() {
   const { data, error } = await supabase
