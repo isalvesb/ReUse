@@ -1,18 +1,17 @@
 import { StyleSheet } from "react-native";
 
-const BG_CREAM      = "#EDE5D8";
-const BLOCK_DARK    = "#2B2118";
-const COUNTER_DOAC  = "#FFD1FF20";
-const COUNTER_TROC  = "#E0C3FC20";
-const COUNTER_VEND  = "#FFE4A120";
-const RATING_BG     = "#3D2F1A";
-const RATING_STAR   = "#F5C518";
-const MUTED         = "#9A9186";
+const BG_CREAM = "#EDE5D8";
+const BLOCK_DARK = "#2B2118";
+const COUNTER_DOAC = "#FFD1FF20";
+const COUNTER_TROC = "#E0C3FC20";
+const COUNTER_VEND = "#FFE4A120";
+const RATING_BG = "#3D2F1A";
+const RATING_STAR = "#F5C518";
+const MUTED = "#9A9186";
 const PURPLE_AVATAR = "#C9A8D4";
-const WHITE         = "#FFFFFF";
+const WHITE = "#FFFFFF";
 
 export default StyleSheet.create({
-
   screen: { flex: 1, backgroundColor: BG_CREAM },
   loadingScreen: {
     flex: 1,
@@ -26,31 +25,19 @@ export default StyleSheet.create({
   },
 
   navBar: {
-    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "center",
     paddingHorizontal: 20,
     paddingBottom: 14,
     backgroundColor: BLOCK_DARK,
   },
+
   navTitle: {
-    flex: 1,
     textAlign: "center",
     color: WHITE,
     fontSize: 17,
     fontFamily: "Inter_700Bold",
   },
-  backButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  backButtonText: {
-    color: WHITE,
-    fontSize: 15,
-    fontFamily: "Inter_400Regular",
-  },
-  placeholder: { width: 60 },
 
   userCard: {
     flexDirection: "row",
@@ -125,17 +112,17 @@ export default StyleSheet.create({
     borderWidth: 1,
   },
 
-  counterCardDoacao: { 
+  counterCardDoacao: {
     backgroundColor: COUNTER_DOAC,
-    borderColor: "#FFD1FF30", 
+    borderColor: "#FFD1FF30",
   },
 
-  counterCardTroca:  { 
+  counterCardTroca: {
     backgroundColor: COUNTER_TROC,
     borderColor: "#E0C3FC30",
   },
 
-  counterCardVenda:  { 
+  counterCardVenda: {
     backgroundColor: COUNTER_VEND,
     borderColor: "#FFE4A130",
   },

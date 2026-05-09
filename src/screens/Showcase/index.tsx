@@ -194,15 +194,7 @@ export function ShowcaseScreen() {
     <View style={styles.screen}>
       {/* ── Bloco escuro fixo (fora do ScrollView) ── */}
       <View style={[styles.navBar, { paddingTop: insets.top + 14 }]}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <Ionicons name="arrow-back" size={20} color="#FFF" />
-          <Text style={styles.backButtonText}>Voltar</Text>
-        </TouchableOpacity>
         <Text style={styles.navTitle}>Minha Vitrine</Text>
-        <View style={styles.placeholder} />
       </View>
 
       <View style={styles.userCard}>
