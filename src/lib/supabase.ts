@@ -1,26 +1,27 @@
 import "react-native-url-polyfill/auto";
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = 'https://cpdwuulriyahlyhrmnuc.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNwZHd1dWxyaXlhaGx5aHJtbnVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3OTk4OTEsImV4cCI6MjA5MjM3NTg5MX0.syDEAVAzUx6ea7ij7Iy5DMjPpvdNMz4Go8bq0yqCwAs';
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error("Variáveis do Supabase não configuradas no .env");
+}
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export async function fetchStats(userId: string) {
   try {
-    // Trocas
     const { count: trocas, error: trocasError } = await supabase
       .from("trocas")
       .select("*", { count: "exact", head: true })
       .eq("user_id", userId);
 
-    // Itens
     const { count: itens, error: itensError } = await supabase
       .from("itens")
       .select("*", { count: "exact", head: true })
       .eq("user_id", userId);
 
-    // Avaliações
     const { data: avaliacoes, error: avaliacoesError } = await supabase
       .from("avaliacoes")
       .select("rating")
@@ -32,6 +33,7 @@ export async function fetchStats(userId: string) {
         itensError,
         avaliacoesError,
       });
+
       return { trocas: 0, itens: 0, avaliacao: 0 };
     }
 
