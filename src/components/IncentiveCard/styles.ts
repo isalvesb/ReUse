@@ -58,6 +58,22 @@ sparkleCircle: {
     flex: 1,
   },
  
+  overlayCenter: {
+  flex: 1,
+  backgroundColor: "rgba(0,0,0,0.55)",
+  justifyContent: "center",
+  alignItems: "center",
+  padding: 24,
+},
+sheetCenter: {
+  backgroundColor: "#2C2416",
+  borderRadius: 24,
+  padding: 24,
+  paddingBottom: 32,
+  alignItems: "center",
+  width: "100%",
+},
+
   overlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.55)",
