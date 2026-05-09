@@ -8,7 +8,7 @@ export type ItemPayload = {
   description: string;
   location: string;
   user_email?: string;
-  price?: string;
+  price?: string | null;
   size?: string;
   cep?: string;
   street?: string;
@@ -16,6 +16,7 @@ export type ItemPayload = {
   city?: string;
   state?: string;
   images?: string[];
+  item_type?: "doacao" | "troca" | "venda" | null;
 };
 
 export type Item = {
@@ -35,10 +36,8 @@ export type Item = {
   neighborhood: string | null;
   city: string | null;
   state: string | null;
+  item_type: "doacao" | "troca" | "venda" | null;
 };
-
-const SUPABASE_URL = "https://cpdwuulriyahlyhrmnuc.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNwZHd1dWxyaXlhaGx5aHJtbnVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3OTk4OTEsImV4cCI6MjA5MjM3NTg5MX0.syDEAVAzUx6ea7ij7Iy5DMjPpvdNMz4Go8bq0yqCwAs";
 
 export async function uploadItemImages(
   uris: string[],
@@ -46,55 +45,73 @@ export async function uploadItemImages(
 ): Promise<string[]> {
   const uploadedUrls: string[] = [];
 
+  const safeEmail = userEmail.replace(/[@.]/g, "_");
+
   for (const uri of uris) {
     try {
-      const fileName = `${userEmail}/${Date.now()}_${Math.random().toString(36).slice(2)}.jpg`;
-      const uploadUrl = `${SUPABASE_URL}/storage/v1/object/item-images/${fileName}`;
+      const fileName = `${safeEmail}/${Date.now()}_${Math.random().toString(36).slice(2)}.jpg`;
 
-      const result = await FileSystem.uploadAsync(uploadUrl, uri, {
-        httpMethod: "POST",
-        uploadType: FileSystem.FileSystemUploadType.BINARY_CONTENT,
-        headers: {
-          "Authorization": `Bearer ${SUPABASE_KEY}`,
-          "apikey": SUPABASE_KEY,
-          "Content-Type": "image/jpeg",
-          "x-upsert": "false",
-        },
+      console.log("📤 Iniciando upload:", fileName);
+
+      const base64 = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.Base64,
       });
 
-      console.log("Upload status:", result.status, result.body);
+      const file = await fetch(uri);
+      const blob = await file.blob();
 
-      if (result.status === 200 || result.status === 201) {
-        const { data: publicUrlData } = supabase.storage
-          .from("item-images")
-          .getPublicUrl(fileName);
+      const { data, error } = await supabase.storage
+      .from("item-images")
+      .upload(fileName, blob, {
+        contentType: "image/jpeg",
+        upsert: true,
+      });
 
-        uploadedUrls.push(publicUrlData.publicUrl);
-        console.log("✅ Uploaded:", publicUrlData.publicUrl);
-      } else {
-        console.log("❌ Upload falhou:", result.status, result.body);
+      if (error) {
+        console.error("❌ Upload falhou:", error.message);
+        throw new Error(`Upload failed: ${error.message}`);
       }
+
+      console.log("✅ Upload bem-sucedido:", data.path);
+
+      const { data: publicUrlData } = supabase.storage
+        .from("item-images")
+        .getPublicUrl(fileName);
+
+      uploadedUrls.push(publicUrlData.publicUrl);
+      console.log("✅ Imagem vinculada:", publicUrlData.publicUrl);
     } catch (err) {
-      console.log("❌ Erro:", err);
+      console.error("❌ Erro no upload:", err);
     }
   }
 
+  console.log("📦 Total de imagens vinculadas:", uploadedUrls.length);
   return uploadedUrls;
 }
 
 export async function createItem(item: ItemPayload) {
-  const { data, error } = await supabase
-    .from("items")
-    .insert([item])
-    .select()
-    .single();
+  try {
+    console.log("💾 Criando item com imagens:", item.images?.length ?? 0);
 
-  if (error) {
-    console.error("❌ Erro ao criar item:", error);
-    throw error;
+    const { data, error } = await supabase
+      .from("items")
+      .insert([item])
+      .select()
+      .single();
+
+    if (error) {
+      console.error("❌ Erro ao criar item:", error.message);
+      console.error("Detalhes:", error.details);
+      throw error;
+    }
+
+    console.log("✅ Item criado com ID:", data.id);
+    console.log("✅ Imagens salvas:", data.images);
+    return data as Item;
+  } catch (error: any) {
+    console.error("❌ Falha ao criar item:", error);
+    throw new Error(`Falha ao criar item: ${error.message}`);
   }
-
-  return data as Item;
 }
 
 export async function getItems() {

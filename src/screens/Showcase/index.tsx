@@ -52,11 +52,21 @@ function getProfileImage(email?: string, avatarUri?: string | null) {
   return profileImagesByEmail[key] ?? defaultProfileImage;
 }
 
+function getItemType(item: Item): ItemType {
+  if (item.item_type === "troca") return "Troca";
+  if (item.item_type === "doacao") return "Doação";
+  if (item.item_type === "venda") return "Venda";
+  const cat = item.category?.toLowerCase() ?? "";
+  if (cat.includes("troca")) return "Troca";
+  if (cat.includes("doa")) return "Doação";
+  return "Venda";
+}
+
 function TypeBadge({ type }: { type: ItemType }) {
   const bg =
-    type === "Venda" ? "#F5C842" :
-    type === "Troca" ? "#C9A8D4" :
-    "#A8D4B0";
+    type === "Venda"  ? "#F5C842" :
+    type === "Troca"  ? "#C9A8D4" :
+                        "#A8D4B0";
   return (
     <View style={[styles.typeBadge, { backgroundColor: bg }]}>
       <Text style={styles.typeBadgeText}>{type}</Text>
@@ -100,26 +110,19 @@ export function ShowcaseScreen() {
   const [items, setItems] = useState<Item[]>([]);
   const [filter, setFilter] = useState<FilterOption>("Todos");
 
-  function getItemType(item: Item): ItemType {
-    const cat = item.category?.toLowerCase() ?? "";
-    if (cat.includes("troca")) return "Troca";
-    if (cat.includes("doa")) return "Doação";
-    return "Venda";
-  }
-
   const filterOptions: FilterOption[] = ["Todos", "Doações", "Trocas", "Vendas"];
 
   const counts = {
     Doações: items.filter((i) => getItemType(i) === "Doação").length,
-    Trocas: items.filter((i) => getItemType(i) === "Troca").length,
-    Vendas: items.filter((i) => getItemType(i) === "Venda").length,
+    Trocas:  items.filter((i) => getItemType(i) === "Troca").length,
+    Vendas:  items.filter((i) => getItemType(i) === "Venda").length,
   };
 
   const filtered =
-    filter === "Todos" ? items :
+    filter === "Todos"   ? items :
     filter === "Doações" ? items.filter((i) => getItemType(i) === "Doação") :
-    filter === "Trocas" ? items.filter((i) => getItemType(i) === "Troca") :
-    items.filter((i) => getItemType(i) === "Venda");
+    filter === "Trocas"  ? items.filter((i) => getItemType(i) === "Troca") :
+                           items.filter((i) => getItemType(i) === "Venda");
 
   useEffect(() => {
     const carregar = async () => {
@@ -155,14 +158,15 @@ export function ShowcaseScreen() {
   if (isLoading) {
     return (
       <View style={styles.loadingScreen}>
-        <ActivityIndicator size="large" color="#342A2A" />
+        <ActivityIndicator size="large" color="#2B2118" />
       </View>
     );
   }
 
   return (
     <View style={styles.screen}>
-      {/* Header */}
+
+      {/* ── Bloco escuro fixo (fora do ScrollView) ── */}
       <View style={[styles.navBar, { paddingTop: insets.top + 14 }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={20} color="#FFF" />
@@ -172,48 +176,48 @@ export function ShowcaseScreen() {
         <View style={styles.placeholder} />
       </View>
 
+      <View style={styles.userCard}>
+        <View style={styles.userCardLeft}>
+          <Image
+            source={getProfileImage(user?.email, user?.avatar)}
+            style={styles.userAvatar}
+          />
+          <View style={styles.userInfo}>
+            <Text style={styles.userName}>{user?.name ?? "Usuário"}</Text>
+            <View style={styles.userLocationRow}>
+              <Ionicons name="location-outline" size={13} color="#9A9186" />
+              <Text style={styles.userLocation}>{user?.location ?? "—"}</Text>
+            </View>
+          </View>
+        </View>
+        <View style={styles.ratingBadge}>
+          <Ionicons name="star" size={14} color="#F5C842" />
+          <Text style={styles.ratingText}>{user?.avaliacao ?? "4.8"}</Text>
+        </View>
+      </View>
+
+      {/* Contadores — fecham o bloco escuro com borderRadius embaixo */}
+      <View style={styles.countersRow}>
+        <View style={[styles.counterCard, styles.counterCardDoacao]}>
+          <Text style={styles.counterValue}>{counts.Doações}</Text>
+          <Text style={styles.counterLabel}>Doações</Text>
+        </View>
+        <View style={[styles.counterCard, styles.counterCardTroca]}>
+          <Text style={styles.counterValue}>{counts.Trocas}</Text>
+          <Text style={styles.counterLabel}>Trocas</Text>
+        </View>
+        <View style={[styles.counterCard, styles.counterCardVenda]}>
+          <Text style={styles.counterValue}>{counts.Vendas}</Text>
+          <Text style={styles.counterLabel}>Vendas</Text>
+        </View>
+      </View>
+
+      {/* ── ScrollView só para o conteúdo abaixo ── */}
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Card do usuário */}
-        <View style={styles.userCard}>
-          <View style={styles.userCardLeft}>
-            <Image
-              source={getProfileImage(user?.email, user?.avatar)}
-              style={styles.userAvatar}
-            />
-            <View style={styles.userInfo}>
-              <Text style={styles.userName}>{user?.name ?? "Usuário"}</Text>
-              <View style={styles.userLocationRow}>
-                <Ionicons name="location-outline" size={13} color="#888780" />
-                <Text style={styles.userLocation}>{user?.location ?? "—"}</Text>
-              </View>
-            </View>
-          </View>
-          <View style={styles.ratingBadge}>
-            <Ionicons name="star" size={14} color="#F5C842" />
-            <Text style={styles.ratingText}>{user?.avaliacao ?? "4.8"}</Text>
-          </View>
-        </View>
-
-        {/* Contadores */}
-        <View style={styles.countersRow}>
-          <View style={styles.counterCard}>
-            <Text style={styles.counterValue}>{counts.Doações}</Text>
-            <Text style={styles.counterLabel}>Doações</Text>
-          </View>
-          <View style={styles.counterCard}>
-            <Text style={styles.counterValue}>{counts.Trocas}</Text>
-            <Text style={styles.counterLabel}>Trocas</Text>
-          </View>
-          <View style={styles.counterCard}>
-            <Text style={styles.counterValue}>{counts.Vendas}</Text>
-            <Text style={styles.counterLabel}>Vendas</Text>
-          </View>
-        </View>
-
         {/* Filtros */}
         <ScrollView
           horizontal
@@ -229,16 +233,20 @@ export function ShowcaseScreen() {
               activeOpacity={0.7}
             >
               <Text style={[styles.filterChipText, filter === f && styles.filterChipTextActive]}>
-                {f}{f !== "Todos" && counts[f as keyof typeof counts] ? ` (${counts[f as keyof typeof counts]})` : ""}
+                {f !== "Todos" && counts[f as keyof typeof counts]
+                  ? `${f} (${counts[f as keyof typeof counts]})`
+                  : f}
               </Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
 
         {/* Contagem total */}
-        <Text style={styles.itemCount}>{filtered.length} {filtered.length === 1 ? "item" : "itens"}</Text>
+        <Text style={styles.itemCount}>
+          {filtered.length} {filtered.length === 1 ? "item" : "itens"}
+        </Text>
 
-        {/* Grade de itens */}
+        {/* Grade */}
         <View style={styles.grid}>
           {filtered.length > 0 ? (
             filtered.map((item) => (

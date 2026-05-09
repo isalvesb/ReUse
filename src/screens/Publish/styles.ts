@@ -27,75 +27,6 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 
-  journeyCard: {
-    backgroundColor: "#2C2416",
-    margin: 16,
-    borderRadius: 16,
-    padding: 16,
-  },
-
-  journeyHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-
-  journeyTitle: {
-    fontSize: 16,
-    fontFamily: "Inter_700Bold",
-    lineHeight: 22,
-    color: "#FFFFFF",
-  },
-
-  journeySubtitle: {
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
-    lineHeight: 24,
-    color: "#888780",
-    marginTop: 2,
-  },
-
-  milestoneRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-
-  milestoneItem: {
-    alignItems: "center",
-    gap: 6,
-  },
-
-  milestoneIcon: {
-    width: 63,
-    height: 94,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  milestoneIconDone: {
-    backgroundColor: "#4A6741",
-  },
-
-  milestoneIconLocked: {
-    backgroundColor: "#3D3020",
-    borderWidth: 1.18,
-    borderColor: "#FFFFFF20",
-    borderStyle: "solid",
-  },
-
-  milestoneLabel: {
-    fontSize: 11,
-    fontFamily: "Inter_400Regular",
-    lineHeight: 16,
-    color: "#888780",
-  },
-
-  milestoneLabelDone: {
-    color: "#A8C89A",
-  },
-
   incentiveCard: {
     backgroundColor: "#2C2416",
     margin: 16,
@@ -529,6 +460,68 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     paddingHorizontal: 32,
   },
+
+pricePrefix: {
+  fontSize: 14,
+  fontFamily: "Inter_400Regular",
+  color: "#342A2A",
+  marginRight: 4,
+  paddingVertical: 12,
+},
+
+priceInput: {
+  flex: 1,
+  height: 48,
+  fontSize: 14,
+  fontFamily: "Inter_400Regular",
+  color: "#342A2A",
+  paddingVertical: 0,
+  textAlignVertical: "center",
+  includeFontPadding: false,
+},
+
+typeModalItem: {
+  flexDirection: "row",
+  alignItems: "center",
+  gap: 12,
+  paddingVertical: 14,
+  borderBottomWidth: 1,
+  borderBottomColor: "#F0F0F0",
+},
+
+typeModalItemActive: {
+  backgroundColor: "#F5FBF0",
+  marginHorizontal: -16,
+  paddingHorizontal: 16,
+},
+
+typeModalBadge: {
+  width: 44,
+  height: 44,
+  borderRadius: 22,
+  alignItems: "center",
+  justifyContent: "center",
+},
+
+typeModalLabel: {
+  fontSize: 14,
+  fontFamily: "Inter_700Bold",
+  lineHeight: 20,
+  color: "#342A2A",
+},
+
+typeModalLabelActive: {
+  color: "#4A6741",
+},
+
+typeModalDesc: {
+  fontSize: 12,
+  fontFamily: "Inter_400Regular",
+  lineHeight: 18,
+  color: "#888780",
+  marginTop: 2,
+},
+
 });
 
 export default styles;

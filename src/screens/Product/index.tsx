@@ -8,7 +8,6 @@ import {
   Pressable,
   ActivityIndicator,
   Dimensions,
-  StyleSheet,
   Alert,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -39,13 +38,18 @@ function getProfileImage(email?: string | null, avatarUri?: string | null) {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const CONDITION_LABEL: Record<string, string> = {
-  novo: "Novo",
+  Novo: "Novo",
   como_novo: "Usado - Como Novo",
   bom_estado: "Usado - Bom estado",
   regular: "Usado - Estado Regular",
 };
 
 function getItemType(item: Item): "Venda" | "Troca" | "Doação" {
+  // Usa o campo item_type salvo no banco (fonte confiável)
+  if (item.item_type === "troca") return "Troca";
+  if (item.item_type === "doacao") return "Doação";
+  if (item.item_type === "venda") return "Venda";
+  // Fallback para itens antigos que não têm item_type preenchido
   const cat = item.category?.toLowerCase() ?? "";
   if (cat.includes("troca")) return "Troca";
   if (cat.includes("doa")) return "Doação";
@@ -88,11 +92,9 @@ export function ProductScreen({ route }: Props) {
     const carregar = async () => {
       if (!itemId) return;
       try {
-        // Busca o item
         const fetchedItem = await getItemById(itemId);
         setItem(fetchedItem);
 
-        // Busca dados do dono do item
         if (fetchedItem.user_email) {
           const raw = await buscar(`user:${fetchedItem.user_email}`);
           if (raw) {
@@ -114,7 +116,6 @@ export function ProductScreen({ route }: Props) {
           }
         }
 
-        // Verifica se o usuário logado é o dono
         const loggedEmail = await buscarToken();
         setIsOwner(
           !!loggedEmail &&
@@ -147,6 +148,11 @@ export function ProductScreen({ route }: Props) {
     itemType === "Troca" ? "#C9A8D4" :
     itemType === "Doação" ? "#A8D4B0" :
     "#F5C842";
+
+  const badgeTextColor =
+    itemType === "Troca" ? "#3C3489" :
+    itemType === "Doação" ? "#27500A" :
+    "#412402";
 
   const locationLabel = item.city
     ? `${item.neighborhood ? `${item.neighborhood}, ` : ""}${item.city} - ${item.state}`
@@ -182,7 +188,6 @@ export function ProductScreen({ route }: Props) {
             </View>
           )}
 
-          {/* Botão editar — só aparece pro dono */}
           {isOwner && (
             <TouchableOpacity
               style={styles.editBtn}
@@ -230,15 +235,15 @@ export function ProductScreen({ route }: Props) {
           {/* Badge + preço */}
           <View style={styles.badgeRow}>
             <View style={[styles.typeBadge, { backgroundColor: badgeBg }]}>
-              <Text style={styles.typeBadgeText}>{itemType}</Text>
+              <Text style={[styles.typeBadgeText, { color: badgeTextColor }]}>
+                {itemType}
+              </Text>
             </View>
-            {/* Preço — visível só em Venda (adapte conforme seu modelo de dados) */}
-            {itemType === "Venda" && (
-              <Text style={styles.price}>R$ —</Text>
+            {itemType === "Venda" && item.price && (
+              <Text style={styles.price}>R$ {item.price}</Text>
             )}
           </View>
 
-          {/* Descrição */}
           <Text style={styles.description}>{item.description}</Text>
         </View>
 
@@ -260,7 +265,6 @@ export function ProductScreen({ route }: Props) {
             </View>
           </View>
 
-          {/* Botão conversar — só pro visitante */}
           {!isOwner && (
             <TouchableOpacity
               style={styles.chatBtn}
@@ -278,4 +282,3 @@ export function ProductScreen({ route }: Props) {
     </View>
   );
 }
-
