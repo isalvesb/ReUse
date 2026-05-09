@@ -7,19 +7,21 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    height: 76,
-    backgroundColor: "#342A2A",
+    height: 100,
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 15,
-    paddingTop: 30,
+    alignItems: "center",
+    padding: 16,
+    backgroundColor: "#342A2A",
+    paddingTop: 50,
+    paddingHorizontal: 20,
   },
 
   backText: {
-    color: "#fff",
     fontSize: 16,
-    marginRight: 47,
+    alignItems: "flex-start",
+    color: "#fff",
+    marginLeft: 7,
   },
 
   headerTitle: {
@@ -31,7 +33,7 @@ const styles = StyleSheet.create({
 
   content: {
     padding: 25,
-    marginBottom: 16,
+    paddingBottom: 40,
   },
 
   avatarContainer: {
