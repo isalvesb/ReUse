@@ -10,7 +10,6 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { logout } from "../../Services/Auth";
 import {
   buscarUsuarioAtual,
   logoutFirebase,
@@ -84,7 +83,9 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
   useEffect(() => {
     const carregarTudo = async () => {
       try {
+
         const firebaseUser = buscarUsuarioAtual();
+
 
         const userId = DEV_SKIP_AUTH ? "dev@reuse.app" : firebaseUser?.uid;
         const emailAtual = DEV_SKIP_AUTH
@@ -145,18 +146,21 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
   const isLogoutDisabled = DEV_SKIP_AUTH || isLoggingOut;
 
   const handleLogout = async () => {
-    if (DEV_SKIP_AUTH) return;
+    if (DEV_SKIP_AUTH) {
+      return;
+    }
+
     if (isLoggingOut) return;
 
     try {
       setIsLoggingOut(true);
 
       await logoutFirebase();
-      await logout();
 
       onLogoutComplete?.();
     } catch (error) {
       console.error("Erro ao fazer logout:", error);
+    } finally {
       setIsLoggingOut(false);
     }
   };
@@ -256,7 +260,9 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
               disabled={isLogoutDisabled}
               style={styles.logoutButton}
             >
-              <Text style={styles.logoutButtonText}>Logout</Text>
+              <Text style={styles.logoutButtonText}>
+                {isLoggingOut ? "Saindo..." : "Logout"}
+              </Text>
             </Pressable>
           </>
         )}

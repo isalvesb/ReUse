@@ -11,6 +11,7 @@ import { ItemCard } from "../../components/ItemCard";
 import { IncentiveModal } from "../../components/IncentiveCard";
 import { salvar, buscar } from "../../Services/Storage";
 import { buscarEmailUsuarioAtual } from "../../Services/firebaseAuth";
+import { supabase } from "../../lib/supabase";
 import styles from "./styles";
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
@@ -145,6 +146,19 @@ const promoCards = [
   },
 ];
 
+async function buscarQuantidadeItensUsuario(email: string) {
+  const { count, error } = await supabase
+    .from("items")
+    .select("id", { count: "exact", head: true })
+    .eq("user_email", email);
+
+  if (error) {
+    return null;
+  }
+
+  return count ?? 0;
+}
+
 interface HomeScreenProps {
   onNavigateToPublish?: () => void;
   onNavigateToProfile?: () => void;
@@ -160,21 +174,56 @@ export function HomeScreen({
 
   useFocusEffect(
     useCallback(() => {
-      let timer: ReturnType<typeof setTimeout>;
+      let timer: ReturnType<typeof setTimeout> | null = null;
+      let isActive = true;
 
       const verificar = async () => {
         const emailUsuario = buscarEmailUsuarioAtual();
+
         if (!emailUsuario) return;
 
+        const quantidadeItens =
+          await buscarQuantidadeItensUsuario(emailUsuario);
+
+        if (!isActive) return;
+
+        if (quantidadeItens === null) {
+          setShowIncentive(false);
+          return;
+        }
+
+        if (quantidadeItens > 0) {
+          await salvar(`incentive_seen:${emailUsuario}`, "true");
+
+          if (isActive) {
+            setShowIncentive(false);
+          }
+
+          return;
+        }
+
         const jaViu = await buscar(`incentive_seen:${emailUsuario}`);
+
+        if (!isActive) return;
+
         if (jaViu !== "true") {
-          timer = setTimeout(() => setShowIncentive(true), 2000);
+          timer = setTimeout(() => {
+            if (isActive) {
+              setShowIncentive(true);
+            }
+          }, 2000);
         }
       };
 
       verificar();
 
-      return () => clearTimeout(timer);
+      return () => {
+        isActive = false;
+
+        if (timer) {
+          clearTimeout(timer);
+        }
+      };
     }, []),
   );
 

@@ -40,7 +40,6 @@ export function ResetEmailSent() {
         "Enviamos novamente o link de recuperação. Verifique sua caixa de entrada e o spam."
       );
     } catch (error: any) {
-      console.log("Erro ao reenviar e-mail:", error.code, error.message);
 
       Alert.alert(
         "Erro",

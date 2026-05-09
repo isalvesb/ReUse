@@ -479,6 +479,9 @@ export function PublishScreen({ navigation, route }: Props) {
         item_type: itemType,
         price: itemType === "venda" ? price : null,
       });
+      
+      await salvar(`incentive_seen:${userEmail}`, "true");
+      setUserItemCount((prev) => prev + 1);
 
       await marcarIncentivoComoVisto(userEmail);
       await limparFormulario();

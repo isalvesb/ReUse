@@ -74,7 +74,6 @@ export async function uploadItemImages(
         .toString(36)
         .slice(2)}.jpg`;
 
-      console.log("📤 Iniciando upload:", fileName);
 
       // 🔥 base64 correto
       const base64 = await FileSystem.readAsStringAsync(uri, {
@@ -103,13 +102,11 @@ export async function uploadItemImages(
 
       uploadedUrls.push(publicUrlData.publicUrl);
 
-      console.log("🔗 URL:", publicUrlData.publicUrl);
     } catch (err) {
       console.error("❌ Erro no upload:", err);
     }
   }
 
-  console.log("📦 Total de imagens:", uploadedUrls.length);
   return uploadedUrls;
 }
 

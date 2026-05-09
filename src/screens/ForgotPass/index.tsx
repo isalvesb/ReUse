@@ -47,7 +47,6 @@ export function ForgotPass() {
         email: emailTratado,
       });
     } catch (error: any) {
-      console.log("Erro ao enviar recuperação de senha:", error.code, error.message);
 
       Alert.alert(
         "Erro",
