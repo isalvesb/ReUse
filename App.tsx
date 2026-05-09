@@ -118,13 +118,17 @@ function AppNavigator() {
     );
   }
 
+  const RenderProfileScreen = () => (
+    <ProfileScreen onLogoutComplete={() => setIsAuthenticated(false)} />
+  );
+
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {isAuthenticated ? (
-          <>
+          <React.Fragment>
             <Stack.Screen name="HomeScreen" component={MainScreen} />
-            <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name="Profile" component={RenderProfileScreen} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />
             <Stack.Screen name="Product" component={ProductScreen} />
             <Stack.Screen name="Notifications" component={Notifications} />
@@ -132,19 +136,19 @@ function AppNavigator() {
             <Stack.Screen name="ForgotPass" component={ForgotPass} />
             <Stack.Screen name="CreateAccount" component={CreateAccount} />
             <Stack.Screen name="ResetEmailSent" component={ResetEmailSent} />
-          </>
+          </React.Fragment>
         ) : (
-          <>
+          <React.Fragment>
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="ForgotPass" component={ForgotPass} />
             <Stack.Screen name="CreateAccount" component={CreateAccount} />
             <Stack.Screen name="HomeScreen" component={MainScreen} />
-            <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name="Profile" component={RenderProfileScreen} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />
             <Stack.Screen name="Product" component={ProductScreen} />
             <Stack.Screen name="Notifications" component={Notifications} />
             <Stack.Screen name="ResetEmailSent" component={ResetEmailSent} />
-          </>
+          </React.Fragment>
         )}
       </Stack.Navigator>
     </NavigationContainer>

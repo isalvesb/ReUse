@@ -31,7 +31,11 @@ const profileImagesByEmail: Record<string, any> = {
   "mir@email.com": require("../../../assets/images/profiles/mir.png"),
 };
 
-export function ProfileScreen() {
+type ProfileScreenProps = {
+  onLogoutComplete?: () => void;
+};
+
+export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
 
@@ -46,7 +50,6 @@ export function ProfileScreen() {
     avaliacao: 0,
   });
 
-  // FUNÇÃO CORRIGIDA DE STATS
   async function fetchStats(userId: string) {
     try {
       const { count: trocas } = await supabase
@@ -82,11 +85,9 @@ export function ProfileScreen() {
     }
   }
 
-  // CARREGA USUÁRIO + STATS JUNTOS
   useEffect(() => {
     const carregarTudo = async () => {
       try {
-        // 🔑 pega usuário do Supabase
         const {
           data: { user: authUser },
         } = await supabase.auth.getUser();
@@ -150,7 +151,10 @@ export function ProfileScreen() {
 
     try {
       setIsLoggingOut(true);
+
       await logout();
+
+      onLogoutComplete?.();
 
       navigation.reset({
         index: 0,
