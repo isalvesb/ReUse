@@ -16,7 +16,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
-import { salvar } from "../../Services/Storage";
+import { salvar, buscar, remover } from "../../Services/Storage";
 import { IncentiveCard } from "../../components/IncentiveCard";
 import { JourneyCard } from "../../components/JourneyCard";
 import { PublishSuccessModal } from "../../components/SucessModal";
@@ -81,6 +81,21 @@ const TYPE_OPTIONS = [
   },
 ];
 
+const DRAFT_KEYS = [
+  "draft_title",
+  "draft_category",
+  "draft_condition",
+  "draft_description",
+  "draft_cep",
+  "draft_street",
+  "draft_neighborhood",
+  "draft_city",
+  "draft_state",
+  "draft_location",
+  "draft_type",
+  "draft_price",
+];
+
 type Props = {
   navigation: any;
   route?: {
@@ -119,6 +134,12 @@ export function PublishScreen({ navigation, route }: Props) {
   const [uploading, setUploading] = useState(false);
   const [loadingItem] = useState(false);
 
+  const salvarCampoRascunho = (key: string, value: string) => {
+    if (!isEditMode) {
+      salvar(key, value);
+    }
+  };
+
   const fetchUserItemCount = async () => {
     const userEmail = buscarEmailUsuarioAtual();
 
@@ -134,49 +155,94 @@ export function PublishScreen({ navigation, route }: Props) {
     }
   };
 
+  const restaurarRascunho = async () => {
+    if (isEditMode) return;
+
+    const [
+      draftTitle,
+      draftCategory,
+      draftCondition,
+      draftDescription,
+      draftCep,
+      draftStreet,
+      draftNeighborhood,
+      draftCity,
+      draftState,
+      draftLocation,
+      draftType,
+      draftPrice,
+    ] = await Promise.all(DRAFT_KEYS.map((key) => buscar(key)));
+
+    if (draftTitle) setTitle(draftTitle);
+    if (draftCategory) setCategory(draftCategory);
+
+    if (
+      draftCondition === "Novo" ||
+      draftCondition === "Usado • Como novo" ||
+      draftCondition === "Usado • Bom estado" ||
+      draftCondition === "Usado • Estado Regular"
+    ) {
+      setCondition(draftCondition);
+    }
+
+    if (draftDescription) setDescription(draftDescription);
+    if (draftCep) setCep(draftCep);
+    if (draftStreet) setStreet(draftStreet);
+    if (draftNeighborhood) setNeighborhood(draftNeighborhood);
+    if (draftCity) setCity(draftCity);
+    if (draftState) setState(draftState);
+    if (draftLocation) setLocation(draftLocation);
+
+    if (
+      draftType === "doacao" ||
+      draftType === "troca" ||
+      draftType === "venda"
+    ) {
+      setItemType(draftType);
+    }
+
+    if (draftPrice) setPrice(draftPrice);
+  };
+
   useEffect(() => {
     fetchUserItemCount();
+    restaurarRascunho();
   }, []);
 
   const salvarTitulo = (v: string) => {
     setTitle(v);
-    salvar("draft_title", v);
+    salvarCampoRascunho("draft_title", v);
   };
 
   const salvarCategoria = (v: string) => {
     setCategory(v);
-    salvar("draft_category", v);
+    salvarCampoRascunho("draft_category", v);
   };
 
   const salvarCondicao = (v: Condition) => {
     setCondition(v);
-    salvar("draft_condition", v);
+    salvarCampoRascunho("draft_condition", v);
   };
 
   const salvarDescricao = (v: string) => {
     setDescription(v);
-    salvar("draft_description", v);
+    salvarCampoRascunho("draft_description", v);
   };
 
   const salvarTipo = (v: ItemType) => {
     setItemType(v);
-
-    if (!isEditMode) {
-      salvar("draft_type", v);
-    }
+    salvarCampoRascunho("draft_type", v);
 
     if (v !== "venda") {
       setPrice("");
+      salvarCampoRascunho("draft_price", "");
     }
   };
 
   const salvarPreco = (v: string) => {
     const clean = v.replace(/[^0-9,]/g, "");
     setPrice(clean);
-
-    if (!isEditMode) {
-      salvar("draft_price", clean);
-    }
+    salvarCampoRascunho("draft_price", clean);
   };
 
   const limparDadosEndereco = () => {
@@ -185,19 +251,17 @@ export function PublishScreen({ navigation, route }: Props) {
     setCity("");
     setState("");
     setLocation("");
-    salvar("draft_street", "");
-    salvar("draft_neighborhood", "");
-    salvar("draft_city", "");
-    salvar("draft_state", "");
-    salvar("draft_location", "");
+
+    salvarCampoRascunho("draft_street", "");
+    salvarCampoRascunho("draft_neighborhood", "");
+    salvarCampoRascunho("draft_city", "");
+    salvarCampoRascunho("draft_state", "");
+    salvarCampoRascunho("draft_location", "");
   };
 
   const salvarCep = (v: string) => {
     setCep(v);
-
-    if (!isEditMode) {
-      salvar("draft_cep", v);
-    }
+    salvarCampoRascunho("draft_cep", v);
 
     if (v.length < 8) {
       limparDadosEndereco();
@@ -215,28 +279,15 @@ export function PublishScreen({ navigation, route }: Props) {
     setState(address.uf);
     setLocation(formattedLocation);
 
-    if (!isEditMode) {
-      salvar("draft_street", address.logradouro);
-      salvar("draft_neighborhood", address.bairro);
-      salvar("draft_city", address.localidade);
-      salvar("draft_state", address.uf);
-      salvar("draft_location", formattedLocation);
-    }
+    salvarCampoRascunho("draft_street", address.logradouro);
+    salvarCampoRascunho("draft_neighborhood", address.bairro);
+    salvarCampoRascunho("draft_city", address.localidade);
+    salvarCampoRascunho("draft_state", address.uf);
+    salvarCampoRascunho("draft_location", formattedLocation);
   };
 
   const limparRascunho = async () => {
-    await salvar("draft_title", "");
-    await salvar("draft_category", "");
-    await salvar("draft_condition", "");
-    await salvar("draft_description", "");
-    await salvar("draft_cep", "");
-    await salvar("draft_street", "");
-    await salvar("draft_neighborhood", "");
-    await salvar("draft_city", "");
-    await salvar("draft_state", "");
-    await salvar("draft_location", "");
-    await salvar("draft_type", "");
-    await salvar("draft_price", "");
+    await Promise.all(DRAFT_KEYS.map((key) => remover(key)));
     await fetchUserItemCount();
   };
 
@@ -732,7 +783,11 @@ export function PublishScreen({ navigation, route }: Props) {
           Localização <Text style={styles.required}>*</Text>
         </Text>
 
-        <CepInput onCepChange={salvarCep} onAddressFound={handleAddressFound} />
+        <CepInput
+          value={cep}
+          onCepChange={salvarCep}
+          onAddressFound={handleAddressFound}
+        />
 
         {location ? (
           <View style={[styles.inputRow, { marginTop: 12 }]}>

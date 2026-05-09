@@ -1,21 +1,36 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View, Text, TextInput, ActivityIndicator } from "react-native";
 import { buscarEnderecoPorCep, CepResponse } from "../../Services/Cep";
 import styles from "./styles";
 
 type CepInputProps = {
+  value?: string;
   onAddressFound: (address: CepResponse) => void;
   onCepChange?: (cep: string) => void;
 };
 
-export function CepInput({ onAddressFound, onCepChange }: CepInputProps) {
-  const [cep, setCep] = useState("");
+function formatCep(value: string) {
+  const onlyNumbers = value.replace(/\D/g, "").slice(0, 8);
+
+  if (onlyNumbers.length > 5) {
+    return onlyNumbers.replace(/^(\d{5})(\d{0,3})/, "$1-$2");
+  }
+
+  return onlyNumbers;
+}
+
+export function CepInput({ value = "", onAddressFound, onCepChange }: CepInputProps) {
+  const [cep, setCep] = useState(formatCep(value));
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  useEffect(() => {
+    setCep(formatCep(value));
+  }, [value]);
+
   async function handleCepChange(value: string) {
-    const onlyNumbers = value.replace(/\D/g, "");
-    const formattedCep = onlyNumbers.replace(/^(\d{5})(\d{0,3})/, "$1-$2");
+    const onlyNumbers = value.replace(/\D/g, "").slice(0, 8);
+    const formattedCep = formatCep(onlyNumbers);
 
     setCep(formattedCep);
     setErrorMessage("");

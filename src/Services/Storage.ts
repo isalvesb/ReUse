@@ -25,7 +25,3 @@ export const buscarObjeto = async <T>(key: string): Promise<T | null> => {
 
   return JSON.parse(value) as T;
 };
-
-export const limparCache = async (keys: string[]) => {
-  await AsyncStorage.multiRemove(keys);
-};
