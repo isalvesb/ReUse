@@ -10,8 +10,11 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { buscarToken, logout } from "../../Services/Auth";
-import { logoutFirebase } from "../../Services/firebaseAuth";
+import { logout } from "../../Services/Auth";
+import {
+  buscarUsuarioAtual,
+  logoutFirebase,
+} from "../../Services/firebaseAuth";
 import { buscar } from "../../Services/Storage";
 import { DEV_SKIP_AUTH } from "../../config/devAuth";
 import { supabase } from "../../lib/supabase";
@@ -89,16 +92,19 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
   useEffect(() => {
     const carregarTudo = async () => {
       try {
-        const {
-          data: { user: authUser },
-        } = await supabase.auth.getUser();
+        const firebaseUser = buscarUsuarioAtual();
 
-        if (authUser?.id) {
-          await fetchStats(authUser.id);
+        const userId = DEV_SKIP_AUTH ? "dev@reuse.app" : firebaseUser?.uid;
+        const emailAtual = DEV_SKIP_AUTH
+          ? "dev@reuse.app"
+          : firebaseUser?.email;
+        const nomeAtual = DEV_SKIP_AUTH
+          ? "Usuário Dev"
+          : firebaseUser?.displayName;
+
+        if (userId) {
+          await fetchStats(userId);
         }
-
-        // pega usuário local (seu sistema atual)
-        const emailAtual = await buscarToken();
 
         if (!emailAtual) {
           setUser(null);
@@ -109,7 +115,7 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
 
         if (!userData) {
           setUser({
-            name: "Usuário ReUse",
+            name: nomeAtual || "Usuário ReUse",
             email: emailAtual,
             location: "Localização não informada",
           });
@@ -119,9 +125,9 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
         const parsedUser = JSON.parse(userData);
 
         setUser({
-          name: parsedUser.name,
-          email: parsedUser.email,
-          location: parsedUser.location,
+          name: parsedUser.name || nomeAtual || "Usuário ReUse",
+          email: parsedUser.email || emailAtual,
+          location: parsedUser.location || "Localização não informada",
         });
 
         if (parsedUser.about) {
@@ -147,21 +153,21 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
   const isLogoutDisabled = DEV_SKIP_AUTH || isLoggingOut;
 
   const handleLogout = async () => {
-  if (DEV_SKIP_AUTH) return;
-  if (isLoggingOut) return;
+    if (DEV_SKIP_AUTH) return;
+    if (isLoggingOut) return;
 
-  try {
-    setIsLoggingOut(true);
+    try {
+      setIsLoggingOut(true);
 
-    await logoutFirebase();
-    await logout();
+      await logoutFirebase();
+      await logout();
 
-    onLogoutComplete?.();
-  } catch (error) {
-    console.error("Erro ao fazer logout:", error);
-    setIsLoggingOut(false);
-  }
-};
+      onLogoutComplete?.();
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+      setIsLoggingOut(false);
+    }
+  };
 
   return (
     <View style={styles.screen}>
