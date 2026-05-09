@@ -16,8 +16,8 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
-import { salvar, buscar } from "../../Services/Storage";
-import { IncentiveCard, IncentiveModal } from "../../components/IncentiveCard";
+import { salvar } from "../../Services/Storage";
+import { IncentiveCard } from "../../components/IncentiveCard";
 import { JourneyCard } from "../../components/JourneyCard";
 import { PublishSuccessModal } from "../../components/SucessModal";
 import { CepInput } from "../../components/CepInput";
@@ -25,6 +25,7 @@ import { CepResponse } from "../../Services/Cep";
 import { createItem, updateItem, uploadItemImages } from "../../Services/Items";
 import { buscarEmailUsuarioAtual } from "../../Services/firebaseAuth";
 import { supabase } from "../../lib/supabase";
+import { buscarToken } from "../../Services/Auth";
 import styles from "./styles";
 
 type Condition =
@@ -32,6 +33,7 @@ type Condition =
   | "Usado • Como novo"
   | "Usado • Bom estado"
   | "Usado • Estado Regular";
+
 type ItemType = "doacao" | "troca" | "venda";
 
 interface PhotoItem {
@@ -106,7 +108,6 @@ export function PublishScreen({ navigation, route }: Props) {
   const [showTypeModal, setShowTypeModal] = useState(false);
   const [userItemCount, setUserItemCount] = useState(0);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [showIncentiveModal, setShowIncentiveModal] = useState(false);
 
   const [cep, setCep] = useState("");
   const [street, setStreet] = useState("");
@@ -116,7 +117,7 @@ export function PublishScreen({ navigation, route }: Props) {
   const [location, setLocation] = useState("");
 
   const [uploading, setUploading] = useState(false);
-  const [loadingItem, setLoadingItem] = useState(false);
+  const [loadingItem] = useState(false);
 
   const fetchUserItemCount = async () => {
     const userEmail = buscarEmailUsuarioAtual();
@@ -141,14 +142,17 @@ export function PublishScreen({ navigation, route }: Props) {
     setTitle(v);
     salvar("draft_title", v);
   };
+
   const salvarCategoria = (v: string) => {
     setCategory(v);
     salvar("draft_category", v);
   };
+
   const salvarCondicao = (v: Condition) => {
     setCondition(v);
     salvar("draft_condition", v);
   };
+
   const salvarDescricao = (v: string) => {
     setDescription(v);
     salvar("draft_description", v);
@@ -156,14 +160,23 @@ export function PublishScreen({ navigation, route }: Props) {
 
   const salvarTipo = (v: ItemType) => {
     setItemType(v);
-    if (!isEditMode) salvar("draft_type", v);
-    if (v !== "venda") setPrice("");
+
+    if (!isEditMode) {
+      salvar("draft_type", v);
+    }
+
+    if (v !== "venda") {
+      setPrice("");
+    }
   };
 
   const salvarPreco = (v: string) => {
     const clean = v.replace(/[^0-9,]/g, "");
     setPrice(clean);
-    if (!isEditMode) salvar("draft_price", clean);
+
+    if (!isEditMode) {
+      salvar("draft_price", clean);
+    }
   };
 
   const limparDadosEndereco = () => {
@@ -181,8 +194,14 @@ export function PublishScreen({ navigation, route }: Props) {
 
   const salvarCep = (v: string) => {
     setCep(v);
-    if (!isEditMode) salvar("draft_cep", v);
-    if (v.length < 8) limparDadosEndereco();
+
+    if (!isEditMode) {
+      salvar("draft_cep", v);
+    }
+
+    if (v.length < 8) {
+      limparDadosEndereco();
+    }
   };
 
   const handleAddressFound = (address: CepResponse) => {
@@ -223,6 +242,7 @@ export function PublishScreen({ navigation, route }: Props) {
 
   const abrirCamera = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
+
     if (status !== "granted") {
       Alert.alert(
         "Permissão necessária",
@@ -230,11 +250,13 @@ export function PublishScreen({ navigation, route }: Props) {
       );
       return;
     }
+
     try {
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ["images"],
         quality: 0.8,
       });
+
       if (!result.canceled && result.assets.length > 0) {
         setPhotos((prev) =>
           [...prev, { uri: result.assets[0].uri }].slice(0, 5),
@@ -247,6 +269,7 @@ export function PublishScreen({ navigation, route }: Props) {
 
   const abrirGaleria = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
     if (status !== "granted") {
       Alert.alert(
         "Permissão necessária",
@@ -254,6 +277,7 @@ export function PublishScreen({ navigation, route }: Props) {
       );
       return;
     }
+
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
@@ -261,6 +285,7 @@ export function PublishScreen({ navigation, route }: Props) {
         selectionLimit: 5 - photos.length,
         quality: 0.8,
       });
+
       if (!result.canceled) {
         const novasFotos = result.assets.map((a) => ({ uri: a.uri }));
         setPhotos((prev) => [...prev, ...novasFotos].slice(0, 5));
@@ -273,7 +298,10 @@ export function PublishScreen({ navigation, route }: Props) {
   const handleAddPhoto = () => {
     if (Platform.OS === "ios") {
       ActionSheetIOS.showActionSheetWithOptions(
-        { options: ["Cancelar", "Câmera", "Galeria"], cancelButtonIndex: 0 },
+        {
+          options: ["Cancelar", "Câmera", "Galeria"],
+          cancelButtonIndex: 0,
+        },
         (index) => {
           if (index === 1) abrirCamera();
           if (index === 2) abrirGaleria();
@@ -297,14 +325,17 @@ export function PublishScreen({ navigation, route }: Props) {
       Alert.alert("Atenção!", "Adicione um título!");
       return false;
     }
+
     if (!category) {
       Alert.alert("Atenção!", "Selecione uma categoria.");
       return false;
     }
+
     if (!condition) {
       Alert.alert("Atenção!", "Selecione a condição do item.");
       return false;
     }
+
     if (!itemType) {
       Alert.alert(
         "Atenção!",
@@ -312,39 +343,58 @@ export function PublishScreen({ navigation, route }: Props) {
       );
       return false;
     }
+
     if (itemType === "venda" && !price.trim()) {
       Alert.alert("Atenção!", "Informe o preço do item.");
       return false;
     }
+
     if (description.trim().length < 20) {
       Alert.alert("Atenção!", "Descrição mínima de 20 caracteres.");
       return false;
     }
+
     if (!location.trim()) {
       Alert.alert("Atenção!", "Informe um CEP válido.");
       return false;
     }
+
     return true;
   };
 
+  const marcarIncentivoComoVisto = async (userEmail: string) => {
+    await salvar(`incentive_seen:${userEmail}`, "true");
+
+    const emailToken = await buscarToken();
+
+    if (emailToken && emailToken !== userEmail) {
+      await salvar(`incentive_seen:${emailToken}`, "true");
+    }
+  };
+
+  const limparFormulario = async () => {
+    setPhotos([]);
+    setTitle("");
+    setCategory("");
+    setCondition(null);
+    setItemType(null);
+    setPrice("");
+    setDescription("");
+    setCep("");
+    setStreet("");
+    setNeighborhood("");
+    setCity("");
+    setState("");
+    setLocation("");
+
+    await limparRascunho();
+  };
+
   const handlePublish = async () => {
-    if (!title.trim()) return Alert.alert("Atenção!", "Adicione um título!");
-    if (!category) return Alert.alert("Atenção!", "Selecione uma categoria.");
-    if (!condition)
-      return Alert.alert("Atenção!", "Selecione a condição do item.");
-    if (!itemType)
-      return Alert.alert(
-        "Atenção!",
-        "Selecione o tipo do item (Doação, Troca ou Venda).",
-      );
-    if (itemType === "venda" && !price.trim())
-      return Alert.alert("Atenção!", "Informe o preço do item.");
-    if (description.trim().length < 20)
-      return Alert.alert("Atenção!", "Descrição mínima de 20 caracteres.");
-    if (!location.trim())
-      return Alert.alert("Atenção!", "Informe um CEP válido.");
+    if (!validar()) return;
 
     setUploading(true);
+
     try {
       const userEmail = buscarEmailUsuarioAtual();
 
@@ -354,6 +404,7 @@ export function PublishScreen({ navigation, route }: Props) {
       }
 
       let imageUrls: string[] = [];
+
       if (photos.length > 0) {
         imageUrls = await uploadItemImages(
           photos.map((p) => p.uri),
@@ -378,24 +429,15 @@ export function PublishScreen({ navigation, route }: Props) {
         price: itemType === "venda" ? price : null,
       });
 
-      setPhotos([]);
-      setTitle("");
-      setCategory("");
-      setCondition(null);
-      setItemType(null);
-      setPrice("");
-      setDescription("");
-      setCep("");
-      setStreet("");
-      setNeighborhood("");
-      setCity("");
-      setState("");
-      setLocation("");
-      await limparRascunho();
+      await marcarIncentivoComoVisto(userEmail);
+      await limparFormulario();
+
+      setUserItemCount((prev) => prev + 1);
       setShowSuccessModal(true);
     } catch (error) {
       const errorMsg =
         error instanceof Error ? error.message : "Erro desconhecido";
+
       Alert.alert("Erro", `Não foi possível publicar: ${errorMsg}`);
     } finally {
       setUploading(false);
@@ -405,9 +447,12 @@ export function PublishScreen({ navigation, route }: Props) {
   const handleSaveEdit = async () => {
     if (!validar()) return;
     if (!editItemId) return;
+
     setUploading(true);
+
     try {
       const userEmail = buscarEmailUsuarioAtual();
+
       if (!userEmail) {
         Alert.alert("Login necessário");
         return;
@@ -419,6 +464,7 @@ export function PublishScreen({ navigation, route }: Props) {
         .map((p) => p.uri);
 
       let novasUrls: string[] = [];
+
       if (fotosNovas.length > 0) {
         novasUrls = await uploadItemImages(
           fotosNovas.map((p) => p.uri),
@@ -443,12 +489,15 @@ export function PublishScreen({ navigation, route }: Props) {
       });
 
       Alert.alert("Salvo!", "Item atualizado com sucesso.", [
-        { text: "OK", onPress: () => navigation?.goBack() },
+        {
+          text: "OK",
+          onPress: () => navigation?.goBack(),
+        },
       ]);
     } catch (error) {
-      console.error("❌ Erro ao publicar item:", error);
       const errorMsg =
         error instanceof Error ? error.message : "Erro desconhecido";
+
       if (errorMsg.includes("RLS") || errorMsg.includes("row-level security")) {
         Alert.alert(
           "Erro de Segurança",
@@ -472,7 +521,10 @@ export function PublishScreen({ navigation, route }: Props) {
       <View
         style={[
           styles.screen,
-          { justifyContent: "center", alignItems: "center" },
+          {
+            justifyContent: "center",
+            alignItems: "center",
+          },
         ]}
       >
         <ActivityIndicator size="large" color="#342A2A" />
@@ -485,24 +537,27 @@ export function PublishScreen({ navigation, route }: Props) {
       style={styles.screen}
       contentContainerStyle={{ paddingBottom: 140 }}
     >
-      {/* NavBar */}
       <View style={[styles.navBar, { paddingTop: insets.top + 14 }]}>
-        <Text style={styles.navTitle}>Publicar Item</Text>
+        <Text style={styles.navTitle}>
+          {isEditMode ? "Editar Item" : "Publicar Item"}
+        </Text>
       </View>
 
-      <JourneyCard userItemCount={userItemCount} />
+      {!isEditMode && <JourneyCard userItemCount={userItemCount} />}
 
-      <IncentiveCard
-        userItemCount={userItemCount}
-        onPublish={() => navigation?.goBack()}
-      />
+      {!isEditMode && (
+        <IncentiveCard
+          userItemCount={userItemCount}
+          onPublish={() => navigation?.goBack()}
+        />
+      )}
 
-      {/* Fotos */}
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Fotos do Item</Text>
         <Text style={styles.cardSubtitle}>
           Adicione até 5 fotos do seu item. A primeira será a foto de capa.
         </Text>
+
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -511,11 +566,13 @@ export function PublishScreen({ navigation, route }: Props) {
           {photos.map((p, i) => (
             <View key={i} style={styles.photoThumb}>
               <Image source={{ uri: p.uri }} style={styles.thumbImg} />
+
               {i === 0 && (
                 <View style={styles.coverBadge}>
                   <Text style={styles.coverBadgeText}>Capa</Text>
                 </View>
               )}
+
               <TouchableOpacity
                 style={styles.removeBtn}
                 onPress={() => removePhoto(i)}
@@ -524,6 +581,7 @@ export function PublishScreen({ navigation, route }: Props) {
               </TouchableOpacity>
             </View>
           ))}
+
           {photos.length < 5 && (
             <TouchableOpacity
               style={styles.addPhotoBtn}
@@ -542,6 +600,7 @@ export function PublishScreen({ navigation, route }: Props) {
         <Text style={styles.label}>
           Título <Text style={styles.required}>*</Text>
         </Text>
+
         <TextInput
           style={styles.input}
           placeholder="Ex: Cadeira de escritório ergonômica"
@@ -553,6 +612,7 @@ export function PublishScreen({ navigation, route }: Props) {
         <Text style={styles.label}>
           Categoria <Text style={styles.required}>*</Text>
         </Text>
+
         <TouchableOpacity
           style={styles.inputDropdown}
           onPress={() => setShowCategoryModal(true)}
@@ -563,12 +623,14 @@ export function PublishScreen({ navigation, route }: Props) {
           >
             {category || "Selecione..."}
           </Text>
+
           <Ionicons name="chevron-down" size={16} color="#888780" />
         </TouchableOpacity>
 
         <Text style={styles.label}>
           Condição <Text style={styles.required}>*</Text>
         </Text>
+
         <View style={styles.conditionGrid}>
           {(
             [
@@ -607,6 +669,7 @@ export function PublishScreen({ navigation, route }: Props) {
         <Text style={styles.label}>
           Tipo <Text style={styles.required}>*</Text>
         </Text>
+
         <TouchableOpacity
           style={styles.inputDropdown}
           onPress={() => setShowTypeModal(true)}
@@ -623,6 +686,7 @@ export function PublishScreen({ navigation, route }: Props) {
                   ? "Venda"
                   : "Selecione..."}
           </Text>
+
           <Ionicons name="chevron-down" size={16} color="#888780" />
         </TouchableOpacity>
 
@@ -631,8 +695,10 @@ export function PublishScreen({ navigation, route }: Props) {
             <Text style={styles.label}>
               Preço <Text style={styles.required}>*</Text>
             </Text>
+
             <View style={styles.inputRow}>
               <Text style={styles.pricePrefix}>R$</Text>
+
               <TextInput
                 style={styles.priceInput}
                 placeholder="0,00"
@@ -648,6 +714,7 @@ export function PublishScreen({ navigation, route }: Props) {
         <Text style={styles.label}>
           Descrição <Text style={styles.required}>*</Text>
         </Text>
+
         <TextInput
           style={[styles.input, { height: 100, textAlignVertical: "top" }]}
           placeholder="Descreva o item, suas características"
@@ -656,6 +723,7 @@ export function PublishScreen({ navigation, route }: Props) {
           multiline
           placeholderTextColor="#aaa"
         />
+
         <Text style={styles.charCount}>
           Mínimo 20 caracteres ({description.length}/20)
         </Text>
@@ -663,7 +731,9 @@ export function PublishScreen({ navigation, route }: Props) {
         <Text style={styles.label}>
           Localização <Text style={styles.required}>*</Text>
         </Text>
+
         <CepInput onCepChange={salvarCep} onAddressFound={handleAddressFound} />
+
         {location ? (
           <View style={[styles.inputRow, { marginTop: 12 }]}>
             <Ionicons
@@ -672,6 +742,7 @@ export function PublishScreen({ navigation, route }: Props) {
               color="#888780"
               style={{ marginRight: 8 }}
             />
+
             <Text style={styles.inputRowField}>{location}</Text>
           </View>
         ) : (
@@ -681,7 +752,6 @@ export function PublishScreen({ navigation, route }: Props) {
         )}
       </View>
 
-      {/* Dica */}
       <View style={styles.tipBox}>
         <Text style={styles.tip}>
           <Text style={styles.tipBold}>Dica:</Text> Itens com fotos claras e
@@ -690,16 +760,17 @@ export function PublishScreen({ navigation, route }: Props) {
         </Text>
       </View>
 
-      {/* Botão publicar */}
       <TouchableOpacity
         style={styles.publishBtn}
-        onPress={handlePublish}
+        onPress={isEditMode ? handleSaveEdit : handlePublish}
         disabled={uploading}
       >
         {uploading ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <Text style={styles.publishBtnText}>Publicar Item</Text>
+          <Text style={styles.publishBtnText}>
+            {isEditMode ? "Salvar Alterações" : "Publicar Item"}
+          </Text>
         )}
       </TouchableOpacity>
 
@@ -710,7 +781,6 @@ export function PublishScreen({ navigation, route }: Props) {
         </Text>
       )}
 
-      {/* ── Modal Categoria ── */}
       <Modal
         visible={showCategoryModal}
         transparent
@@ -724,7 +794,9 @@ export function PublishScreen({ navigation, route }: Props) {
         >
           <View style={styles.modalSheet}>
             <View style={styles.modalHandle} />
+
             <Text style={styles.modalTitle}>Selecione a categoria</Text>
+
             <FlatList
               data={CATEGORIES}
               keyExtractor={(item) => item}
@@ -747,6 +819,7 @@ export function PublishScreen({ navigation, route }: Props) {
                   >
                     {item}
                   </Text>
+
                   {category === item && (
                     <Ionicons name="checkmark" size={16} color="#4A6741" />
                   )}
@@ -757,7 +830,6 @@ export function PublishScreen({ navigation, route }: Props) {
         </TouchableOpacity>
       </Modal>
 
-      {/* ── Modal Tipo ── */}
       <Modal
         visible={showTypeModal}
         transparent
@@ -771,7 +843,9 @@ export function PublishScreen({ navigation, route }: Props) {
         >
           <View style={styles.modalSheet}>
             <View style={styles.modalHandle} />
+
             <Text style={styles.modalTitle}>Tipo do item</Text>
+
             {TYPE_OPTIONS.map((opt) => (
               <TouchableOpacity
                 key={opt.key}
@@ -796,6 +870,7 @@ export function PublishScreen({ navigation, route }: Props) {
                     color={opt.badgeText}
                   />
                 </View>
+
                 <View style={{ flex: 1 }}>
                   <Text
                     style={[
@@ -805,8 +880,10 @@ export function PublishScreen({ navigation, route }: Props) {
                   >
                     {opt.label}
                   </Text>
+
                   <Text style={styles.typeModalDesc}>{opt.desc}</Text>
                 </View>
+
                 {itemType === opt.key && (
                   <Ionicons name="checkmark" size={18} color="#4A6741" />
                 )}
