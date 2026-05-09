@@ -139,11 +139,11 @@ export default StyleSheet.create({
     marginBottom: 8,
   },
 
-  aboutInput: {
+  aboutText: {
     fontSize: 14,
     color: "#3A2D2D",
-    minHeight: 80,
-    textAlignVertical: "top",
+    lineHeight: 20,
+    minHeight: 40,
   },
 
   editButton: {

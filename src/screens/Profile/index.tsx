@@ -1,12 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  Image,
-  Pressable,
-  Text,
-  View,
-  TextInput,
-} from "react-native";
+import { ActivityIndicator, Image, Pressable, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -50,7 +43,7 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
   const [stats, setStats] = useState({
     trocas: 0,
     itens: 0,
-    avaliacao: 0,
+    avaliacao: 4.8,
   });
 
   async function fetchStats(userEmail: string) {
@@ -67,7 +60,7 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
       setStats({
         trocas: 0,
         itens: itens || 0,
-        avaliacao: 0,
+        avaliacao: 4.8,
       });
     } catch (error) {
       console.error("Erro ao buscar stats:", error);
@@ -75,7 +68,7 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
       setStats({
         trocas: 0,
         itens: 0,
-        avaliacao: 0,
+        avaliacao: 4.8,
       });
     }
   }
@@ -83,9 +76,7 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
   useEffect(() => {
     const carregarTudo = async () => {
       try {
-
         const firebaseUser = buscarUsuarioAtual();
-
 
         const userId = DEV_SKIP_AUTH ? "dev@reuse.app" : firebaseUser?.uid;
         const emailAtual = DEV_SKIP_AUTH
@@ -145,6 +136,8 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
 
   const isLogoutDisabled = DEV_SKIP_AUTH || isLoggingOut;
 
+  const notificationCount = 0;
+
   const handleLogout = async () => {
     if (DEV_SKIP_AUTH) {
       return;
@@ -186,9 +179,13 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
         >
           <Ionicons name="notifications-outline" size={22} color="#F7EFDE" />
 
-          <View style={styles.notificationBadge}>
-            <Text style={styles.notificationBadgeText}>1</Text>
-          </View>
+          {notificationCount > 0 && (
+            <View style={styles.notificationBadge}>
+              <Text style={styles.notificationBadgeText}>
+                {notificationCount}
+              </Text>
+            </View>
+          )}
         </Pressable>
         {isLoadingUser ? (
           <View style={styles.loadingContent}>
@@ -229,7 +226,9 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
 
               <View style={styles.statCard3}>
                 <Ionicons name="star-outline" size={16} style={styles.icon} />
-                <Text style={styles.statNumber}>{stats.avaliacao}</Text>
+                <Text style={styles.statNumber}>
+                  {stats.avaliacao.toFixed(1)}
+                </Text>
                 <Text style={styles.statLabel}>Avaliação</Text>
               </View>
             </View>
@@ -238,14 +237,9 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
             <View style={styles.aboutCard}>
               <Text style={styles.aboutTitle}>Sobre mim</Text>
 
-              <TextInput
-                style={styles.aboutInput}
-                placeholder="Fale um pouco sobre você..."
-                placeholderTextColor="#999"
-                value={about}
-                onChangeText={setAbout}
-                multiline
-              />
+              <Text style={styles.aboutText}>
+                {about || "Nenhuma informação adicionada ainda."}
+              </Text>
             </View>
 
             <Pressable
