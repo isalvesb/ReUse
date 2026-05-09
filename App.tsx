@@ -32,6 +32,7 @@ import { ProfileScreen } from "./src/screens/Profile";
 import { ProductScreen } from "./src/screens/Product";
 import { DEV_SKIP_AUTH } from "./src/config/devAuth";
 import Notifications from "./src/screens/Notifications";
+import { EditProfileScreen } from "./src/screens/EditProfile";
 
 type RootStackParamList = {
   Login: undefined;
@@ -123,6 +124,7 @@ function AppNavigator() {
           <>
             <Stack.Screen name="HomeScreen" component={MainScreen} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name="EditProfile" component={EditProfileScreen} />
             <Stack.Screen name="Product" component={ProductScreen} />
             <Stack.Screen name="Notifications" component={Notifications} />
             <Stack.Screen name="Login" component={Login} />
@@ -137,6 +139,7 @@ function AppNavigator() {
             <Stack.Screen name="CreateAccount" component={CreateAccount} />
             <Stack.Screen name="HomeScreen" component={MainScreen} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name="EditProfile" component={EditProfileScreen} />
             <Stack.Screen name="Product" component={ProductScreen} />
             <Stack.Screen name="Notifications" component={Notifications} />
             <Stack.Screen name="ResetEmailSent" component={ResetEmailSent} />

@@ -230,7 +230,7 @@ export function ProfileScreen() {
 
               <TextInput
                 style={styles.aboutInput}
-                placeholder="Fale sobre você..."
+                placeholder="Fale um pouco sobre você..."
                 placeholderTextColor="#999"
                 value={about}
                 onChangeText={setAbout}
@@ -238,7 +238,10 @@ export function ProfileScreen() {
               />
             </View>
 
-            <Pressable style={styles.editButton}>
+            <Pressable
+              style={styles.editButton}
+              onPress={() => navigation.navigate("EditProfile")}
+            >
               <Text style={styles.editButtonText}>Editar</Text>
             </Pressable>
 
