@@ -44,11 +44,13 @@ const styles = StyleSheet.create({
     minHeight: 360,
     padding: 20,
     position: "relative",
+    overflow: "hidden",
   },
 
   heroContent: {
-    maxWidth: "60%",
-    left: 15,
+    width: "54%",
+    marginLeft: 15,
+    zIndex: 2,
   },
 
   heroTitle: {
@@ -66,17 +68,19 @@ const styles = StyleSheet.create({
   },
 
   heroImage: {
-    width: 140,
-    height: 140,
+    width: 120,
+    height: 120,
     position: "absolute",
-    right: 40,
-    bottom: 90,
+    right: 25,
+    bottom: 100,
+    zIndex: 1,
   },
 
   heroButton: {
     position: "absolute",
     right: 20,
     bottom: 20,
+    zIndex: 3,
   },
 
   compactCard: {
