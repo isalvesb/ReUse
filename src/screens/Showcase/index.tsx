@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { buscarEmailUsuarioAtual } from "../../Services/firebaseAuth";
 import { buscar } from "../../Services/Storage";
@@ -32,24 +32,20 @@ type UserData = {
   name: string;
   email: string;
   location: string;
-  avatar?: string | null;
+  avatarUri?: string | null;
   avaliacao?: string;
 };
 
 type FilterOption = "Todos" | "Doações" | "Trocas" | "Vendas";
 
 const defaultProfileImage = require("../../../assets/images/profiles/default.png");
-const profileImagesByEmail: Record<string, any> = {
-  "gui@email.com": require("../../../assets/images/profiles/gui.png"),
-  "isa@email.com": require("../../../assets/images/profiles/isa.png"),
-  "kau@email.com": require("../../../assets/images/profiles/kau.png"),
-  "mir@email.com": require("../../../assets/images/profiles/mir.png"),
-};
 
-function getProfileImage(email?: string, avatarUri?: string | null) {
-  if (avatarUri) return { uri: avatarUri };
-  const key = email?.toLowerCase() ?? "";
-  return profileImagesByEmail[key] ?? defaultProfileImage;
+function getProfileImage(avatarUri?: string | null) {
+  if (typeof avatarUri === "string" && avatarUri.trim() !== "") {
+    return { uri: avatarUri };
+  }
+
+  return defaultProfileImage;
 }
 
 function getItemType(item: Item): ItemType {
@@ -143,44 +139,67 @@ export function ShowcaseScreen() {
           ? items.filter((i) => getItemType(i) === "Troca")
           : items.filter((i) => getItemType(i) === "Venda");
 
-  useEffect(() => {
-    const carregar = async () => {
-      try {
-        const email = buscarEmailUsuarioAtual();
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
 
-        if (!email) {
-          setIsLoading(false);
-          return;
+      const carregar = async () => {
+        try {
+          const email = buscarEmailUsuarioAtual();
+
+          if (!email) {
+            if (isActive) {
+              setIsLoading(false);
+            }
+
+            return;
+          }
+
+          const raw = await buscar(`user:${email}`);
+
+          if (!isActive) return;
+
+          if (raw) {
+            const parsed = JSON.parse(raw);
+
+            setUser({
+              name: parsed.name ?? "Usuário ReUse",
+              email,
+              location: parsed.location ?? "Localização não informada",
+              avatarUri: parsed.avatarUri ?? null,
+              avaliacao: parsed.avaliacao ?? "4.8",
+            });
+          } else {
+            setUser({
+              name: "Usuário ReUse",
+              email,
+              location: "Localização não informada",
+              avatarUri: null,
+              avaliacao: "4.8",
+            });
+          }
+
+          const userItems = await getItemsByUser(email);
+
+          if (isActive) {
+            setItems(userItems);
+          }
+        } catch (err) {
+          console.error("Erro ao carregar vitrine:", err);
+        } finally {
+          if (isActive) {
+            setIsLoading(false);
+          }
         }
+      };
 
-        const raw = await buscar(`user:${email}`);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          setUser({
-            name: parsed.name,
-            email: parsed.email,
-            location: parsed.location,
-            avatar: parsed.avatar ?? null,
-            avaliacao: parsed.avaliacao ?? "4.8",
-          });
-        } else {
-          setUser({
-            name: "Usuário ReUse",
-            email,
-            location: "Localização não informada",
-          });
-        }
+      carregar();
 
-        const userItems = await getItemsByUser(email);
-        setItems(userItems);
-      } catch (err) {
-        console.error("Erro ao carregar vitrine:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    carregar();
-  }, []);
+      return () => {
+        isActive = false;
+      };
+    }, []),
+  );
 
   if (isLoading) {
     return (
@@ -200,7 +219,7 @@ export function ShowcaseScreen() {
       <View style={styles.userCard}>
         <View style={styles.userCardLeft}>
           <Image
-            source={getProfileImage(user?.email, user?.avatar)}
+            source={getProfileImage(user?.avatarUri)}
             style={styles.userAvatar}
           />
           <View style={styles.userInfo}>

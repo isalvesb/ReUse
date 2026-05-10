@@ -171,6 +171,7 @@ export function HomeScreen({
   onNavigateToProduct,
 }: HomeScreenProps) {
   const [showIncentive, setShowIncentive] = useState(false);
+  const [avatarUri, setAvatarUri] = useState<string | null>(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -223,6 +224,52 @@ export function HomeScreen({
         if (timer) {
           clearTimeout(timer);
         }
+      };
+    }, []),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
+
+      const carregarAvatarUsuario = async () => {
+        const emailUsuario = buscarEmailUsuarioAtual();
+
+        if (!emailUsuario) {
+          if (isActive) {
+            setAvatarUri(null);
+          }
+
+          return;
+        }
+
+        const dadosUsuario = await buscar(`user:${emailUsuario}`);
+
+        if (!isActive) return;
+
+        if (!dadosUsuario) {
+          setAvatarUri(null);
+          return;
+        }
+
+        try {
+          const usuarioSalvo = JSON.parse(dadosUsuario);
+          const fotoSalva = usuarioSalvo?.avatarUri;
+
+          if (typeof fotoSalva === "string" && fotoSalva.trim() !== "") {
+            setAvatarUri(fotoSalva);
+          } else {
+            setAvatarUri(null);
+          }
+        } catch {
+          setAvatarUri(null);
+        }
+      };
+
+      carregarAvatarUsuario();
+
+      return () => {
+        isActive = false;
       };
     }, []),
   );
@@ -380,7 +427,7 @@ export function HomeScreen({
           { useNativeDriver: false },
         )}
       >
-        <Header onProfilePress={onNavigateToProfile} />
+        <Header onProfilePress={onNavigateToProfile} avatarUri={avatarUri} />
         <RevealOnScroll scrollY={scrollY}>
           <View style={styles.searchWrap}>
             <SearchBar />

@@ -1,64 +1,25 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { View, Text, Image, Pressable, Animated } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
-import { buscarEmailUsuarioAtual } from "../../Services/firebaseAuth";
 import styles from "./styles";
 
 const defaultProfileImage = require("../../../assets/images/profiles/default.png");
 
-const profileImagesByEmail: Record<string, any> = {
-  "gui@email.com": require("../../../assets/images/profiles/gui.png"),
-  "isa@email.com": require("../../../assets/images/profiles/isa.png"),
-  "kau@email.com": require("../../../assets/images/profiles/kau.png"),
-  "mir@email.com": require("../../../assets/images/profiles/mir.png"),
-};
-
 type HeaderProps = {
   onProfilePress?: () => void;
+  avatarUri?: string | null;
 };
 
-export default function Header({ onProfilePress }: HeaderProps) {
-  const [profileImageSource, setProfileImageSource] =
-    useState(defaultProfileImage);
+export default function Header({ onProfilePress, avatarUri }: HeaderProps) {
   const headerOpacity = useRef(new Animated.Value(0)).current;
   const headerTranslateY = useRef(new Animated.Value(8)).current;
 
   const iconScale = useRef(new Animated.Value(1)).current;
   const iconOverlayOpacity = useRef(new Animated.Value(0)).current;
 
-  useFocusEffect(
-    useCallback(() => {
-      let isActive = true;
-
-      const carregarImagemPerfil = async () => {
-        try {
-          const emailAtual = buscarEmailUsuarioAtual();
-          const normalizedEmail = emailAtual?.toLowerCase();
-
-          const imageSource =
-            normalizedEmail && profileImagesByEmail[normalizedEmail]
-              ? profileImagesByEmail[normalizedEmail]
-              : defaultProfileImage;
-
-          if (isActive) {
-            setProfileImageSource(imageSource);
-          }
-        } catch (error) {
-          console.error("Erro ao carregar imagem do perfil:", error);
-
-          if (isActive) {
-            setProfileImageSource(defaultProfileImage);
-          }
-        }
-      };
-
-      carregarImagemPerfil();
-
-      return () => {
-        isActive = false;
-      };
-    }, []),
-  );
+  const profileImageSource =
+    avatarUri && avatarUri.trim() !== ""
+      ? { uri: avatarUri }
+      : defaultProfileImage;
 
   useEffect(() => {
     Animated.parallel([
