@@ -72,6 +72,7 @@ type Props = {
   route?: {
     params?: {
       itemId: number;
+      returnTo?: string;
     };
   };
 };
@@ -81,6 +82,7 @@ export function ProductScreen({ route }: Props) {
   const insets = useSafeAreaInsets();
 
   const itemId = route?.params?.itemId;
+  const returnTo = route?.params?.returnTo ?? "vitrine";
 
   const [item, setItem] = useState<Item | null>(null);
   const [owner, setOwner] = useState<OwnerData | null>(null);
@@ -207,10 +209,11 @@ export function ProductScreen({ route }: Props) {
               activeOpacity={0.85}
               onPress={() =>
                 navigation.navigate("HomeScreen", {
-                  screen: "Publish",
+                  screen: "publicar",
                   params: {
                     mode: "edit",
                     itemId: item.id,
+                    returnTo,
                   },
                 })
               }
@@ -292,21 +295,6 @@ export function ProductScreen({ route }: Props) {
               </Text>
             </View>
           </View>
-
-          {isOwner && (
-            <TouchableOpacity
-              style={styles.editBtn}
-              activeOpacity={0.85}
-              onPress={() => {
-                Alert.alert(
-                  "Edição em breve",
-                  "A edição de itens será ativada em uma próxima versão.",
-                );
-              }}
-            >
-              <Ionicons name="pencil" size={18} color="#342A2A" />
-            </TouchableOpacity>
-          )}
         </View>
       </ScrollView>
     </View>

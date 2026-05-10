@@ -102,6 +102,7 @@ type Props = {
     params?: {
       mode?: "edit";
       itemId?: number;
+      returnTo?: string;
     };
   };
 };
@@ -111,6 +112,7 @@ export function PublishScreen({ navigation, route }: Props) {
 
   const isEditMode = route?.params?.mode === "edit";
   const editItemId = route?.params?.itemId;
+  const returnTo = route?.params?.returnTo ?? "vitrine";
 
   const [photos, setPhotos] = useState<PhotoItem[]>([]);
   const [title, setTitle] = useState("");
@@ -479,7 +481,7 @@ export function PublishScreen({ navigation, route }: Props) {
         item_type: itemType,
         price: itemType === "venda" ? price : null,
       });
-      
+
       await salvar(`incentive_seen:${userEmail}`, "true");
       setUserItemCount((prev) => prev + 1);
 
@@ -545,7 +547,10 @@ export function PublishScreen({ navigation, route }: Props) {
       Alert.alert("Salvo!", "Item atualizado com sucesso.", [
         {
           text: "OK",
-          onPress: () => navigation?.goBack(),
+          onPress: () =>
+            navigation.navigate("HomeScreen", {
+              screen: returnTo,
+            }),
         },
       ]);
     } catch (error) {

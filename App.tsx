@@ -23,7 +23,7 @@ import { ForgotPass } from "./src/screens/ForgotPass";
 import { ResetEmailSent } from "./src/screens/ResetEmailSent";
 import { CreateAccount } from "./src/screens/CreateAccount";
 import { HomeScreen } from "./src/screens/Home";
-import { ChatsScreen } from "./src/screens/Chats";
+import Chats from "./src/screens/Chats";
 import { ShowcaseScreen } from "./src/screens/Showcase";
 import { PublishScreen } from "./src/screens/Publish";
 import TabBar from "./src/components/TabBar";
@@ -34,43 +34,97 @@ import { DEV_SKIP_AUTH } from "./src/config/devAuth";
 import Notifications from "./src/screens/Notifications";
 import { EditProfileScreen } from "./src/screens/EditProfile";
 
+type TabName = "home" | "publicar" | "vitrine" | "chats";
+
 type RootStackParamList = {
   Login: undefined;
   ForgotPass: undefined;
   CreateAccount: undefined;
-  HomeScreen: undefined;
-  Profile: undefined;
   ResetEmailSent: undefined;
-  Notifications: undefined;
-  Product: { itemId: number };
+
+  HomeScreen:
+    | {
+        screen?: TabName;
+        params?: {
+          mode?: "edit";
+          itemId?: number;
+          returnTo?: TabName;
+        };
+      }
+    | undefined;
+
+  Profile: undefined;
   EditProfile: undefined;
+  Notifications: undefined;
+
+  Product: {
+    itemId: number;
+    returnTo?: TabName;
+  };
+
   Chats: { recipientEmail?: string } | undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-type TabName = "home" | "publicar" | "vitrine" | "chats";
 
-function MainScreen() {
+function MainScreen({ route }: any) {
   const [activeTab, setActiveTab] = useState<TabName>("home");
+  const [publishParams, setPublishParams] = useState<any>(undefined);
+
   const navigation = useNavigation<any>();
+
+  useEffect(() => {
+    const screen = route?.params?.screen as TabName | undefined;
+    const params = route?.params?.params;
+
+    if (!screen) return;
+
+    if (screen === "publicar") {
+      setPublishParams(params);
+      setActiveTab("publicar");
+      return;
+    }
+
+    setPublishParams(undefined);
+    setActiveTab(screen);
+  }, [route?.params]);
+
+  const handleTabPress = (tab: TabName) => {
+    setPublishParams(undefined);
+    setActiveTab(tab);
+  };
 
   const renderScreen = () => {
     switch (activeTab) {
       case "publicar":
-        return <PublishScreen navigation={navigation} />;
+        return (
+          <PublishScreen
+            navigation={navigation}
+            route={{ params: publishParams }}
+          />
+        );
+
       case "vitrine":
         return <ShowcaseScreen />;
+
       case "chats":
-        return <ChatsScreen />;
+        return <Chats />;
+
       case "home":
       default:
         return (
           <HomeScreen
-            onNavigateToPublish={() => setActiveTab("publicar")}
+            onNavigateToPublish={() => {
+              setPublishParams(undefined);
+              setActiveTab("publicar");
+            }}
             onNavigateToProfile={() => navigation.navigate("Profile")}
             onNavigateToProduct={(itemId) =>
-              navigation.navigate("Product", { itemId })
+              navigation.navigate("Product", {
+                itemId,
+                returnTo: "home",
+              })
             }
           />
         );
@@ -80,7 +134,7 @@ function MainScreen() {
   return (
     <View style={styles.mainScreen}>
       <View style={{ flex: 1 }}>{renderScreen()}</View>
-      <TabBar activeTab={activeTab} onTabPress={setActiveTab} />
+      <TabBar activeTab={activeTab} onTabPress={handleTabPress} />
     </View>
   );
 }
@@ -126,7 +180,7 @@ function AppNavigator() {
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />
             <Stack.Screen name="Product" component={ProductScreen} />
             <Stack.Screen name="Notifications" component={Notifications} />
-            <Stack.Screen name="Chats" component={ChatsScreen} />
+            <Stack.Screen name="Chats" component={Chats} />
           </React.Fragment>
         ) : (
           <React.Fragment>

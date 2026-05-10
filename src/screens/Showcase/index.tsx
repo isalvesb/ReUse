@@ -313,7 +313,10 @@ export function ShowcaseScreen() {
                     image: item.images?.[0] ?? undefined,
                   }}
                   onPress={() =>
-                    navigation.navigate("Product", { itemId: item.id })
+                    navigation.navigate("Product", {
+                      itemId: item.id,
+                      returnTo: "vitrine",
+                    })
                   }
                 />
               </View>
