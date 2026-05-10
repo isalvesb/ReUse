@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { ActivityIndicator, Image, Pressable, Text, View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -39,6 +39,7 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [user, setUser] = useState<UserData | null>(null);
   const [about, setAbout] = useState("");
+  const [avatarUri, setAvatarUri] = useState("");
 
   const [stats, setStats] = useState({
     trocas: 0,
@@ -73,66 +74,73 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
     }
   }
 
-  useEffect(() => {
-    const carregarTudo = async () => {
-      try {
-        const firebaseUser = buscarUsuarioAtual();
+  useFocusEffect(
+    useCallback(() => {
+      const carregarTudo = async () => {
+        setIsLoadingUser(true);
+        try {
+          const firebaseUser = buscarUsuarioAtual();
 
-        const userId = DEV_SKIP_AUTH ? "dev@reuse.app" : firebaseUser?.uid;
-        const emailAtual = DEV_SKIP_AUTH
-          ? "dev@reuse.app"
-          : firebaseUser?.email;
-        const nomeAtual = DEV_SKIP_AUTH
-          ? "Usuário Dev"
-          : firebaseUser?.displayName;
+          const userId = DEV_SKIP_AUTH ? "dev@reuse.app" : firebaseUser?.uid;
+          const emailAtual = DEV_SKIP_AUTH
+            ? "dev@reuse.app"
+            : firebaseUser?.email;
+          const nomeAtual = DEV_SKIP_AUTH
+            ? "Usuário Dev"
+            : firebaseUser?.displayName;
 
-        if (emailAtual) {
-          await fetchStats(emailAtual);
-        }
+          if (emailAtual) {
+            await fetchStats(emailAtual);
+          }
 
-        if (!emailAtual) {
-          setUser(null);
-          return;
-        }
+          if (!emailAtual) {
+            setUser(null);
+            return;
+          }
 
-        const userData = await buscar(`user:${emailAtual}`);
+          const userData = await buscar(`user:${emailAtual}`);
 
-        if (!userData) {
+          if (!userData) {
+            setUser({
+              name: nomeAtual || "Usuário ReUse",
+              email: emailAtual,
+              location: "Localização não informada",
+            });
+
+            setAbout("");
+            setAvatarUri("");
+
+            return;
+          }
+
+          const parsedUser = JSON.parse(userData);
+
           setUser({
-            name: nomeAtual || "Usuário ReUse",
-            email: emailAtual,
-            location: "Localização não informada",
+            name: parsedUser.name || nomeAtual || "Usuário ReUse",
+            email: parsedUser.email || emailAtual,
+            location: parsedUser.location || "Localização não informada",
           });
-          return;
+
+          setAbout(parsedUser.about || "");
+          setAvatarUri(parsedUser.avatarUri || "");
+        } catch (error) {
+          console.error("Erro ao carregar dados:", error);
+        } finally {
+          setIsLoadingUser(false);
         }
+      };
 
-        const parsedUser = JSON.parse(userData);
-
-        setUser({
-          name: parsedUser.name || nomeAtual || "Usuário ReUse",
-          email: parsedUser.email || emailAtual,
-          location: parsedUser.location || "Localização não informada",
-        });
-
-        if (parsedUser.about) {
-          setAbout(parsedUser.about);
-        }
-      } catch (error) {
-        console.error("Erro ao carregar dados:", error);
-      } finally {
-        setIsLoadingUser(false);
-      }
-    };
-
-    carregarTudo();
-  }, []);
+      carregarTudo();
+    }, []),
+  );
 
   const normalizedEmail = user?.email?.toLowerCase();
 
-  const profileImageSource =
-    normalizedEmail && profileImagesByEmail[normalizedEmail]
-      ? profileImagesByEmail[normalizedEmail]
-      : defaultProfileImage;
+  const profileImageSource = avatarUri
+  ? { uri: avatarUri }
+  : normalizedEmail && profileImagesByEmail[normalizedEmail]
+    ? profileImagesByEmail[normalizedEmail]
+    : defaultProfileImage;
 
   const isLogoutDisabled = DEV_SKIP_AUTH || isLoggingOut;
 

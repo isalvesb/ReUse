@@ -106,6 +106,15 @@ const styles = StyleSheet.create({
     color: "#0A0A0A",
   },
 
+  disabledInput: {
+    color: "#8C8585",
+    opacity: 0.65,
+  },
+
+  disabledInputContainer: {
+    opacity: 0.7,
+  },
+
   aboutInput: {
     minHeight: 120,
     borderWidth: 1,
