@@ -1,29 +1,28 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Search, Bell, ShoppingBag } from "lucide-react";
 import Button from "@/components/Button";
-import Image from "next/image";
 
 export default function Header({ loggedIn = false }) {
     return (
         <header className="w-full bg-reuse-brown px-6 py-3">
-            <div className="mx-auto flex max-w-7xl items-center justify-between gap-6">
+            <div className="mx-auto flex h-[46px] max-w-[1344px] items-center justify-between gap-6">
 
                 {/* Logo */}
-                <Link
-                    href="/">
+                <Link href="/">
                     <Image
-                        src='/images/logo/ReUse-creme.png'
+                        src="/images/logo/ReUse-creme.png"
                         width={130}
                         height={16}
-                        alt="Logo creme"
-                        className="h-auto w-32.5"
+                        alt="ReUse"
+                        className="h-auto w-[130px]"
                         priority
                     />
                 </Link>
 
                 {/* Busca */}
-                <div className="hidden w-87.5 md:flex">
-                    <div className="flex w-full items-center rounded-2xl bg-reuse-cream px-4">
+                <div className="hidden w-[350px] md:flex">
+                    <div className="flex h-10 w-full items-center rounded-2xl bg-reuse-cream px-4">
                         <input
                             type="text"
                             placeholder="Busque sapato, poltrona, notebook..."
@@ -31,7 +30,7 @@ export default function Header({ loggedIn = false }) {
                         />
 
                         <Search
-                            size={24}
+                            size={20}
                             strokeWidth={2}
                             className="text-reuse-brown"
                         />
@@ -40,6 +39,7 @@ export default function Header({ loggedIn = false }) {
 
                 {/* Navegação */}
                 <nav className="hidden items-center gap-8 text-sm text-reuse-white lg:flex">
+
                     <Link
                         href="/eletronicos"
                         className="hover:text-reuse-pink transition"
@@ -78,22 +78,58 @@ export default function Header({ loggedIn = false }) {
                     )}
                 </nav>
 
-                {/* Área do Usuário */}
+                {/* Área do usuário */}
                 {loggedIn ? (
                     <div className="flex items-center gap-7">
 
-                        {/* NOTIFICAÇÕES */}
+                        {/* Notificações */}
                         <Link
-                            href='/notificacoes'
-                            className="relative text-reuse-white hover:text-reuse-pink "
-                )}
+                            href="/notificacoes"
+                            className="relative text-reuse-white hover:text-reuse-pink transition"
+                            aria-label="Notificações"
+                        >
+                            <Bell size={22} strokeWidth={1.8} />
 
-                        {/* Publicar */}
-                        <Button href="/publicar-item">
-                            Publicar Item
-                        </Button>
+                            <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-reuse-pink text-[9px] font-bold text-reuse-brown">
+                                1
+                            </span>
+                        </Link>
+
+                        {/* Sacola */}
+                        <Link
+                            href="/vitrine"
+                            className="text-reuse-white hover:text-reuse-pink transition"
+                            aria-label="Minha sacola"
+                        >
+                            <ShoppingBag
+                                size={21}
+                                strokeWidth={1.8}
+                            />
+                        </Link>
+
+                        {/* Foto do usuário */}
+                        <Link
+                            href="/perfil"
+                            aria-label="Meu perfil"
+                        >
+                            <div className="relative h-8 w-8 overflow-hidden rounded-full">
+                                <Image
+                                    src="/images/perfil/maria-silva.png"
+                                    alt="Meu perfil"
+                                    fill
+                                    sizes="32px"
+                                    className="object-cover"
+                                />
+                            </div>
+                        </Link>
 
                     </div>
+                ) : (
+                    <Button href="/login">
+                        Entrar
+                    </Button>
+                )}
+            </div>
         </header>
     );
 }
