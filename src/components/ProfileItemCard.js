@@ -43,7 +43,14 @@ export default function ProfileItemCard({
 
                 <div className="mt-auto flex items-center justify-between">
 
-                    <span className={`rounded-full px-2 py-1 text-xs font-medium ${type === 'Troca ? "bg-[#e0c3fc] text-[#4a1d96]" : "bg-[#ffe4a1] text-[#78350f]"'}`}>
+                    <span
+                        className={`rounded-full px-2 py-1 text-xs font-medium ${type === "Venda"
+                            ? "bg-[#ffe4a1] text-[#78350f]"
+                            : type === "Troca"
+                                ? "bg-[#e0c3fc] text-[#4a1d96]"
+                                : "bg-[#d9ead3] text-[#285430]"
+                            }`}
+                    >
                         {type}
                     </span>
 
