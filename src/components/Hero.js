@@ -21,7 +21,7 @@ const slides = [
         ),
         description: "ao que você não usa mais",
         button: "Publicar item",
-        href: "/publicar-item",
+        href: "/perfil#publicar-item",
         image: "/images/banners/banner-1.png",
     },
     {
@@ -49,7 +49,7 @@ const slides = [
         ),
         description: "Faça parte de uma comunidade que acredita em novos propósitos.",
         button: "Conhecer a ReUse",
-        href: "/vitrine",
+        href: "/#reuse",
         image: "/images/banners/banner-3.png",
     },
 ];

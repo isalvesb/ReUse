@@ -50,7 +50,7 @@ export default function RecuperarSenha() {
                 {/* ILUSTRAÇÃO */}
                 <div className="mb-6 flex justify-center">
                     <Image
-                        src='/images/recuperar-senha/security-shield.png'
+                        src='/images/cta/security-shield.png'
                         width={180}
                         height={185}
                         alt="Escudo de segurança"

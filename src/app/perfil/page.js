@@ -189,12 +189,10 @@ export default function Perfil() {
                     </section>
                 </div>
 
-
-                {/* ==================================================
-                FORMULÁRIO DE PUBLICAR ITEM
-            ================================================== */}
+                {/* ==================================================FORMULÁRIO DE PUBLICAR ITEM=================================================*/}
 
                 <section
+                    id="publicar-item"
                     ref={publicarRef}
                     className="mx-auto mt-24 w-full max-w-[598px] scroll-mt-8"
                 >

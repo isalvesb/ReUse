@@ -1,5 +1,5 @@
 import Header from "@/components/Header";
-import ProductCard from "@/components/ProductCard";
+import ProfileItemCard from "@/components/ProfileItemCard";
 
 const products = [
     {
@@ -7,14 +7,49 @@ const products = [
         name: "Cadeira de madeira",
         condition: "Usado • Bom estado",
         distance: "2 km de você",
+        type: "Venda",
         image: "/images/itens/cadeira.jpg",
     },
     {
         id: 2,
-        name: "Canon EOS 60D",
+        name: "Teclado gamer",
         condition: "Usado • Bom estado",
         distance: "2 km de você",
-        image: "/images/itens/canon.png",
+        type: "Doação",
+        image: "/images/itens/teclado.jpg",
+    },
+    {
+        id: 3,
+        name: "Câmera vintage",
+        condition: "Bom estado",
+        distance: "3 km de você",
+        type: "Venda",
+        image: "/images/itens/camera-vintage.jpg",
+        category: "vendas",
+    },
+    {
+        id: 4,
+        name: "Iphone 17",
+        condition: "Usado • Ótimo estado",
+        distance: "2 km de você",
+        type: "Venda",
+        image: "/images/itens/iphone17.png",
+    },
+    {
+        id: 5,
+        name: "Jaqueta de couro",
+        condition: "Usado • Tam 40",
+        distance: "1,4 km de você",
+        type: "Troca",
+        image: "/images/itens/jaqueta.jpg",
+    },
+    {
+        id: 6,
+        name: "Tênis Adidas Pink",
+        condition: "Usado • Bom estado",
+        distance: "2 km de você",
+        type: "Venda",
+        image: "/images/itens/tenis-adidas.png",
     },
 ];
 
@@ -28,9 +63,9 @@ export default function Vitrine() {
                     Vitrine
                 </h1>
 
-                <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-6">
                     {products.map((product) => (
-                        <ProductCard
+                        <ProfileItemCard
                             key={product.id}
                             {...product}
                         />

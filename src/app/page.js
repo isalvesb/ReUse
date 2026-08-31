@@ -172,7 +172,7 @@ export default function Home() {
 
         {/* BANNER APP */}
 
-        <section className="relative mt-30 mx-auto flex h-64 w-275 items-center overflow-visible rounded-2xl bg-reuse-pink">
+        <section id="reuse" className="relative mt-30 mx-auto flex h-64 w-275 items-center overflow-visible rounded-2xl bg-reuse-pink">
 
           {/* Conteúdo */}
           <div className="absolute left-27.25 top-1/2 flex w-96 -translate-y-1/2 flex-col items-start gap-2">
