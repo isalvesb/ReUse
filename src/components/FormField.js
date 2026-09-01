@@ -19,7 +19,7 @@ export default function FormField({
                     value={value}
                     onChange={(event) => onChange(event.target.value)}
                     placeholder={placeholder}
-                    className={`h-12 w-full rounded-[10px] border border-reuse-brown bg-[#F3F3F5] px-3 pr-11 text-1rem text-[#0A0A0A] outline-none ${active
+                    className={`h-12 w-full rounded-[10px] border border-reuse-brown bg-reuse-white px-3 pr-11 text-1rem text-[#0A0A0A] outline-none ${active
                         ? 'border-reuse-brown'
                         : 'border-reuse-pink'
                         }`}

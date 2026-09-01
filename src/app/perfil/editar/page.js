@@ -84,14 +84,14 @@ export default function EditarPerfil() {
                     <FormField
                         label='Nome'
                         value={nome}
-                        onChange={(event) => setNome(event.target.value)}
+                        onChange={setNome}
                     />
 
                     {/* EMAIL */}
                     <FormField
                         label='E-mail'
                         value={email}
-                        onChange={(event) => setEmail(event.target.value)}
+                        onChange={setEmail}
                         active
                     />
 
@@ -99,7 +99,7 @@ export default function EditarPerfil() {
                     <FormField
                         label='Localização'
                         value={localizacao}
-                        onChange={(event) => setLocalizacao(event.target.value)}
+                        onChange={setLocalizacao}
                         active
                     />
 
@@ -112,7 +112,7 @@ export default function EditarPerfil() {
                         <textarea
                             value={sobre}
                             onChange={(event) => setSobre(event.target.value)}
-                            className="mt-2 h-[120px] w-full resize-none rounded-[10px] border border-reuse-brow bg-[#F3F3F5] px-3 py-2 text-1rem leading-[26px] text-reuse-brown outline-none"
+                            className="mt-2 h-[120px] w-full resize-none rounded-[10px] border border-reuse-brow bg-reuse-white px-3 py-2 text-1rem leading-[26px] text-reuse-brown outline-none"
                         />
                     </div>
 

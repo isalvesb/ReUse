@@ -3,8 +3,20 @@ import Footer from "@/components/Footer";
 import ProductGallery from "@/components/ProductGallery";
 import SellerCard from "@/components/SellerCard";
 import { MapPin } from "lucide-react";
+import { products } from "@/data/products";
+import { notFound } from "next/navigation";
 
-export default function DetalheProduto() {
+export default async function DetalheProduto({ params }) {
+    const { id } = await params;
+
+    const product = products.find(
+        (item) => item.id === Number(id)
+    );
+
+    if (!product) {
+        notFound();
+    }
+
     return (
         <>
             <Header loggedIn />
@@ -15,12 +27,9 @@ export default function DetalheProduto() {
 
                     {/* GALERIA */}
                     <ProductGallery
-                        mainImage="/images/itens/cadeira.png"
-                        mainAlt="Cadeira de madeira"
-                        thumbnails={[
-                            "/images/itens/cadeira.png",
-                            "/images/itens/cadeira-2.png",
-                        ]}
+                        mainImage={product.image}
+                        mainAlt={product.name}
+                        thumbnails={product.thumbnails}
                     />
 
                     {/* INFORMAÇÕES */}
@@ -30,26 +39,26 @@ export default function DetalheProduto() {
                         <div className="mb-8 w-[343px]">
 
                             <h1 className="text-2xl font-bold text-reuse-brown">
-                                Cadeira de madeira
+                                {product.name}
                             </h1>
 
                             <p className="mt-2 text-sm text-[#584C4C]">
-                                Usado - Bom estado
+                                {product.condition}
                             </p>
 
                             <p className="mt-2 flex gap-1 text-sm text-[#584C4C]">
                                 <MapPin size={20} />
-                                1 km de você
+                                {product.distance}
                             </p>
 
                             <div className="mt-4 flex items-center justify-between">
 
                                 <span className="rounded-full bg-[#FFE4A1] px-4 py-1 text-xs font-medium text-[#78350F]">
-                                    Venda
+                                    {product.type}
                                 </span>
 
                                 <span className="text-base font-bold text-reuse-brown">
-                                    R$ 350
+                                    {product.price}
                                 </span>
 
                             </div>
@@ -58,18 +67,15 @@ export default function DetalheProduto() {
 
                         {/* DESCRIÇÃO */}
                         <p className="mb-12.5 w-[343px] text-base leading-5 text-reuse-brown">
-                            Cadeira de madeira maciça em excelente estado de
-                            conservação. Perfeita para sala de jantar ou
-                            escritório. O assento é confortável e o design
-                            clássico combina com diversos estilos de decoração.
+                            {product.description}
                         </p>
 
                         {/* VENDEDOR */}
                         <SellerCard
-                            name="Maria Silva"
-                            image="/images/perfil/maria-silva.png"
-                            itemsCount={12}
-                            rating={4.8}
+                            name={product.seller.name}
+                            image={product.seller.image}
+                            itemsCount={product.seller.itemsCount}
+                            rating={product.seller.rating}
                         />
 
                     </section>

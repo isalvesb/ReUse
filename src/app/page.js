@@ -62,7 +62,7 @@ export default function Home() {
     <>
       <Header />
 
-      <main>
+      <main className="bg-reuse-cream">
 
         <Hero />
 

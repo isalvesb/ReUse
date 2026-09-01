@@ -1,6 +1,7 @@
 import {
-    Gift, Package, Star,
+    Gift, Package, Pencil, Star,
 } from 'lucide-react';
+import Link from 'next/link';
 
 export default function ProfileInfo() {
     return (
@@ -65,11 +66,19 @@ export default function ProfileInfo() {
             </div>
 
             {/* SOBRE MIM */}
-            <div className='rounded-2xl bg-reuse-cream/60 px-4.25 py-6'>
+            <div className='px-4 pt-6 pb-5 bg-[#F3E8D2] rounded-2xl gap-3 w-[421px] h-[281px]'>
+                <div className="flex justify-between">
+                    <h2 className="mb-3 text-xl font-bold text-reuse-brown">
+                        Sobre mim
+                    </h2>
 
-                <h2 className='mb-3 text-xl font-bold text-reuse-brown'>
-                    Sobre mim
-                </h2>
+                    <Link
+                        href="/perfil/editar"
+                        className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F2D5AB]"
+                    >
+                        <Pencil size={20} />
+                    </Link>
+                </div>
 
                 <p className='text-base leading-6.5 text-reuse-brown'>
                     Sou mãe da Beatriz e do Pedro. Quero um futuro mais sustentável para os meus netos, e acredito que temos que consumir com mais consciência.
@@ -80,6 +89,6 @@ export default function ProfileInfo() {
                     Hoje tenho praticado mais o desapego e focado mais em realizar trocas que fazem produtos usados circular.
                 </p>
             </div>
-        </div>
+        </div >
     );
 }
