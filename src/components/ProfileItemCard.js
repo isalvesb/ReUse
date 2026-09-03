@@ -4,6 +4,7 @@ import Link from "next/link";
 export default function ProfileItemCard({
     id,
     name,
+    category,
     condition,
     distance,
     type,
@@ -11,8 +12,9 @@ export default function ProfileItemCard({
     image,
 }) {
     return (
-        <Link href={`/vitrine/${id}`} className="block">
+        <Link href={`/produto/${id}`} className="block">
             <article className="w-43.25 overflow-hidden rounded-2xl bg-reuse-cream shadow-sm">
+
                 {/* IMAGEM */}
                 <div className="relative h-37.5 w-full">
                     <Image
@@ -24,13 +26,21 @@ export default function ProfileItemCard({
                     />
                 </div>
 
-                {/* CONTEÚDO */}
-                <div className="flex h-[149px] flex-col gap-2 bg-reuse-white px-3 py-3">
-                    <h3 className="min-h-10 text-base font-bold leading-5 text-reuse-brown">
+                {/* INFORMAÇÕES */}
+                <div className="flex min-h-[190px] flex-col bg-reuse-white px-3 py-3">
+
+                    {/* CATEGORIA */}
+                    <p className="mb-2 text-[13px] font-medium leading-5 text-reuse-brown-light">
+                        {category}
+                    </p>
+
+                    {/* NOME */}
+                    <h3 className="text-base font-bold leading-5 text-reuse-brown">
                         {name}
                     </h3>
 
-                    <div className="flex flex-col gap-1">
+                    {/* CONDIÇÃO + DISTÂNCIA */}
+                    <div className="mt-2 flex flex-col gap-1">
                         <p className="text-[13px] font-medium leading-5 text-reuse-brown-light">
                             {condition}
                         </p>
@@ -40,7 +50,8 @@ export default function ProfileItemCard({
                         </p>
                     </div>
 
-                    <div className="mt-auto flex items-center justify-between">
+                    {/* TIPO + PREÇO */}
+                    <div className="mt-auto flex items-center justify-between pt-3">
                         <span
                             className={`rounded-full px-2 py-1 text-xs font-medium ${type === "Venda"
                                     ? "bg-[#ffe4a1] text-[#78350f]"

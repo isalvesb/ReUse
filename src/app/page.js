@@ -62,12 +62,12 @@ export default function Home() {
     <>
       <Header />
 
-      <main className="bg-reuse-cream">
+      <main className="min-h-screen w-full bg-reuse-cream pb-20">
 
         <Hero />
 
         {/* CATEGORIAS */}
-        <section className="mx-auto mt-16 max-w-7xl px-6">
+        <section className="mx-auto mt-16 w-full max-w-7xl px-6">
           <h2 className="text-2xl font-bold text-reuse-brown">
             Descubra por categorias
           </h2>
@@ -104,7 +104,7 @@ export default function Home() {
         </section>
 
         {/* PRODUTOS */}
-        <section className="mx-auto mt-16 max-w-7xl px-6">
+        <section className="mx-auto mt-16 w-full max-w-7xl px-6">
 
           <h2 className="text-2xl font-bold text-reuse-brown">
             Produtos perto de você
@@ -172,7 +172,7 @@ export default function Home() {
 
         {/* BANNER APP */}
 
-        <section id="reuse" className="relative mt-30 mx-auto flex h-64 w-275 items-center overflow-visible rounded-2xl bg-reuse-pink">
+        <section id="reuse" className="relative mx-auto mt-30 flex h-64 w-full max-w-275 items-center overflow-visible rounded-2xl bg-reuse-pink">
 
           {/* Conteúdo */}
           <div className="absolute left-27.25 top-1/2 flex w-96 -translate-y-1/2 flex-col items-start gap-2">

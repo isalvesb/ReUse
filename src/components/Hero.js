@@ -56,7 +56,7 @@ const slides = [
 
 export default function Hero() {
     return (
-        <section className="mx-auto mt-10 max-w-7xl px-6">
+        <section className="mx-auto mt-10 w-full max-w-7xl px-6">
             <Swiper
                 modules={[Autoplay, Pagination]}
                 autoplay={{
@@ -78,6 +78,7 @@ export default function Hero() {
                                 src={slide.image}
                                 alt=""
                                 fill
+                                sizes="(max-width: 768px) 100vw, 1280px"
                                 priority={slide.id === 1}
                                 className="object-cover"
                             />

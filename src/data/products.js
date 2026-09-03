@@ -1,18 +1,23 @@
 export const products = [
     {
         id: 1,
-        name: "Cadeira de madeira",
+        category: "Móveis / Cadeira",
+        name: "Cadeira de Madeira Estilo Søborg Anos 50",
         condition: "Usado • Bom estado",
-        distance: "2 km de você",
+        distance: "1 km de você",
         type: "Venda",
-        price: "R$ 350",
+        price: "R$ 490",
         image: "/images/itens/cadeira.png",
         thumbnails: [
             "/images/itens/cadeira.png",
             "/images/itens/cadeira-2.png",
+            "/images/itens/cadeira-3.jpg"
         ],
-        description:
-            "Cadeira de madeira maciça em excelente estado de conservação. Perfeita para sala de jantar ou escritório. O assento é confortável e o design clássico combina com diversos estilos de decoração.",
+        description: `Cadeira Estilo Søborg, inspirada no modelo original dinamarquês dos anos 1950. Toda de madeira maciça com acabamentos excelentes.
+
+        Aceito trocas por outros móveis também.
+
+        Disponível para retirada na Vila Madalena - SP.`,
         seller: {
             name: "Maria Silva",
             image: "/images/perfil/maria-silva.png",
@@ -23,6 +28,7 @@ export const products = [
 
     {
         id: 2,
+        category: "Eletrônicos",
         name: "Teclado gamer",
         condition: "Usado • Bom estado",
         distance: "2 km de você",
@@ -45,6 +51,7 @@ export const products = [
 
     {
         id: 3,
+        category: "Eletrônicos / Câmeras",
         name: "Câmera vintage",
         condition: "Bom estado",
         distance: "3 km de você",
@@ -67,6 +74,7 @@ export const products = [
 
     {
         id: 4,
+        category: "Eletrônicos / Celulares",
         name: "Iphone 17",
         condition: "Usado • Ótimo estado",
         distance: "2 km de você",
@@ -88,6 +96,7 @@ export const products = [
     },
     {
         id: 5,
+        category: "Roupas",
         name: "Jaqueta de couro",
         condition: "Usado • Tam 40",
         distance: "1,4 km de você",
@@ -107,6 +116,7 @@ export const products = [
     },
     {
         id: 6,
+        category: "Sapatos",
         name: "Tênis Adidas Pink",
         condition: "Usado • Bom estado",
         distance: "2 km de você",

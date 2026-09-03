@@ -5,7 +5,7 @@ import Button from "@/components/Button";
 
 export default function Header({ loggedIn = false }) {
     return (
-        <header className="w-full bg-reuse-brown px-6 py-3">
+        <header className="w-full bg-reuse-brown px-6 py-3 shrink-0">
             <div className="mx-auto flex h-[46px] max-w-[1344px] items-center justify-between gap-6">
 
                 {/* Logo */}

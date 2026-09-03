@@ -30,7 +30,8 @@ html {
 
 body {
   margin: 0;
-  background: var(--reuse-white);
+  padding: 0;
+  background: var(--reuse-cream);
   color: var(--reuse-brown);
   font-family: "Inter", "KronaOne", "Syne", sans-serif;
 }

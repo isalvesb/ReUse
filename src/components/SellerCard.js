@@ -54,9 +54,9 @@ export default function SellerCard({
                 variant="secondary"
                 className="mt-4 w-full rounded-[14px]"
             >
-                <span className="flex items-center justify-center gap-2">
-                    <MessageSquare size={16} />
-                    <span>Conversar</span>
+                <span className="flex items-center justify-center gap-1 px-28">
+                    <MessageSquare size={24} />
+                    <span className="text-sm">Conversar</span>
                 </span>
             </Button>
 
