@@ -8,6 +8,7 @@ export default function SellerCard({
     image,
     itemsCount,
     rating,
+    href,
 }) {
     return (
         <div className="h-[166px] w-[343px] rounded-2xl bg-[#F3E8D2] px-4 py-7">
@@ -52,6 +53,7 @@ export default function SellerCard({
             {/* BOTÃO */}
             <Button
                 variant="secondary"
+                href={href}
                 className="mt-4 w-full rounded-[14px]"
             >
                 <span className="flex items-center justify-center gap-1 px-28">

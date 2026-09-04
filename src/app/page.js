@@ -1,66 +1,36 @@
+import Link from "next/link";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import CategoryCard from "@/components/CategoryCard";
 import ProductCard from "@/components/ProductCard";
 import Footer from "@/components/Footer";
 import Image from "next/image";
+import { prisma } from "@/lib/prisma";
+import { getCurrentUser, getUnreadNotificationCount } from "@/lib/current-user";
+import { formatItemForCard } from "@/lib/format";
 
-const products = [
-  {
-    id: 1,
-    name: "Cadeira de madeira",
-    condition: "Usado • Bom estado",
-    distance: "1 km de você",
-    type: "Venda",
-    image: "/images/itens/cadeira.jpg",
-  },
-  {
-    id: 2,
-    name: "Tênis Adidas Pink",
-    condition: "Usado • Bom estado",
-    distance: "2 km de você",
-    type: "Venda",
-    image: "/images/itens/tenis-adidas.png",
-  },
-  {
-    id: 3,
-    name: "Jaqueta de couro",
-    condition: "Usado • Tam 40",
-    distance: "1,4 km de você",
-    type: "Troca",
-    image: "/images/itens/jaqueta.jpg",
-  },
-  {
-    id: 4,
-    name: "iPhone 17 Pro",
-    condition: "Usado • Ótimo estado",
-    distance: "1,4 km de você",
-    type: "Venda",
-    image: "/images/itens/iphone17.png",
-  },
-  {
-    id: 5,
-    name: "Teclado gamer",
-    condition: "Usado • Bom estado",
-    distance: "2 km de você",
-    type: "Doação",
-    image: "/images/itens/teclado.jpg",
-  },
-  {
-    id: 6,
-    name: "Canon EOS 60D",
-    condition: "Usado • Bom estado",
-    distance: "2 km de você",
-    type: "Venda",
-    image: "/images/itens/canon.png",
-  },
-];
+export const dynamic = "force-dynamic";
 
+export default async function Home() {
+  const user = await getCurrentUser();
 
-export default function Home() {
+  const items = await prisma.item.findMany({
+    where: { status: "ATIVO" },
+    include: {
+      images: { orderBy: { position: "asc" }, take: 1 },
+      category: true,
+    },
+    orderBy: { createdAt: "desc" },
+    take: 6,
+  });
+
+  const products = items.map(formatItemForCard);
+
+  const unreadCount = user ? await getUnreadNotificationCount(user.id) : 0;
+
   return (
     <>
-      <Header />
+      <Header loggedIn={!!user} avatarUrl={user?.avatarUrl} unreadCount={unreadCount} />
 
       <main className="min-h-screen w-full bg-reuse-cream pb-20">
 
@@ -112,60 +82,33 @@ export default function Home() {
 
           <div className="mt-8 grid gap-x-16 gap-y-8 md:grid-cols-2">
 
-            <ProductCard
-              name="Cadeira de madeira"
-              condition="Usado • Bom estado"
-              distance="1 km de você"
-              type="Venda"
-              image="/images/itens/cadeira.jpg"
-            />
+            {products.map((product) => (
+              <Link key={product.id} href={`/produto/${product.id}`}>
+                <ProductCard
+                  name={product.name}
+                  condition={product.condition}
+                  distance={product.distance}
+                  type={product.type}
+                  image={product.image}
+                />
+              </Link>
+            ))}
 
-            <ProductCard
-              name="Tênis Adidas Pink"
-              condition="Usado • Bom estado"
-              distance="2 km de você"
-              type="Venda"
-              image="/images/itens/tenis-adidas.png"
-            />
-
-            <ProductCard
-              name="Jaqueta de couro"
-              condition="Usado • Tam 40"
-              distance="1,4 km de você"
-              type="Troca"
-              image="/images/itens/jaqueta.jpg"
-            />
-
-            <ProductCard
-              name="Iphone 17 Pro"
-              condition="Usado • Ótimo estado"
-              distance="1,4 km de você"
-              type="Venda"
-              image="/images/itens/iphone17.png"
-            />
-
-            <ProductCard
-              name="Teclado gamer"
-              condition="Usado • Bom estado"
-              distance="2 km de você"
-              type="Doação"
-              image="/images/itens/teclado.jpg"
-            />
-
-            <ProductCard
-              name="Canon EOS 60D"
-              condition="Usado • Bom estado"
-              distance="2 km de você"
-              type="Venda"
-              image="/images/itens/canon.png"
-            />
+            {products.length === 0 && (
+              <p className="text-sm text-reuse-brown-light">
+                Nenhum item publicado ainda.
+              </p>
+            )}
 
           </div>
 
           <div className="mt-10 flex justify-center">
-            <button className="rounded-xl bg-reuse-pink px-8 py-3 text-sm font-semibold text-reuse-brown transition hover:scale-105">
+            <Link
+              href="/vitrine"
+              className="rounded-xl bg-reuse-pink px-8 py-3 text-sm font-semibold text-reuse-brown transition hover:scale-105"
+            >
               Ver mais
-            </button>
+            </Link>
           </div>
 
         </section>

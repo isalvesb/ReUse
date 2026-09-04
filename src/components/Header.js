@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Search, Bell, ShoppingBag } from "lucide-react";
 import Button from "@/components/Button";
 
-export default function Header({ loggedIn = false }) {
+export default function Header({ loggedIn = false, avatarUrl, unreadCount = 0 }) {
     return (
         <header className="w-full bg-reuse-brown px-6 py-3 shrink-0">
             <div className="mx-auto flex h-[46px] max-w-[1344px] items-center justify-between gap-6">
@@ -90,9 +90,11 @@ export default function Header({ loggedIn = false }) {
                         >
                             <Bell size={22} strokeWidth={1.8} />
 
-                            <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-reuse-pink text-[9px] font-bold text-reuse-brown">
-                                1
-                            </span>
+                            {unreadCount > 0 && (
+                                <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-reuse-pink text-[9px] font-bold text-reuse-brown">
+                                    {unreadCount > 9 ? "9+" : unreadCount}
+                                </span>
+                            )}
                         </Link>
 
                         {/* Sacola */}
@@ -114,7 +116,7 @@ export default function Header({ loggedIn = false }) {
                         >
                             <div className="relative h-8 w-8 overflow-hidden rounded-full">
                                 <Image
-                                    src="/images/perfil/maria-silva.png"
+                                    src={avatarUrl || "/images/perfil/avatar.png"}
                                     alt="Meu perfil"
                                     fill
                                     sizes="32px"

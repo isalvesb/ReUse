@@ -2,6 +2,7 @@ import { Pencil } from "lucide-react";
 
 export default function FormField({
     label,
+    name,
     value,
     onChange,
     placeholder = '',
@@ -16,6 +17,7 @@ export default function FormField({
             <div className="relative mt-2">
                 <input
                     type="text"
+                    name={name}
                     value={value}
                     onChange={(event) => onChange(event.target.value)}
                     placeholder={placeholder}

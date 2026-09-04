@@ -1,8 +1,32 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { Suspense, useActionState } from "react";
+import { useSearchParams } from "next/navigation";
 import Button from "@/components/Button";
+import { signIn } from "./actions";
+
+const initialState = { error: null };
+
+function OAuthErrorBanner() {
+    const searchParams = useSearchParams();
+    const oauthError = searchParams.get("oauthError");
+
+    if (!oauthError) {
+        return null;
+    }
+
+    return (
+        <p className="mb-4 text-center text-sm font-medium text-red-300">
+            {oauthError}
+        </p>
+    );
+}
 
 export default function Login() {
+    const [state, formAction, pending] = useActionState(signIn, initialState);
+
     return (
         <main className="flex min-h-screen">
 
@@ -33,8 +57,12 @@ export default function Login() {
                         />
                     </div>
 
+                    <Suspense fallback={null}>
+                        <OAuthErrorBanner />
+                    </Suspense>
+
                     {/* FORMULÁRIO */}
-                    <form>
+                    <form action={formAction}>
 
                         {/* E-MAIL */}
                         <label className="mb-2 block text-sm font-bold text-reuse-cream">
@@ -42,7 +70,10 @@ export default function Login() {
                         </label>
 
                         <input
+                            name="email"
                             type="email"
+                            required
+                            autoComplete="email"
                             className="h-12 w-full rounded-3xl bg-reuse-white px-4 outline-none"
                         />
 
@@ -52,9 +83,19 @@ export default function Login() {
                         </label>
 
                         <input
+                            name="password"
                             type="password"
+                            required
+                            autoComplete="current-password"
                             className="h-12 w-full rounded-3xl bg-reuse-white px-4 outline-none"
                         />
+
+                        {/* ERRO */}
+                        {state?.error && (
+                            <p className="mt-3 text-sm font-medium text-red-300">
+                                {state.error}
+                            </p>
+                        )}
 
                         {/* LINKS */}
                         <div className="mt-6 text-center">
@@ -83,9 +124,10 @@ export default function Login() {
                         <Button
                             type="submit"
                             variant="primary"
+                            disabled={pending}
                             className="mt-8 h-12 w-full rounded-3xl"
                         >
-                            Entrar
+                            {pending ? "Entrando..." : "Entrar"}
                         </Button>
 
                     </form>
@@ -104,11 +146,10 @@ export default function Login() {
                     </div>
 
                     {/* GOOGLE */}
-                    <Button
-                        type="button"
-                        variant="outline"
-                        className="h-12 w-full rounded-3xl border-reuse-pink text-reuse-cream">
-
+                    <a
+                        href="/api/auth/google"
+                        className="flex h-12 w-full items-center justify-center rounded-3xl border border-reuse-pink text-sm font-medium text-reuse-cream transition-all duration-200 hover:scale-105 hover:bg-reuse-brown-light"
+                    >
                         <Image
                             src="/images/logo/Icon-google.png"
                             width={21}
@@ -118,13 +159,12 @@ export default function Login() {
                         />
 
                         Continuar com Google
-                    </Button>
+                    </a>
 
                     {/* FACEBOOK */}
-                    <Button
-                        type="button"
-                        variant="outline"
-                        className="mt-4 h-12 w-full rounded-3xl border-reuse-pink text-reuse-cream"
+                    <a
+                        href="/api/auth/facebook"
+                        className="mt-4 flex h-12 w-full items-center justify-center rounded-3xl border border-reuse-pink text-sm font-medium text-reuse-cream transition-all duration-200 hover:scale-105 hover:bg-reuse-brown-light"
                     >
                         <Image
                             src="/images/logo/Icon-facebook.png"
@@ -135,7 +175,7 @@ export default function Login() {
                         />
 
                         Continuar com Facebook
-                    </Button>
+                    </a>
 
                 </div>
 

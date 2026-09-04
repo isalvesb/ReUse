@@ -3,7 +3,12 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-export default function ProfileInfo() {
+export default function ProfileInfo({
+    tradesCount = 0,
+    salesCount = 0,
+    rating = 0,
+    bio,
+}) {
     return (
         <div className='flex w-full flex-col gap-6'>
 
@@ -20,7 +25,7 @@ export default function ProfileInfo() {
                     </div>
 
                     <strong className='text-[22px] leading-6 text-reuse-brown'>
-                        24
+                        {tradesCount}
                     </strong>
 
                     <span className='mt-2 text-[10px] text-reuse-brown/80'>
@@ -38,7 +43,7 @@ export default function ProfileInfo() {
                     </div>
 
                     <strong className='text-[22px] leading-6 text-reuse-brown'>
-                        12
+                        {salesCount}
                     </strong>
 
                     <span className='mt-2 text-[10px] text-reuse-brown/80'>
@@ -56,7 +61,7 @@ export default function ProfileInfo() {
                     </div>
 
                     <strong className='text-[22px] leading-6 text-reuse-brown'>
-                        4.8
+                        {rating.toFixed(1)}
                     </strong>
 
                     <span className='mt-2 text-[10px] text-reuse-brown/80'>
@@ -66,7 +71,7 @@ export default function ProfileInfo() {
             </div>
 
             {/* SOBRE MIM */}
-            <div className='px-4 pt-6 pb-5 bg-[#F3E8D2] rounded-2xl gap-3 w-[421px] h-[281px]'>
+            <div className='px-4 pt-6 pb-5 bg-[#F3E8D2] rounded-2xl gap-3 w-[421px] min-h-[281px]'>
                 <div className="flex justify-between">
                     <h2 className="mb-3 text-xl font-bold text-reuse-brown">
                         Sobre mim
@@ -80,13 +85,8 @@ export default function ProfileInfo() {
                     </Link>
                 </div>
 
-                <p className='text-base leading-6.5 text-reuse-brown'>
-                    Sou mãe da Beatriz e do Pedro. Quero um futuro mais sustentável para os meus netos, e acredito que temos que consumir com mais consciência.
-                </p>
-
-                <p className='mt-2 text-base leading-6.5 text-reuse-brown'>
-                    Reutilizar as coisas nos aproxima mais dessa meta.
-                    Hoje tenho praticado mais o desapego e focado mais em realizar trocas que fazem produtos usados circular.
+                <p className='whitespace-pre-line text-base leading-6.5 text-reuse-brown'>
+                    {bio || "Você ainda não escreveu nada sobre você. Clique no lápis para editar seu perfil."}
                 </p>
             </div>
         </div >
