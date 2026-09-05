@@ -3,7 +3,8 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { verifyPassword } from "@/lib/auth";
-import { createSession } from "@/lib/session";
+import { createSession, destroySession, } from "@/lib/session";
+
 
 export async function signIn(_prevState, formData) {
     const email = formData.get("email")?.toString().trim().toLowerCase() ?? "";
@@ -32,4 +33,9 @@ export async function signIn(_prevState, formData) {
     await createSession(user.id);
 
     redirect("/perfil");
+}
+
+export async function signOut() {
+    await destroySession();
+    redirect("/login");
 }

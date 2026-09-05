@@ -125,7 +125,8 @@ export default async function DetalheProduto({ params }) {
                                 image={product.seller.avatarUrl || "/images/perfil/avatar.png"}
                                 itemsCount={sellerItemsCount}
                                 rating={product.seller.rating.toFixed(1)}
-                                href={viewer ? `/chat-anunciante?itemId=${product.id}` : "/login"}
+                                sellerId={product.seller.id}
+                                href={viewer ? `/chat?itemId=${product.id}` : "/login"}
                             />
                         )}
 

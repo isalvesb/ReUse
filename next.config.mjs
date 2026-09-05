@@ -1,13 +1,21 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
   reactCompiler: true,
+
   experimental: {
     serverActions: {
-      // Formulário de publicar item envia até 5 fotos; o padrão de 1MB
-      // estoura fácil com fotos reais de celular/câmera.
+      // Formulário de publicar item envia até 5 fotos
       bodySizeLimit: "15mb",
     },
+  },
+
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+    ],
   },
 };
 

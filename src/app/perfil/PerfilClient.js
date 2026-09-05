@@ -26,9 +26,9 @@ const filters = [
 
 const FILTER_TYPE_MAP = {
     todos: null,
-    doacoes: "DOACAO",
-    trocas: "TROCA",
-    vendas: "VENDA",
+    doacoes: "Doação",
+    trocas: "Troca",
+    vendas: "Venda",
 };
 
 const initialState = { error: null, success: false };
@@ -239,32 +239,32 @@ function PublishFormFields() {
                     />
 
                     <ConditionButton
-                        label="Usado - Como Novo"
+                        label="Usado • Como Novo"
                         selected={
-                            condicao === "Usado - Como Novo"
+                            condicao === "Usado • Como Novo"
                         }
                         onClick={() =>
-                            setCondicao("Usado - Como Novo")
+                            setCondicao("Usado • Como Novo")
                         }
                     />
 
                     <ConditionButton
-                        label="Usado - Bom Estado"
+                        label="Usado • Bom Estado"
                         selected={
-                            condicao === "Usado - Bom Estado"
+                            condicao === "Usado • Bom Estado"
                         }
                         onClick={() =>
-                            setCondicao("Usado - Bom Estado")
+                            setCondicao("Usado • Bom Estado")
                         }
                     />
 
                     <ConditionButton
-                        label="Usado - Estado Regular"
+                        label="Usado • Estado Regular"
                         selected={
-                            condicao === "Usado - Estado Regular"
+                            condicao === "Usado • Estado Regular"
                         }
                         onClick={() =>
-                            setCondicao("Usado - Estado Regular")
+                            setCondicao("Usado • Estado Regular")
                         }
                     />
 

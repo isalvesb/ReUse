@@ -1,6 +1,3 @@
-// Schema Prisma da plataforma ReUse! (versão web)
-// Documentação: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,87 +7,137 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ================================
-// USUÁRIO
-// ================================
-// Objetivo: guardar os dados de conta e perfil de cada usuário da plataforma.
-// Usada em: cadastro, login, perfil (view + edição), vitrine/produto (dados do anunciante).
 model User {
-  id           String    @id @default(cuid())
-  name         String
-  email        String    @unique
-  // Nulo para contas criadas via login social (Google/Facebook), que não têm senha própria.
-  passwordHash String?
-  location     String?
-  bio          String?   @db.Text
-  avatarUrl    String?
-  rating       Float     @default(0)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-
-  items               Item[]                @relation("SellerItems")
-  notifications       Notification[]
-  sentMessages        Message[]             @relation("SentMessages")
-  buyerConversations  Conversation[]        @relation("BuyerConversations")
-  sellerConversations Conversation[]        @relation("SellerConversations")
-  passwordResetTokens PasswordResetToken[]
+  id                  String               @id @default(cuid())
+  name                String
+  email               String               @unique
+  passwordHash        String?
+  location            String?
+  bio                 String?
+  avatarUrl           String?
+  rating              Float                @default(0)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
   accounts            Account[]
+  buyerConversations  Conversation[]       @relation("BuyerConversations")
+  sellerConversations Conversation[]       @relation("SellerConversations")
+  items               Item[]               @relation("SellerItems")
+  sentMessages        Message[]            @relation("SentMessages")
+  notifications       Notification[]
+  passwordResetTokens PasswordResetToken[]
 
   @@map("users")
 }
 
-// ================================
-// CONTA SOCIAL (OAuth)
-// ================================
-// Objetivo: ligar um usuário a uma conta de login social (Google/Facebook),
-// permitindo que a mesma pessoa entre tanto por e-mail/senha quanto por OAuth.
-// Usada em: /login e /cadastro (botões "Continuar com Google/Facebook").
 model Account {
   id                String   @id @default(cuid())
-  provider          String   // "google" | "facebook"
+  provider          String
   providerAccountId String
   createdAt         DateTime @default(now())
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@map("accounts")
 }
 
-// ================================
-// TOKEN DE RECUPERAÇÃO DE SENHA
-// ================================
-// Objetivo: viabilizar o fluxo "Esqueceu a senha?" com um token de uso único e validade,
-// em vez de trocar a senha diretamente por e-mail.
-// Usada em: recuperar-senha (criação do token) e redefinir-senha/[token] (consumo do token).
 model PasswordResetToken {
   id        String    @id @default(cuid())
   token     String    @unique
+  userId    String
   expiresAt DateTime
   usedAt    DateTime?
   createdAt DateTime  @default(now())
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("password_reset_tokens")
 }
 
-// ================================
-// CATEGORIA
-// ================================
-// Objetivo: agrupar itens por categoria (Eletrônicos, Roupas, Móveis, Livros, Outros)
-// para permitir filtros e navegação por categoria no header e na vitrine.
 model Category {
-  id   String @id @default(cuid())
-  name String @unique
-  slug String @unique
-
+  id    String @id @default(cuid())
+  name  String @unique
+  slug  String @unique
   items Item[]
 
   @@map("categories")
+}
+
+model Item {
+  id            String         @id @default(cuid())
+  title         String
+  description   String
+  price         Decimal?       @db.Decimal(10, 2)
+  type          ItemType
+  condition     ItemCondition
+  status        ItemStatus     @default(ATIVO)
+  location      String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  sellerId      String
+  categoryId    String
+  conversations Conversation[]
+  images        ItemImage[]
+  category      Category       @relation(fields: [categoryId], references: [id])
+  seller        User           @relation("SellerItems", fields: [sellerId], references: [id], onDelete: Cascade)
+  notifications Notification[]
+
+  @@index([categoryId])
+  @@index([sellerId])
+  @@map("items")
+}
+
+model ItemImage {
+  id       String @id @default(cuid())
+  url      String
+  position Int    @default(0)
+  itemId   String
+  item     Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@index([itemId])
+  @@map("item_images")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  userId    String
+  itemId    String?
+  item      Item?    @relation(fields: [itemId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("notifications")
+}
+
+model Conversation {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  itemId    String
+  buyerId   String
+  sellerId  String
+  buyer     User      @relation("BuyerConversations", fields: [buyerId], references: [id], onDelete: Cascade)
+  item      Item      @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  seller    User      @relation("SellerConversations", fields: [sellerId], references: [id], onDelete: Cascade)
+  messages  Message[]
+
+  @@unique([itemId, buyerId])
+  @@map("conversations")
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  content        String
+  createdAt      DateTime     @default(now())
+  conversationId String
+  senderId       String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User         @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@map("messages")
 }
 
 enum ItemType {
@@ -111,118 +158,4 @@ enum ItemStatus {
   RESERVADO
   CONCLUIDO
   INATIVO
-}
-
-// ================================
-// ITEM (produto anunciado)
-// ================================
-// Objetivo: representar cada item publicado por um usuário (venda, troca ou doação),
-// central para a vitrine, a página de detalhes do produto e o formulário de publicação no perfil.
-model Item {
-  id          String        @id @default(cuid())
-  title       String
-  description String        @db.Text
-  price       Decimal?      @db.Decimal(10, 2)
-  type        ItemType
-  condition   ItemCondition
-  status      ItemStatus    @default(ATIVO)
-  location    String?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-
-  sellerId String
-  seller   User   @relation("SellerItems", fields: [sellerId], references: [id], onDelete: Cascade)
-
-  categoryId String
-  category   Category @relation(fields: [categoryId], references: [id])
-
-  images        ItemImage[]
-  notifications Notification[]
-  conversations Conversation[]
-
-  @@index([categoryId])
-  @@index([sellerId])
-  @@map("items")
-}
-
-// ================================
-// IMAGEM DO ITEM
-// ================================
-// Objetivo: suportar a galeria de fotos de cada item (capa + miniaturas),
-// usada na vitrine (foto de capa) e na página de detalhes do produto (galeria).
-model ItemImage {
-  id       String @id @default(cuid())
-  url      String
-  position Int    @default(0)
-
-  itemId String
-  item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
-
-  @@index([itemId])
-  @@map("item_images")
-}
-
-// ================================
-// NOTIFICAÇÃO
-// ================================
-// Objetivo: registrar eventos relevantes para o usuário (nova mensagem, item publicado,
-// interesse em item, etc.) exibidos na página de Notificações e no sininho do header.
-model Notification {
-  id        String   @id @default(cuid())
-  message   String
-  read      Boolean  @default(false)
-  createdAt DateTime @default(now())
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  itemId String?
-  item   Item?   @relation(fields: [itemId], references: [id], onDelete: SetNull)
-
-  @@index([userId])
-  @@map("notifications")
-}
-
-// ================================
-// CONVERSA
-// ================================
-// Objetivo: agrupar as mensagens trocadas entre comprador/interessado e anunciante
-// a respeito de um item específico, usada na tela de Chat com o Anunciante.
-model Conversation {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-
-  itemId String
-  item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
-
-  buyerId String
-  buyer   User   @relation("BuyerConversations", fields: [buyerId], references: [id], onDelete: Cascade)
-
-  sellerId String
-  seller   User   @relation("SellerConversations", fields: [sellerId], references: [id], onDelete: Cascade)
-
-  messages Message[]
-
-  @@unique([itemId, buyerId])
-  @@map("conversations")
-}
-
-// ================================
-// MENSAGEM
-// ================================
-// Objetivo: guardar cada mensagem individual trocada dentro de uma conversa,
-// usada na tela de Chat com o Anunciante.
-model Message {
-  id        String   @id @default(cuid())
-  content   String   @db.Text
-  createdAt DateTime @default(now())
-
-  conversationId String
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-
-  senderId String
-  sender   User   @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
-
-  @@index([conversationId])
-  @@map("messages")
 }

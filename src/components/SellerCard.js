@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { MessageSquare } from "lucide-react";
 import { FaStar } from "react-icons/fa";
 import Button from "@/components/Button";
@@ -9,12 +10,16 @@ export default function SellerCard({
     itemsCount,
     rating,
     href,
+    sellerId
 }) {
     return (
         <div className="h-[166px] w-[343px] rounded-2xl bg-[#F3E8D2] px-4 py-7">
 
             {/* INFORMAÇÕES DO USUÁRIO */}
-            <div className="flex items-center gap-3">
+            <Link
+                href={`/perfil/${sellerId}`}
+                className="flex items-center gap-3">
+
 
                 {/* FOTO */}
                 <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full">
@@ -47,8 +52,7 @@ export default function SellerCard({
                         <span>{rating}</span>
                     </div>
                 </div>
-
-            </div>
+            </Link>
 
             {/* BOTÃO */}
             <Button
