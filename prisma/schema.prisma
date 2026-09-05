@@ -16,25 +16,25 @@ datasource db {
 // Objetivo: guardar os dados de conta e perfil de cada usuário da plataforma.
 // Usada em: cadastro, login, perfil (view + edição), vitrine/produto (dados do anunciante).
 model User {
-  id           String   @id @default(cuid())
+  id           String    @id @default(cuid())
   name         String
-  email        String   @unique
+  email        String    @unique
   // Nulo para contas criadas via login social (Google/Facebook), que não têm senha própria.
   passwordHash String?
   location     String?
-  bio          String?  @db.Text
+  bio          String?   @db.Text
   avatarUrl    String?
-  rating       Float    @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  rating       Float     @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
-  items                Item[]                @relation("SellerItems")
-  notifications        Notification[]
-  sentMessages         Message[]             @relation("SentMessages")
-  buyerConversations    Conversation[]        @relation("BuyerConversations")
-  sellerConversations   Conversation[]        @relation("SellerConversations")
-  passwordResetTokens  PasswordResetToken[]
-  accounts             Account[]
+  items               Item[]                @relation("SellerItems")
+  notifications       Notification[]
+  sentMessages        Message[]             @relation("SentMessages")
+  buyerConversations  Conversation[]        @relation("BuyerConversations")
+  sellerConversations Conversation[]        @relation("SellerConversations")
+  passwordResetTokens PasswordResetToken[]
+  accounts            Account[]
 
   @@map("users")
 }
@@ -47,7 +47,7 @@ model User {
 // Usada em: /login e /cadastro (botões "Continuar com Google/Facebook").
 model Account {
   id                String   @id @default(cuid())
-  provider          String // "google" | "facebook"
+  provider          String   // "google" | "facebook"
   providerAccountId String
   createdAt         DateTime @default(now())
 
@@ -65,14 +65,16 @@ model Account {
 // em vez de trocar a senha diretamente por e-mail.
 // Usada em: recuperar-senha (criação do token) e redefinir-senha/[token] (consumo do token).
 model PasswordResetToken {
-  id        String   @id @default(cuid())
-  token     String   @unique
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String    @id @default(cuid())
+  token     String    @unique
   expiresAt DateTime
   usedAt    DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
   @@map("password_reset_tokens")
 }
 
@@ -82,9 +84,10 @@ model PasswordResetToken {
 // Objetivo: agrupar itens por categoria (Eletrônicos, Roupas, Móveis, Livros, Outros)
 // para permitir filtros e navegação por categoria no header e na vitrine.
 model Category {
-  id    String @id @default(cuid())
-  name  String @unique
-  slug  String @unique
+  id   String @id @default(cuid())
+  name String @unique
+  slug String @unique
+
   items Item[]
 
   @@map("categories")
@@ -127,8 +130,8 @@ model Item {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
-  sellerId   String
-  seller     User     @relation("SellerItems", fields: [sellerId], references: [id], onDelete: Cascade)
+  sellerId String
+  seller   User   @relation("SellerItems", fields: [sellerId], references: [id], onDelete: Cascade)
 
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id])
