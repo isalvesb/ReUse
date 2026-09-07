@@ -166,7 +166,7 @@ export default function Header({
                                 <Image
                                     src={
                                         avatarUrl ||
-                                        "/images/perfil/avatar.png"
+                                        "/images/perfil/maria-silva.png"
                                     }
                                     alt="Meu perfil"
                                     fill

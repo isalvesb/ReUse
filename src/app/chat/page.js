@@ -1,124 +1,177 @@
-import { redirect } from "next/navigation";
-import Link from "next/link";
+"use client";
+
+import { useState } from "react";
+
 import Header from "@/components/Header";
-import { prisma } from "@/lib/prisma";
-import { getCurrentUser, getUnreadNotificationCount } from "@/lib/current-user";
-import ChatThread from "./ChatThread";
+import Footer from "@/components/Footer";
+import ChatList from "@/components/ChatList";
+import ChatWindow from "@/components/ChatWindow";
 
-export const dynamic = "force-dynamic";
+const conversations = [
+    {
+        id: 1,
+        name: "Cláudio Souza",
+        image: "/images/avatars/claudio-souza.jpg",
+        preview:
+            "Olá! Vi seu anúncio da cadeira de madeira. Tenho interesse!",
+    },
+    {
+        id: 2,
+        name: "Paula Ferreira",
+        image: "/images/avatars/paula-ferreira.jpg",
+        preview:
+            "Oi, Maria! Tenho disponibilidade sim, que horas seria melhor?",
+    },
+    {
+        id: 3,
+        name: "Mari Soares",
+        image: "/images/avatars/mari-soares.jpg",
+        preview:
+            "Infelizmente não consigo hoje...",
+    },
 
-const conversationInclude = {
-    item: { include: { images: { take: 1, orderBy: { position: "asc" } } } },
-    buyer: true,
-    seller: true,
-    messages: { orderBy: { createdAt: "asc" }, include: { sender: true } },
-};
+    {
+        id: 4,
+        name: "Paulo Silva",
+        image: "/images/avatars/paulo-silva.jpg",
+        preview:
+            "Maria, você aceitaria trocar a cadeira por uma mesa de cabeç...",
+    },
 
-export default async function ChatAnunciante({ searchParams }) {
-    const params = await searchParams;
-    const viewer = await getCurrentUser();
+    {
+        id: 5,
+        name: "Iara Prado",
+        image: "/images/avatars/iara-prado.jpg",
+        preview:
+            "Seria possível no sábado?",
+    },
 
-    if (!viewer) {
-        redirect("/login");
+    {
+        id: 6,
+        name: "Luana Maranhão",
+        image: "/images/avatars/luana-maranhao.jpg",
+        preview:
+            "Maria, minha filha amou os livros! Obrigada pela gentileza",
+    },
+
+    {
+        id: 7,
+        name: "Gabriel P.",
+        image: "/images/avatars/gabriel-p..jpg",
+        preview:
+            "Valeu. Vou pensar um pouco e te falo",
+    },
+
+    {
+        id: 8,
+        name: "Daniel Matos",
+        image: "/images/avatars/daniel-matos.jpg",
+        preview:
+            "Muito obrigada, Maria!",
+    },
+
+    {
+        id: 9,
+        name: "Cristina Martins",
+        image: "/images/avatars/cristina-martins.jpg",
+        preview:
+            "Eu quem agradeço, Maria! Até",
+    },
+];
+
+const initialMessages = [
+    {
+        id: 1,
+        text: "Olá! Vi seu anúncio da cadeira de madeira. Tenho interesse!",
+        time: "10:32",
+        sender: "other",
+    },
+    {
+        id: 2,
+        text: "Você aceita trocar por uma cômoda?",
+        time: "10:33",
+        sender: "other",
+    },
+    {
+        id: 3,
+        text: "Olá, tudo certo? A cadeira está em excelente estado",
+        time: "10:33",
+        sender: "me",
+    },
+    {
+        id: 4,
+        text: "Então, Cláudio, não seria somente venda mesmo",
+        time: "10:35",
+        sender: "me",
+    },
+    {
+        id: 5,
+        text: "Ah, sem problemas, vou pensar um pouco mais e te retorno",
+        time: "10:36",
+        sender: "other",
+    },
+];
+
+export default function ChatPage() {
+    const [selectedConversation, setSelectedConversation] =
+        useState(1);
+
+    const [message, setMessage] = useState("");
+
+    const [messages, setMessages] =
+        useState(initialMessages);
+
+    const selectedUser = conversations.find(
+        (conversation) =>
+            conversation.id === selectedConversation
+    );
+
+    function handleSend(event) {
+        event.preventDefault();
+
+        if (!message.trim()) return;
+
+        setMessages((current) => [
+            ...current,
+            {
+                id: Date.now(),
+                text: message,
+                time: new Date().toLocaleTimeString("pt-BR", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                }),
+                sender: "me",
+            },
+        ]);
+
+        setMessage("");
     }
-
-    const unreadCount = await getUnreadNotificationCount(viewer.id);
-
-    let conversation = null;
-
-    if (params.conversationId) {
-        conversation = await prisma.conversation.findUnique({
-            where: { id: params.conversationId },
-            include: conversationInclude,
-        });
-
-        if (conversation && conversation.buyerId !== viewer.id && conversation.sellerId !== viewer.id) {
-            conversation = null;
-        }
-    } else if (params.itemId) {
-        const item = await prisma.item.findUnique({ where: { id: params.itemId } });
-
-        if (item && item.sellerId !== viewer.id) {
-            conversation = await prisma.conversation.upsert({
-                where: { itemId_buyerId: { itemId: item.id, buyerId: viewer.id } },
-                update: {},
-                create: { itemId: item.id, buyerId: viewer.id, sellerId: item.sellerId },
-                include: conversationInclude,
-            });
-        }
-    }
-
-    const conversations = await prisma.conversation.findMany({
-        where: { OR: [{ buyerId: viewer.id }, { sellerId: viewer.id }] },
-        include: conversationInclude,
-        orderBy: { createdAt: "desc" },
-    });
 
     return (
-        <>
-            <Header loggedIn avatarUrl={viewer.avatarUrl} unreadCount={unreadCount} />
+        <div className="min-h-screen bg-[#F9EEDC]">
 
-            <main className="mx-auto flex min-h-[calc(100vh-72px)] max-w-5xl gap-6 bg-reuse-cream px-6 py-10">
+            <Header loggedIn />
 
-                {/* LISTA DE CONVERSAS */}
-                <aside className="w-72 shrink-0 rounded-2xl border border-reuse-pink bg-reuse-white p-3">
-                    <h2 className="mb-3 px-2 text-sm font-bold text-reuse-brown">
-                        Conversas
-                    </h2>
+            <main className="flex w-full">
 
-                    <div className="flex flex-col gap-1">
-                        {conversations.map((conv) => {
-                            const otherUser = conv.buyerId === viewer.id ? conv.seller : conv.buyer;
-                            const active = conversation?.id === conv.id;
-                            const lastMessage = conv.messages[conv.messages.length - 1];
+                <ChatList
+                    conversations={conversations}
+                    selectedConversation={selectedConversation}
+                    onSelectConversation={setSelectedConversation}
+                />
 
-                            return (
-                                <Link
-                                    key={conv.id}
-                                    href={`/chat-anunciante?conversationId=${conv.id}`}
-                                    className={`rounded-xl px-3 py-2 text-sm transition ${active ? "bg-reuse-pink/40 font-medium" : "hover:bg-reuse-cream"
-                                        }`}
-                                >
-                                    <p className="font-medium text-reuse-brown">
-                                        {otherUser.name}
-                                    </p>
-
-                                    <p className="truncate text-xs text-reuse-brown-light">
-                                        {conv.item.title}
-                                    </p>
-
-                                    {lastMessage && (
-                                        <p className="truncate text-xs text-reuse-beige">
-                                            {lastMessage.content}
-                                        </p>
-                                    )}
-                                </Link>
-                            );
-                        })}
-
-                        {conversations.length === 0 && (
-                            <p className="px-3 py-2 text-xs text-reuse-brown-light">
-                                Nenhuma conversa ainda. Acesse a página de um
-                                produto e clique em &quot;Conversar&quot;.
-                            </p>
-                        )}
-                    </div>
-                </aside>
-
-                {/* THREAD */}
-                <section className="flex flex-1 flex-col rounded-2xl border border-reuse-pink bg-reuse-white">
-                    {conversation ? (
-                        <ChatThread key={conversation.id} conversation={conversation} viewerId={viewer.id} />
-                    ) : (
-                        <div className="flex flex-1 items-center justify-center p-10 text-center text-sm text-reuse-brown-light">
-                            Selecione uma conversa ao lado ou acesse a partir
-                            da página de um produto para começar a conversar
-                            com o anunciante.
-                        </div>
-                    )}
-                </section>
+                <ChatWindow
+                    user={selectedUser}
+                    messages={messages}
+                    message={message}
+                    setMessage={setMessage}
+                    onSend={handleSend}
+                />
 
             </main>
-        </>
+
+            <Footer />
+
+        </div>
     );
 }
