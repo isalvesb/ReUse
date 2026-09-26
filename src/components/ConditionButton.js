@@ -7,7 +7,8 @@ export default function ConditionButton({
         <button
             type="button"
             onClick={onClick}
-            className={`flex min-h-[74px] items-center justify-center rounded-[10px] border px-3 text-center text-1rem font-medium leading-6 transition ${selected
+            aria-pressed={selected}
+            className={`flex min-h-[74px] items-center justify-center rounded-[10px] border px-3 text-center text-base font-medium leading-6 transition ${selected
                 ? 'border-reuse-brown bg-reuse-pink'
                 : "border-[#D1D5DC] bg-reuse-white"
                 }`}

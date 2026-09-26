@@ -37,6 +37,7 @@ export default function Login() {
                     width={754}
                     height={1024}
                     alt="Calças jeans"
+                    loading="eager"
                     className="h-full w-full object-cover"
                 />
             </section>
@@ -54,6 +55,7 @@ export default function Login() {
                             width={188}
                             height={26}
                             alt="ReUse logo rosa"
+                            loading="eager"
                         />
                     </div>
 
@@ -65,27 +67,31 @@ export default function Login() {
                     <form action={formAction}>
 
                         {/* E-MAIL */}
-                        <label className="mb-2 block text-sm font-bold text-reuse-cream">
+                        <label htmlFor="email" className="mb-2 block text-sm font-bold text-reuse-cream">
                             E-mail
                         </label>
 
                         <input
+                            id="email"
                             name="email"
                             type="email"
                             required
+                            maxLength={254}
                             autoComplete="email"
                             className="h-12 w-full rounded-3xl bg-reuse-white px-4 outline-none"
                         />
 
                         {/* SENHA */}
-                        <label className="mb-2 mt-3 block text-sm font-bold text-reuse-cream">
+                        <label htmlFor="password" className="mb-2 mt-3 block text-sm font-bold text-reuse-cream">
                             Senha
                         </label>
 
                         <input
+                            id="password"
                             name="password"
                             type="password"
                             required
+                            maxLength={128}
                             autoComplete="current-password"
                             className="h-12 w-full rounded-3xl bg-reuse-white px-4 outline-none"
                         />

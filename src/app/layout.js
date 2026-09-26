@@ -14,7 +14,7 @@ const inter = Inter({
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" data-scroll-behavior="smooth">
       <body className={`${kronaOne.variable} ${inter.variable}`}>
         {children}
       </body>

@@ -30,6 +30,10 @@ export default async function DetalheProduto({ params }) {
         notFound();
     }
 
+    if (product.status !== "ATIVO" && viewer?.id !== product.sellerId) {
+        notFound();
+    }
+
     const sellerItemsCount = await prisma.item.count({
         where: { sellerId: product.sellerId, status: "ATIVO" },
     });
@@ -42,12 +46,12 @@ export default async function DetalheProduto({ params }) {
         <>
             <Header loggedIn={!!viewer} avatarUrl={viewer?.avatarUrl} unreadCount={unreadCount} />
 
-            <main className="mx-auto max-w-6xl px-6 py-20">
+            <main className="mx-auto max-w-6xl px-6 py-12 md:py-20">
 
                 {/* Voltar */}
                 <Link
                     href="/vitrine"
-                    className="-ml-8 mb-8 inline-flex items-center gap-2 text-1rem font-medium text-[#342a2a]"
+                    className="mb-8 inline-flex items-center gap-2 text-base font-medium text-[#342a2a] md:-ml-8"
                 >
                     <ArrowLeft size={20} />
                     Voltar
@@ -67,7 +71,7 @@ export default async function DetalheProduto({ params }) {
                     <section>
 
                         {/* INFORMAÇÕES DO PRODUTO */}
-                        <div className="mb-8 w-[343px]">
+                        <div className="mb-8 w-full max-w-[343px]">
 
                             <p className="mb-3 text-sm font-medium text-reuse-brown-light">
                                 {product.category.name}
@@ -113,7 +117,7 @@ export default async function DetalheProduto({ params }) {
                                 Descrição do item
                             </h2>
 
-                            <p className="mt-3 mb-9 w-[491px] whitespace-pre-line leading-7 text-reuse-brown-light">
+                            <p className="mb-9 mt-3 w-full max-w-[491px] whitespace-pre-line leading-7 text-reuse-brown-light">
                                 {product.description}
                             </p>
                         </div>

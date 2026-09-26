@@ -8,6 +8,7 @@ export default function ProfileInfo({
     salesCount = 0,
     rating = 0,
     bio,
+    canEdit = false,
 }) {
     return (
         <div className='flex w-full flex-col gap-6'>
@@ -71,18 +72,21 @@ export default function ProfileInfo({
             </div>
 
             {/* SOBRE MIM */}
-            <div className='px-4 pt-6 pb-5 bg-[#F3E8D2] rounded-2xl gap-3 w-[421px] min-h-[281px]'>
+            <div className='min-h-[281px] w-full rounded-2xl bg-[#F3E8D2] px-4 pb-5 pt-6'>
                 <div className="flex justify-between">
                     <h2 className="mb-3 text-xl font-bold text-reuse-brown">
                         Sobre mim
                     </h2>
 
-                    <Link
-                        href="/perfil/editar"
-                        className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F2D5AB]"
-                    >
-                        <Pencil size={20} />
-                    </Link>
+                    {canEdit && (
+                        <Link
+                            href="/perfil/editar"
+                            aria-label="Editar perfil"
+                            className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F2D5AB]"
+                        >
+                            <Pencil aria-hidden="true" size={20} />
+                        </Link>
+                    )}
                 </div>
 
                 <p className='whitespace-pre-line text-base leading-6.5 text-reuse-brown'>

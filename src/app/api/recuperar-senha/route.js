@@ -1,14 +1,36 @@
-import { randomBytes } from "crypto";
 import { Resend } from "resend";
 import { prisma } from "@/lib/prisma";
-
-const TOKEN_TTL_MS = 60 * 60 * 1000; // 1 hora
+import {
+    createPasswordResetToken,
+    escapeHtml,
+    PASSWORD_RESET_TTL_MS,
+} from "@/lib/password-reset.mjs";
+import { isValidEmail, normalizeEmail } from "@/lib/validation.mjs";
+import { consumeRateLimit } from "@/lib/rate-limit";
 
 export async function POST(request) {
-    const { email } = await request.json();
+    const body = await request.json().catch(() => null);
+    const email = normalizeEmail(body?.email);
 
-    if (!email) {
-        return Response.json({ error: "Informe um e-mail." }, { status: 400 });
+    if (!isValidEmail(email)) {
+        return Response.json({ error: "Informe um e-mail válido." }, { status: 400 });
+    }
+
+    const rateLimit = await consumeRateLimit({
+        scope: "recuperar-senha",
+        identifier: email,
+        limit: 3,
+        windowMs: 60 * 60 * 1000,
+    });
+
+    if (!rateLimit.allowed) {
+        return Response.json(
+            { error: "Muitas solicitações. Tente novamente mais tarde." },
+            {
+                status: 429,
+                headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
+            }
+        );
     }
 
     const normalizedEmail = email.toString().trim().toLowerCase();
@@ -23,18 +45,25 @@ export async function POST(request) {
         return Response.json({ success: true });
     }
 
-    const token = randomBytes(32).toString("hex");
+    const { rawToken, tokenHash } = createPasswordResetToken();
+    const now = new Date();
 
-    await prisma.passwordResetToken.create({
-        data: {
-            token,
-            userId: user.id,
-            expiresAt: new Date(Date.now() + TOKEN_TTL_MS),
-        },
-    });
+    await prisma.$transaction([
+        prisma.passwordResetToken.updateMany({
+            where: { userId: user.id, usedAt: null },
+            data: { usedAt: now },
+        }),
+        prisma.passwordResetToken.create({
+            data: {
+                token: tokenHash,
+                userId: user.id,
+                expiresAt: new Date(now.getTime() + PASSWORD_RESET_TTL_MS),
+            },
+        }),
+    ]);
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-    const resetLink = `${appUrl}/redefinir-senha/${token}`;
+    const resetLink = `${appUrl}/redefinir-senha/${rawToken}`;
 
     if (process.env.NODE_ENV !== "production") {
         console.log("[Recuperar senha] Link de redefinição:", resetLink);
@@ -53,9 +82,9 @@ export async function POST(request) {
             to: [user.email],
             subject: "Redefina sua senha - ReUse!",
             html: `
-                <p>Olá, ${user.name}!</p>
+                <p>Olá, ${escapeHtml(user.name)}!</p>
                 <p>Recebemos uma solicitação para redefinir sua senha na ReUse!.</p>
-                <p><a href="${resetLink}">Clique aqui para criar uma nova senha</a></p>
+                <p><a href="${escapeHtml(resetLink)}">Clique aqui para criar uma nova senha</a></p>
                 <p>Este link expira em 1 hora. Se você não solicitou, ignore este e-mail.</p>
             `,
         });

@@ -41,21 +41,20 @@ export default function PerfilPublicoClient({ user, items }) {
 
     return (
         <main className="w-full bg-reuse-cream">
-            <div className="mx-auto max-w-7xl px-10 py-13.25">
+            <div className="mx-auto max-w-7xl px-6 py-10 md:px-10 md:py-13.25">
 
                 {/* =========================
                     PERFIL
                 ========================= */}
-                <div className="grid grid-cols-[421px_1fr] gap-24.75">
+                <div className="grid gap-12 lg:grid-cols-[minmax(0,421px)_minmax(0,1fr)] lg:gap-12 xl:gap-24.75">
 
                     {/* =========================
                         COLUNA ESQUERDA
                     ========================= */}
-                    <aside className="flex flex-col">
+                    <aside className="mx-auto flex w-full max-w-[421px] flex-col lg:mx-0">
 
                         <ProfileHeader
                             name={user.name}
-                            email={user.email}
                             location={user.location}
                             avatarUrl={user.avatarUrl}
                             memberSince={user.memberSince}
@@ -78,7 +77,7 @@ export default function PerfilPublicoClient({ user, items }) {
                     <section>
 
                         {/* FILTROS */}
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                             {filters.map((filter) => {
                                 const active =
                                     activeFilter === filter.value;
@@ -110,8 +109,8 @@ export default function PerfilPublicoClient({ user, items }) {
 
                         {/* CARDS */}
                         {filteredItems.length > 0 ? (
-                            <div className="mt-5 grid grid-cols-4 gap-x-15 gap-y-10 pb-12">
-                                {filteredItems.map((item) => (
+                            <div className="mt-5 grid grid-cols-[repeat(auto-fit,minmax(173px,1fr))] justify-items-center gap-6 pb-12 lg:justify-items-start">
+                                {filteredItems.map((item, index) => (
                                     <ProfileItemCard
                                         key={item.id}
                                         id={item.id}
@@ -121,6 +120,7 @@ export default function PerfilPublicoClient({ user, items }) {
                                         type={item.type}
                                         price={item.price}
                                         image={item.image}
+                                        eager={index === 0}
                                     />
                                 ))}
                             </div>

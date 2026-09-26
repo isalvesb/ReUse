@@ -5,16 +5,20 @@ import Button from "@/components/Button";
 import { Mail } from 'lucide-react';
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { FIELD_LIMITS } from "@/lib/validation.mjs";
 
 export default function RecuperarSenha() {
     const router = useRouter();
 
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
     async function handleSubmit(event) {
         event.preventDefault();
+        if (loading) return;
 
+        setError('');
         setLoading(true);
 
         try {
@@ -26,16 +30,17 @@ export default function RecuperarSenha() {
                 body: JSON.stringify({ email }),
             });
 
-            const data = await response.json();
+            const data = await response.json().catch(() => null);
 
             if (!response.ok) {
-                alert(data.error);
+                setError(data?.error || 'Não foi possível enviar o e-mail.');
                 return;
             }
 
-            router.push(`/email-enviado?email=${encodeURIComponent(email)}`);
-        } catch (error) {
-            alert('Não foi possível enviar o e-mail');
+            const normalizedEmail = email.trim().toLowerCase();
+            router.push(`/email-enviado?email=${encodeURIComponent(normalizedEmail)}`);
+        } catch {
+            setError('Não foi possível enviar o e-mail. Tente novamente.');
         } finally {
             setLoading(false);
         }
@@ -84,15 +89,33 @@ export default function RecuperarSenha() {
                             className="text-[#99A1AF] absolute left-4 top-1/2 -translate-y-1/2" />
 
                         <input
+                            id="email"
                             type="email"
                             value={email}
-                            onChange={(event) => setEmail(event.target.value)}
+                            onChange={(event) => {
+                                setEmail(event.target.value);
+                                if (error) setError('');
+                            }}
                             placeholder="seu@email.com"
                             required
+                            maxLength={FIELD_LIMITS.email}
+                            autoComplete="email"
+                            aria-invalid={Boolean(error)}
+                            aria-describedby={error ? "recovery-error" : undefined}
                             className="h-12 w-full rounded-3xl border border-[#99A1AF] bg-reuse-white pl-11 pr-2 text-sm text-reuse-brown outline-none transition focus:border-reuse-pink"
                         />
 
                     </div>
+
+                    {error && (
+                        <p
+                            id="recovery-error"
+                            role="alert"
+                            className="mt-3 text-sm font-medium text-red-600"
+                        >
+                            {error}
+                        </p>
+                    )}
 
                     <Button
                         type="submit"

@@ -1,12 +1,20 @@
 "use server";
 
-import { randomUUID } from "crypto";
-import { mkdir, writeFile } from "fs/promises";
-import path from "path";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { destroySession, getCurrentUserId } from "@/lib/session";
+import {
+    deleteStoredItemImage,
+    storeItemImage,
+    UploadValidationError,
+} from "@/lib/uploads";
+import { getItemPhotoValidationError } from "@/lib/upload-constraints.mjs";
+import { FIELD_LIMITS } from "@/lib/validation.mjs";
+
+const MAX_TITLE_LENGTH = 120;
+const MAX_DESCRIPTION_LENGTH = 3000;
+const MAX_LOCATION_LENGTH = 160;
 
 export async function logOut() {
     await destroySession();
@@ -21,34 +29,29 @@ export async function updateProfile(_prevState, formData) {
     }
 
     const name = formData.get("name")?.toString().trim();
-    const email = formData.get("email")?.toString().trim().toLowerCase();
     const location = formData.get("location")?.toString().trim();
     const bio = formData.get("bio")?.toString().trim();
 
-    if (!name || !email) {
-        return { error: "Nome e e-mail são obrigatórios." };
+    if (!name) {
+        return { error: "O nome é obrigatório." };
     }
 
-    const emailInUse = await prisma.user.findFirst({
-        where: { email, NOT: { id: userId } },
+    if (name.length > FIELD_LIMITS.name) {
+        return { error: `O nome pode ter no máximo ${FIELD_LIMITS.name} caracteres.` };
+    }
+
+    if (location && location.length > FIELD_LIMITS.location) {
+        return { error: `A localização pode ter no máximo ${FIELD_LIMITS.location} caracteres.` };
+    }
+
+    if (bio && bio.length > FIELD_LIMITS.bio) {
+        return { error: `A biografia pode ter no máximo ${FIELD_LIMITS.bio} caracteres.` };
+    }
+
+    await prisma.user.update({
+        where: { id: userId },
+        data: { name, location: location || null, bio: bio || null },
     });
-
-    if (emailInUse) {
-        return { error: "Este e-mail já está em uso por outra conta." };
-    }
-
-    try {
-        await prisma.user.update({
-            where: { id: userId },
-            data: { name, email, location: location || null, bio: bio || null },
-        });
-    } catch (error) {
-        if (error.code === "P2002") {
-            return { error: "Este e-mail já está em uso por outra conta." };
-        }
-
-        throw error;
-    }
 
     revalidatePath("/perfil");
     revalidatePath("/perfil/editar");
@@ -64,9 +67,9 @@ const NEGOTIATION_TYPE_MAP = {
 
 const CONDITION_MAP = {
     "Novo": "NOVO",
-    "Usado - Como Novo": "USADO_COMO_NOVO",
-    "Usado - Bom Estado": "USADO_BOM_ESTADO",
-    "Usado - Estado Regular": "USADO_ESTADO_REGULAR",
+    "Usado • Como Novo": "USADO_COMO_NOVO",
+    "Usado • Bom Estado": "USADO_BOM_ESTADO",
+    "Usado • Estado Regular": "USADO_ESTADO_REGULAR",
 };
 
 export async function publishItem(_prevState, formData) {
@@ -95,6 +98,21 @@ export async function publishItem(_prevState, formData) {
         return { error: `A descrição deve ter no mínimo 20 caracteres (${description.length}/20).` };
     }
 
+    if (title.length > MAX_TITLE_LENGTH) {
+        return { error: `O título pode ter no máximo ${MAX_TITLE_LENGTH} caracteres.` };
+    }
+
+    if (description.length > MAX_DESCRIPTION_LENGTH) {
+        return { error: `A descrição pode ter no máximo ${MAX_DESCRIPTION_LENGTH} caracteres.` };
+    }
+
+    if (location && location.length > MAX_LOCATION_LENGTH) {
+        return { error: `A localização pode ter no máximo ${MAX_LOCATION_LENGTH} caracteres.` };
+    }
+
+    const photoValidationError = getItemPhotoValidationError(photos);
+    if (photoValidationError) return { error: photoValidationError };
+
     const type = NEGOTIATION_TYPE_MAP[negotiationType];
     const condition = CONDITION_MAP[conditionLabel];
 
@@ -112,49 +130,78 @@ export async function publishItem(_prevState, formData) {
 
     const price = type === "VENDA" && priceRaw ? Number(priceRaw) : null;
 
-    if (type === "VENDA" && (!priceRaw || Number.isNaN(price))) {
+    if (
+        type === "VENDA"
+        && (
+            !priceRaw
+            || !Number.isFinite(price)
+            || price <= 0
+            || price > 99999999.99
+        )
+    ) {
         return { error: "Informe um preço válido para itens de venda." };
     }
 
-    const imageUrls = [];
+    const storedImages = [];
 
-    if (photos.length > 0) {
-        const uploadDir = path.join(process.cwd(), "public", "uploads", "items");
-        await mkdir(uploadDir, { recursive: true });
-
-        for (const file of photos.slice(0, 5)) {
-            const buffer = Buffer.from(await file.arrayBuffer());
-            const extension = path.extname(file.name) || ".jpg";
-            const filename = `${randomUUID()}${extension}`;
-
-            await writeFile(path.join(uploadDir, filename), buffer);
-            imageUrls.push(`/uploads/items/${filename}`);
+    try {
+        for (const file of photos) {
+            storedImages.push(await storeItemImage(file));
         }
+    } catch (error) {
+        console.error("Falha ao armazenar imagem do item", error);
+
+        await Promise.allSettled(
+            storedImages.map(deleteStoredItemImage)
+        );
+
+        return {
+            error: error instanceof UploadValidationError
+                ? error.message
+                : "Não foi possível enviar as imagens.",
+        };
     }
 
-    const item = await prisma.item.create({
-        data: {
-            title,
-            description,
-            price,
-            type,
-            condition,
-            location: location || null,
-            sellerId: userId,
-            categoryId: category.id,
-            images: {
-                create: imageUrls.map((url, index) => ({ url, position: index })),
-            },
-        },
-    });
+    let item;
 
-    await prisma.notification.create({
-        data: {
-            userId,
-            message: `Seu item "${title}" foi publicado com sucesso.`,
-            itemId: item.id,
-        },
-    });
+    try {
+        item = await prisma.$transaction(async (transaction) => {
+            const createdItem = await transaction.item.create({
+                data: {
+                    title,
+                    description,
+                    price,
+                    type,
+                    condition,
+                    location: location || null,
+                    sellerId: userId,
+                    categoryId: category.id,
+                    images: {
+                        create: storedImages.map(({ url }, index) => ({
+                            url,
+                            position: index,
+                        })),
+                    },
+                },
+            });
+
+            await transaction.notification.create({
+                data: {
+                    userId,
+                    message: `Seu item "${title}" foi publicado com sucesso.`,
+                    itemId: createdItem.id,
+                },
+            });
+
+            return createdItem;
+        });
+    } catch (error) {
+        console.error("Falha ao publicar item", error);
+        await Promise.allSettled(
+            storedImages.map(deleteStoredItemImage)
+        );
+        return { error: "Não foi possível publicar o item. Tente novamente." };
+    }
 
     revalidatePath("/perfil");
     revalidatePath("/vitrine");

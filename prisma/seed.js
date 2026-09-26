@@ -13,6 +13,12 @@ const CATEGORIES = [
 ];
 
 async function main() {
+    const seedPassword = process.env.SEED_PASSWORD;
+
+    if (!seedPassword || seedPassword.length < 8) {
+        throw new Error("Defina SEED_PASSWORD com pelo menos 8 caracteres antes de executar o seed.");
+    }
+
     console.log("Seed: criando categorias...");
 
     const categories = {};
@@ -29,7 +35,7 @@ async function main() {
 
     console.log("Seed: criando usuários...");
 
-    const senhaPadrao = await bcrypt.hash("reuse123", 10);
+    const senhaPadrao = await bcrypt.hash(seedPassword, 10);
 
     const maria = await prisma.user.upsert({
         where: { email: "maria.silva@email.com" },

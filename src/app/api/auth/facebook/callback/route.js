@@ -26,6 +26,10 @@ export async function GET(request) {
     const clientSecret = process.env.FACEBOOK_CLIENT_SECRET;
     const redirectUri = `${getAppUrl()}/api/auth/facebook/callback`;
 
+    if (!clientId || !clientSecret) {
+        loginError("Login com Facebook não configurado.");
+    }
+
     const tokenUrl = new URL("https://graph.facebook.com/v21.0/oauth/access_token");
     tokenUrl.searchParams.set("client_id", clientId);
     tokenUrl.searchParams.set("client_secret", clientSecret);
@@ -55,16 +59,24 @@ export async function GET(request) {
     const profile = await profileResponse.json();
 
     if (!profile.email) {
-        loginError("Não conseguimos obter seu e-mail do Facebook. Permita o acesso ao e-mail ou use outro método de login.");
+        loginError("O Facebook não forneceu um e-mail para esta conta. Use outro método de login.");
     }
 
-    const user = await findOrCreateOAuthUser({
-        provider: "facebook",
-        providerAccountId: profile.id,
-        email: profile.email,
-        name: profile.name,
-        avatarUrl: profile.picture?.data?.url,
-    });
+    let user;
+
+    try {
+        user = await findOrCreateOAuthUser({
+            provider: "facebook",
+            providerAccountId: profile.id,
+            email: profile.email,
+            emailVerified: false,
+            name: profile.name,
+            avatarUrl: profile.picture?.data?.url,
+        });
+    } catch (error) {
+        console.error("[Facebook OAuth] Falha ao vincular conta:", error.message);
+        loginError("Entre com sua senha antes de vincular o Facebook a uma conta existente.");
+    }
 
     await createSession(user.id);
 

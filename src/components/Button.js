@@ -14,7 +14,7 @@ export default function Button({
             "bg-reuse-pink text-reuse-brown hover:bg-[#DDA6DD]",
 
         secondary:
-            "bg-reuse-brown text-white hover:bg-[]",
+            "bg-reuse-brown text-white hover:bg-[#4A3A3A]",
 
         outline:
             "border border-reuse-brown bg-transparent text-reuse-brown hover:bg-reuse-brown hover:text-white",

@@ -1,121 +1,128 @@
 import Image from "next/image";
 import { Send } from "lucide-react";
 
-export default function ChatWindow({
-    user,
-    messages,
-    message,
-    setMessage,
-    onSend,
-}) {
+function formatTime(value) {
+    return new Intl.DateTimeFormat("pt-BR", {
+        hour: "2-digit",
+        minute: "2-digit",
+    }).format(new Date(value));
+}
+
+function formatDate(value) {
+    return new Intl.DateTimeFormat("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+    }).format(new Date(value));
+}
+
+export default function ChatWindow({ conversation, formAction, pending, error }) {
+    if (!conversation) {
+        return (
+            <section className="flex min-h-[540px] min-w-0 flex-1 items-center justify-center px-8 text-center text-reuse-brown-light">
+                Selecione uma conversa ou abra um item da vitrine para enviar uma mensagem.
+            </section>
+        );
+    }
+
+    const lastMessage = conversation.messages.at(-1);
+    const persistedConversationId = conversation.id.startsWith("new:")
+        ? ""
+        : conversation.id;
+
     return (
-        <section className="flex min-w-0 flex-1 flex-col">
-
-            {/* ================= CABEÇALHO ================= */}
-
-            <div className="flex h-[88px] shrink-0 items-center border border-reuse-brown/20 px-7 gap-2.5">
-
-                <div className="h-[60px] w-[60px] overflow-hidden rounded-full">
+        <section className="flex min-h-[640px] min-w-0 flex-1 flex-col">
+            <div className="flex min-h-[88px] shrink-0 items-center gap-3 border-b border-reuse-brown/20 px-7 py-3">
+                <div className="h-[60px] w-[60px] shrink-0 overflow-hidden rounded-full">
                     <Image
-                        src={user.image}
-                        alt={user.name}
+                        src={conversation.image}
+                        alt={conversation.name}
                         width={60}
                         height={60}
                         className="h-full w-full object-cover object-top"
                     />
                 </div>
 
-                <h1 className="ml-4.5 text-2xl font-bold">
-                    {user.name}
-                </h1>
-
+                <div className="min-w-0">
+                    <h1 className="truncate text-xl font-bold text-reuse-brown">
+                        {conversation.name}
+                    </h1>
+                    <p className="truncate text-sm text-reuse-brown-light">
+                        {conversation.itemTitle}
+                    </p>
+                </div>
             </div>
 
-            {/* ================= ÁREA DAS MENSAGENS ================= */}
+            <div className="relative flex-1 bg-[#F2D5AB]/20 px-5 py-8 md:px-16">
+                {lastMessage && (
+                    <p className="mb-7 text-center text-[11px] text-reuse-brown-light">
+                        {formatDate(lastMessage.createdAt)}
+                    </p>
+                )}
 
-            <div className="relative flex-1 overflow-hidden bg-[#F2D5AB/20]">
-
-                {/* DATA */}
-
-                <div className="absolute left-1/2 top-[35px] -translate-x-1/2 text-[10px] text-reuse-brown">
-                    31/08/2026
-                </div>
-
-                {/* MENSAGENS */}
-
-                <div className="absolute inset-x-0 bottom-8 top-[145px]  overflow-y-auto px-[65px]">
-
-                    <div className="flex min-h-full flex-col justify-end gap-3.5">
-
-                        {messages.map((item) => (
+                <div className="flex min-h-full flex-col justify-end gap-3.5">
+                    {conversation.messages.map((item) => (
+                        <div
+                            key={item.id}
+                            className={`flex ${item.sender === "me" ? "justify-end" : "justify-start"}`}
+                        >
                             <div
-                                key={item.id}
-                                className={`flex ${item.sender === "me"
-                                    ? "justify-end"
-                                    : "justify-start"
-                                    }`}
+                                className={`max-w-[75%] rounded-2xl px-4 py-3 ${item.sender === "me"
+                                    ? "bg-reuse-cream text-reuse-brown"
+                                    : "bg-reuse-brown text-reuse-cream"
+                                }`}
                             >
-
-                                <div
-                                    className={`max-w-[260px] rounded-2xl px-4 py-3 ${item.sender === "me"
-                                        ? "bg-reuse-cream text-reuse-brown"
-                                        : "bg-reuse-brown text-reuse-cream"
-                                        }`}
-                                >
-
-                                    <p className="text-[13px] leading-[19px]">
-                                        {item.text}
-                                    </p>
-
-                                    <span
-                                        className={`mt-1 block text-[9px] ${item.sender === "me"
-                                            ? "text-reuse-brown"
-                                            : "text-reuse-brown"
-                                            }`}
-                                    >
-                                        {item.time}
-                                    </span>
-
-                                </div>
-
+                                <p className="whitespace-pre-wrap break-words text-[13px] leading-[19px]">
+                                    {item.text}
+                                </p>
+                                <span className="mt-1 block text-right text-[9px] opacity-70">
+                                    {formatTime(item.createdAt)}
+                                </span>
                             </div>
-                        ))}
+                        </div>
+                    ))}
 
-                    </div>
+                    {conversation.messages.length === 0 && (
+                        <p className="m-auto max-w-md text-center text-sm text-reuse-brown-light">
+                            Esta conversa ainda não tem mensagens. Escreva abaixo para falar sobre o item.
+                        </p>
+                    )}
                 </div>
             </div>
-
-            {/* ================= CAMPO DE ENVIO ================= */}
 
             <form
-                onSubmit={onSend}
-                className="flex h-[93px] shrink-0 items-center gap-3 border-t border-reuse-brown/20 bg-[#FBEFE0] px-6"
+                action={formAction}
+                className="flex min-h-[93px] shrink-0 flex-wrap items-center gap-3 border-t border-reuse-brown/20 bg-[#FBEFE0] px-6 py-4"
             >
+                <input type="hidden" name="conversationId" value={persistedConversationId} />
+                <input type="hidden" name="itemId" value={conversation.itemId} />
 
                 <input
                     type="text"
-                    value={message}
-                    onChange={(event) =>
-                        setMessage(event.target.value)
-                    }
+                    name="message"
+                    aria-label="Mensagem"
+                    maxLength={1000}
+                    required
+                    autoComplete="off"
                     placeholder="Digite sua mensagem..."
-                    className="h-[47px] flex-1 rounded-full border border-reuse-brown/20 bg-reuse-white px-4 py-3 text-sm text-reuse-brown outline-none placeholder:text-reuse-brown/50 focus:border-reuse-pink"
+                    className="h-[47px] min-w-0 flex-1 rounded-full border border-reuse-brown/20 bg-reuse-white px-4 py-3 text-sm text-reuse-brown outline-none placeholder:text-reuse-brown/50 focus:border-reuse-pink"
                 />
 
                 <button
                     type="submit"
+                    disabled={pending}
                     aria-label="Enviar mensagem"
-                    className="flex h-[47px] w-[47px] shrink-0 items-center justify-center px-3.5 rounded-full bg-reuse-pink/50 text-reuse-brown transition hover:scale-105"
+                    className="flex h-[47px] w-[47px] shrink-0 items-center justify-center rounded-full bg-reuse-pink/50 px-3.5 text-reuse-brown transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                    <Send
-                        size={20}
-                        strokeWidth={1.7}
-                        className="-rotate-[8deg]"
-                    />
+                    <Send size={20} strokeWidth={1.7} className="-rotate-[8deg]" />
                 </button>
 
+                {error && (
+                    <p className="w-full text-sm font-medium text-red-600">
+                        {error}
+                    </p>
+                )}
             </form>
-
         </section>
     );
 }

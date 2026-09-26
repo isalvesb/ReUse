@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Archive, CheckCheck } from "lucide-react";
+import { CheckCheck } from "lucide-react";
 
 export default function ChatList({
     conversations,
@@ -7,11 +7,11 @@ export default function ChatList({
     onSelectConversation,
 }) {
     return (
-        <aside className="w-[457px] shrink-0 border-r border-reuse-brown/20  bg-[#F9EEDC] px-8 pt-[54px]">
+        <aside className="w-full shrink-0 border-b border-reuse-brown/20 bg-[#F9EEDC] px-5 py-6 lg:w-[390px] lg:border-b-0 lg:border-r lg:px-8 lg:pt-[54px]">
             <div className="flex h-full flex-col">
 
                 {/* LISTA DE CONVERSAS */}
-                <div className="flex-1 space-y-6 overflow-hidden mb-4">
+                <div className="flex-1 space-y-3 overflow-hidden">
 
                     {conversations.map((conversation) => {
                         const isSelected =
@@ -21,6 +21,7 @@ export default function ChatList({
                             <button
                                 key={conversation.id}
                                 type="button"
+                                aria-pressed={isSelected}
                                 onClick={() =>
                                     onSelectConversation(conversation.id)
                                 }
@@ -55,7 +56,7 @@ export default function ChatList({
                                             className="mt-0.5 shrink-0 text-reuse-brown"
                                         />
 
-                                        <p className="line-clamp-2 text-sm leading-4.5">
+                                        <p className="line-clamp-2 text-sm leading-[18px]">
                                             {conversation.preview}
                                         </p>
 
@@ -64,21 +65,13 @@ export default function ChatList({
                             </button>
                         );
                     })}
+
+                    {conversations.length === 0 && (
+                        <p className="rounded-2xl bg-reuse-white/70 p-5 text-sm text-reuse-brown-light">
+                            Você ainda não tem conversas. Abra um item da vitrine para falar com o anunciante.
+                        </p>
+                    )}
                 </div>
-
-                {/* MENSAGENS ARQUIVADAS */}
-                <button
-                    type="button"
-                    className="mb-8 mt-8 flex items-center justify-center gap-2 text-sm text-reuse-brown hover:opacity-70"
-                >
-                    <Archive
-                        size={14}
-                        strokeWidth={1.5}
-                    />
-
-                    Mensagens Arquivadas
-                </button>
-
             </div>
         </aside>
     );
