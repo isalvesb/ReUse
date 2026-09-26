@@ -1,177 +1,141 @@
-"use client";
-
-import { useState } from "react";
-
+import { redirect } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ChatList from "@/components/ChatList";
-import ChatWindow from "@/components/ChatWindow";
+import ChatClient from "./ChatClient";
+import { prisma } from "@/lib/prisma";
+import { getCurrentUser, getUnreadNotificationCount } from "@/lib/current-user";
 
-const conversations = [
-    {
-        id: 1,
-        name: "Cláudio Souza",
-        image: "/images/avatars/claudio-souza.jpg",
-        preview:
-            "Olá! Vi seu anúncio da cadeira de madeira. Tenho interesse!",
-    },
-    {
-        id: 2,
-        name: "Paula Ferreira",
-        image: "/images/avatars/paula-ferreira.jpg",
-        preview:
-            "Oi, Maria! Tenho disponibilidade sim, que horas seria melhor?",
-    },
-    {
-        id: 3,
-        name: "Mari Soares",
-        image: "/images/avatars/mari-soares.jpg",
-        preview:
-            "Infelizmente não consigo hoje...",
-    },
+export const dynamic = "force-dynamic";
 
-    {
-        id: 4,
-        name: "Paulo Silva",
-        image: "/images/avatars/paulo-silva.jpg",
-        preview:
-            "Maria, você aceitaria trocar a cadeira por uma mesa de cabeç...",
-    },
+function firstValue(value) {
+    return Array.isArray(value) ? value[0] : value;
+}
 
-    {
-        id: 5,
-        name: "Iara Prado",
-        image: "/images/avatars/iara-prado.jpg",
-        preview:
-            "Seria possível no sábado?",
-    },
+function serializeConversation(conversation, userId) {
+    const otherUser = conversation.buyerId === userId
+        ? conversation.seller
+        : conversation.buyer;
+    const orderedMessages = [...conversation.messages].reverse();
+    const lastMessage = orderedMessages.at(-1);
 
-    {
-        id: 6,
-        name: "Luana Maranhão",
-        image: "/images/avatars/luana-maranhao.jpg",
-        preview:
-            "Maria, minha filha amou os livros! Obrigada pela gentileza",
-    },
+    return {
+        id: conversation.id,
+        itemId: conversation.itemId,
+        itemTitle: conversation.item.title,
+        name: otherUser.name,
+        image: otherUser.avatarUrl || "/images/perfil/avatar.png",
+        preview: lastMessage?.content || `Conversa sobre ${conversation.item.title}`,
+        messages: orderedMessages.map((message) => ({
+            id: message.id,
+            text: message.content,
+            createdAt: message.createdAt.toISOString(),
+            sender: message.senderId === userId ? "me" : "other",
+        })),
+        lastActivity: (lastMessage?.createdAt || conversation.createdAt).toISOString(),
+    };
+}
 
-    {
-        id: 7,
-        name: "Gabriel P.",
-        image: "/images/avatars/gabriel-p..jpg",
-        preview:
-            "Valeu. Vou pensar um pouco e te falo",
-    },
+export default async function ChatPage({ searchParams }) {
+    const user = await getCurrentUser();
 
-    {
-        id: 8,
-        name: "Daniel Matos",
-        image: "/images/avatars/daniel-matos.jpg",
-        preview:
-            "Muito obrigada, Maria!",
-    },
+    if (!user) {
+        redirect("/login");
+    }
 
-    {
-        id: 9,
-        name: "Cristina Martins",
-        image: "/images/avatars/cristina-martins.jpg",
-        preview:
-            "Eu quem agradeço, Maria! Até",
-    },
-];
+    const params = await searchParams;
+    const requestedConversationId = String(firstValue(params?.conversationId) || "");
+    const requestedItemId = String(firstValue(params?.itemId) || "");
 
-const initialMessages = [
-    {
-        id: 1,
-        text: "Olá! Vi seu anúncio da cadeira de madeira. Tenho interesse!",
-        time: "10:32",
-        sender: "other",
-    },
-    {
-        id: 2,
-        text: "Você aceita trocar por uma cômoda?",
-        time: "10:33",
-        sender: "other",
-    },
-    {
-        id: 3,
-        text: "Olá, tudo certo? A cadeira está em excelente estado",
-        time: "10:33",
-        sender: "me",
-    },
-    {
-        id: 4,
-        text: "Então, Cláudio, não seria somente venda mesmo",
-        time: "10:35",
-        sender: "me",
-    },
-    {
-        id: 5,
-        text: "Ah, sem problemas, vou pensar um pouco mais e te retorno",
-        time: "10:36",
-        sender: "other",
-    },
-];
-
-export default function ChatPage() {
-    const [selectedConversation, setSelectedConversation] =
-        useState(1);
-
-    const [message, setMessage] = useState("");
-
-    const [messages, setMessages] =
-        useState(initialMessages);
-
-    const selectedUser = conversations.find(
-        (conversation) =>
-            conversation.id === selectedConversation
-    );
-
-    function handleSend(event) {
-        event.preventDefault();
-
-        if (!message.trim()) return;
-
-        setMessages((current) => [
-            ...current,
-            {
-                id: Date.now(),
-                text: message,
-                time: new Date().toLocaleTimeString("pt-BR", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                }),
-                sender: "me",
+    const [rows, unreadCount] = await Promise.all([
+        prisma.conversation.findMany({
+            where: {
+                OR: [
+                    { buyerId: user.id },
+                    { sellerId: user.id },
+                ],
             },
-        ]);
+            include: {
+                buyer: { select: { id: true, name: true, avatarUrl: true } },
+                seller: { select: { id: true, name: true, avatarUrl: true } },
+                item: { select: { id: true, title: true, status: true } },
+                messages: {
+                    orderBy: { createdAt: "desc" },
+                    take: 100,
+                },
+            },
+            orderBy: { createdAt: "desc" },
+        }),
+        getUnreadNotificationCount(user.id),
+    ]);
 
-        setMessage("");
+    const conversations = rows.map((row) => serializeConversation(row, user.id));
+    let selectedConversationId = conversations.some(
+        (conversation) => conversation.id === requestedConversationId
+    )
+        ? requestedConversationId
+        : "";
+
+    if (requestedItemId) {
+        const existing = conversations.find(
+            (conversation) => conversation.itemId === requestedItemId
+        );
+
+        if (existing) {
+            selectedConversationId = existing.id;
+        } else {
+            const item = await prisma.item.findFirst({
+                where: {
+                    id: requestedItemId,
+                    status: "ATIVO",
+                    NOT: { sellerId: user.id },
+                },
+                select: {
+                    id: true,
+                    title: true,
+                    seller: {
+                        select: { name: true, avatarUrl: true },
+                    },
+                },
+            });
+
+            if (item) {
+                const draftId = `new:${item.id}`;
+                conversations.unshift({
+                    id: draftId,
+                    itemId: item.id,
+                    itemTitle: item.title,
+                    name: item.seller.name,
+                    image: item.seller.avatarUrl || "/images/perfil/avatar.png",
+                    preview: `Inicie uma conversa sobre ${item.title}`,
+                    messages: [],
+                    lastActivity: new Date().toISOString(),
+                });
+                selectedConversationId = draftId;
+            }
+        }
+    }
+
+    conversations.sort((a, b) => b.lastActivity.localeCompare(a.lastActivity));
+
+    if (!selectedConversationId && conversations.length > 0) {
+        selectedConversationId = conversations[0].id;
     }
 
     return (
         <div className="min-h-screen bg-[#F9EEDC]">
+            <Header
+                loggedIn
+                avatarUrl={user.avatarUrl}
+                unreadCount={unreadCount}
+            />
 
-            <Header loggedIn />
-
-            <main className="flex w-full">
-
-                <ChatList
-                    conversations={conversations}
-                    selectedConversation={selectedConversation}
-                    onSelectConversation={setSelectedConversation}
-                />
-
-                <ChatWindow
-                    user={selectedUser}
-                    messages={messages}
-                    message={message}
-                    setMessage={setMessage}
-                    onSend={handleSend}
-                />
-
-            </main>
+            <ChatClient
+                key={selectedConversationId || "empty"}
+                conversations={conversations}
+                initialConversationId={selectedConversationId}
+            />
 
             <Footer />
-
         </div>
     );
 }
