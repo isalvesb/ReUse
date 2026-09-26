@@ -24,23 +24,23 @@ export default function Footer() {
 
                     <ul className="space-y-3 text-sm text-reuse-white">
                         <li>
-                            <Link href="/pecas-raras">Peças raras</Link>
+                            <Link href="/vitrine?q=vintage">Peças raras</Link>
                         </li>
 
                         <li>
-                            <Link href="/sapatos">Sapatos</Link>
+                            <Link href="/vitrine?categoria=sapatos">Sapatos</Link>
                         </li>
 
                         <li>
-                            <Link href="/moveis">Móveis</Link>
+                            <Link href="/vitrine?categoria=moveis">Móveis</Link>
                         </li>
 
                         <li>
-                            <Link href="/eletronicos">Eletrônicos</Link>
+                            <Link href="/vitrine?categoria=eletronicos">Eletrônicos</Link>
                         </li>
 
                         <li>
-                            <Link href="/livros">Livros</Link>
+                            <Link href="/vitrine?categoria=livros">Livros</Link>
                         </li>
                     </ul>
                 </div>
@@ -53,20 +53,14 @@ export default function Footer() {
 
                     <ul className="space-y-3 text-sm text-reuse-white">
                         <li>
-                            <Link href="/minha-vitrine">
+                            <Link href="/perfil">
                                 Minha Vitrine
                             </Link>
                         </li>
 
                         <li>
-                            <Link href="/trocas">
-                                Minhas Trocas
-                            </Link>
-                        </li>
-
-                        <li>
-                            <Link href="/favoritos">
-                                Favoritos
+                            <Link href="/vitrine?tipo=TROCA">
+                                Explorar trocas
                             </Link>
                         </li>
 
@@ -78,25 +72,15 @@ export default function Footer() {
                     </ul>
                 </div>
 
-                {/* Redes */}
+                {/* Sobre */}
                 <div>
                     <h3 className="mb-4 font-bold">
-                        Redes Sociais
+                        Consumo consciente
                     </h3>
 
-                    <ul className="space-y-3 text-sm text-reuse-white">
-                        <li>
-                            <a href="#">Facebook</a>
-                        </li>
-
-                        <li>
-                            <a href="#">Instagram</a>
-                        </li>
-
-                        <li>
-                            <a href="#">Pinterest</a>
-                        </li>
-                    </ul>
+                    <p className="text-sm leading-6 text-reuse-white">
+                        Doe, troque ou venda itens para prolongar sua vida útil e reduzir desperdícios.
+                    </p>
                 </div>
 
             </div>

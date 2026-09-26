@@ -10,10 +10,8 @@ import {
     ShoppingBag,
     User,
     Package,
-    Heart,
     MessageCircle,
     Settings,
-    HelpCircle,
     LogOut,
 } from "lucide-react";
 
@@ -64,47 +62,48 @@ export default function Header({
                 </Link>
 
                 {/* Busca */}
-                <div className="hidden w-[350px] md:flex">
+                <form action="/vitrine" method="get" className="hidden w-[350px] md:flex">
                     <div className="flex h-10 w-full items-center rounded-2xl bg-reuse-cream px-4">
                         <input
                             type="text"
+                            name="q"
+                            maxLength={80}
                             placeholder="Busque sapato, poltrona, notebook..."
+                            aria-label="Buscar na vitrine"
                             className="w-full bg-transparent text-sm text-reuse-brown outline-none placeholder:text-reuse-brown-light"
                         />
 
-                        <Search
-                            size={20}
-                            strokeWidth={2}
-                            className="text-reuse-brown"
-                        />
+                        <button type="submit" aria-label="Buscar" className="text-reuse-brown">
+                            <Search size={20} strokeWidth={2} />
+                        </button>
                     </div>
-                </div>
+                </form>
 
                 {/* Navegação */}
                 <nav className="hidden items-center gap-8 text-sm text-reuse-white lg:flex">
                     <Link
-                        href="/eletronicos"
+                        href="/vitrine?categoria=eletronicos"
                         className="transition hover:text-reuse-pink"
                     >
                         Eletrônicos
                     </Link>
 
                     <Link
-                        href="/roupas"
+                        href="/vitrine?categoria=roupas"
                         className="transition hover:text-reuse-pink"
                     >
                         Roupas
                     </Link>
 
                     <Link
-                        href="/moveis"
+                        href="/vitrine?categoria=moveis"
                         className="transition hover:text-reuse-pink"
                     >
                         Móveis
                     </Link>
 
                     <Link
-                        href="/livros"
+                        href="/vitrine?categoria=livros"
                         className="transition hover:text-reuse-pink"
                     >
                         Livros
@@ -112,7 +111,7 @@ export default function Header({
 
                     {loggedIn && (
                         <Link
-                            href="/vitrine"
+                            href="/perfil"
                             className="font-bold transition hover:text-reuse-pink"
                         >
                             Minha Vitrine
@@ -143,7 +142,7 @@ export default function Header({
                         <Link
                             href="/vitrine"
                             className="text-reuse-white transition hover:text-reuse-pink"
-                            aria-label="Minha sacola"
+                            aria-label="Explorar vitrine"
                         >
                             <ShoppingBag
                                 size={21}
@@ -224,21 +223,12 @@ export default function Header({
                                         </Link>
 
                                         <Link
-                                            href="/vitrine"
+                                            href="/perfil"
                                             onClick={() => setProfileOpen(false)}
                                             className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-reuse-brown transition hover:bg-reuse-pink/20"
                                         >
                                             <Package size={18} />
                                             <span>Meus itens</span>
-                                        </Link>
-
-                                        <Link
-                                            href="/favoritos"
-                                            onClick={() => setProfileOpen(false)}
-                                            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-reuse-brown transition hover:bg-reuse-pink/20"
-                                        >
-                                            <Heart size={18} />
-                                            <span>Favoritos</span>
                                         </Link>
 
                                         <Link
@@ -270,11 +260,11 @@ export default function Header({
 
                                     <div className="h-px bg-reuse-brown/10" />
 
-                                    {/* Configurações e ajuda */}
+                                    {/* Configurações */}
                                     <div className="p-2">
 
                                         <Link
-                                            href="/configuracoes"
+                                            href="/perfil/editar"
                                             onClick={() => setProfileOpen(false)}
                                             className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-reuse-brown transition hover:bg-reuse-pink/20"
                                         >
@@ -282,14 +272,6 @@ export default function Header({
                                             <span>Configurações</span>
                                         </Link>
 
-                                        <Link
-                                            href="/ajuda"
-                                            onClick={() => setProfileOpen(false)}
-                                            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-reuse-brown transition hover:bg-reuse-pink/20"
-                                        >
-                                            <HelpCircle size={18} />
-                                            <span>Ajuda</span>
-                                        </Link>
                                     </div>
 
                                     <div className="h-px bg-reuse-brown/10" />
@@ -320,4 +302,3 @@ export default function Header({
         </header >
     );
 }
-

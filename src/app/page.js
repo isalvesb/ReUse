@@ -47,28 +47,28 @@ export default async function Home() {
               title="Peças raras"
               description="Se apaixone por peças clássicas"
               image="/images/categorias/camera.png"
-              href="/pecas-raras"
+              href="/vitrine?q=vintage"
             />
 
             <CategoryCard
               title="Sapatos para todos os gostos"
               description="Encontre seu par perfeito"
               image="/images/categorias/tenis.png"
-              href="/sapatos"
+              href="/vitrine?categoria=sapatos"
             />
 
             <CategoryCard
               title="Eletrônicos"
               description="Usados sim, mas continuam tinindo"
               image="/images/categorias/notebook.png"
-              href="/eletronicos"
+              href="/vitrine?categoria=eletronicos"
             />
 
             <CategoryCard
               title="Para sua casa"
               description="Decoração com estilo único para você inovar"
               image="/images/categorias/sofa.png"
-              href="/moveis"
+              href="/vitrine?categoria=moveis"
             />
           </div>
         </section>
@@ -115,22 +115,25 @@ export default async function Home() {
 
         {/* BANNER APP */}
 
-        <section id="reuse" className="relative mx-auto mt-30 flex h-64 w-full max-w-275 items-center overflow-visible rounded-2xl bg-reuse-pink">
+        <section
+          id="reuse"
+          className="relative mx-6 mt-20 flex min-h-64 max-w-275 overflow-hidden rounded-2xl bg-reuse-pink px-6 py-10 md:mx-auto md:mt-30 md:h-64 md:items-center md:overflow-visible md:px-0 md:py-0"
+        >
 
           {/* Conteúdo */}
-          <div className="absolute left-27.25 top-1/2 flex w-96 -translate-y-1/2 flex-col items-start gap-2">
+          <div className="relative z-10 flex w-full max-w-sm flex-col items-start gap-2 md:absolute md:left-27.25 md:top-1/2 md:w-96 md:-translate-y-1/2">
 
             {/* Logo */}
-            < Image
+            <Image
               src="/images/logo/ReUse-marrom.png"
               alt="ReUse"
               width={351}
               height={39}
-              className="h-auto w-351 object-contain"
+              className="h-auto w-full max-w-[351px] object-contain"
             />
 
             {/* Título */}
-            <h2 className="font-(--font-krona) text-3xl leading-9 text-reuse-brown">
+            <h2 className="font-(--font-krona) text-2xl leading-8 text-reuse-brown md:text-3xl md:leading-9">
               BAIXE AGORA O APP
             </h2>
 
@@ -149,7 +152,7 @@ export default async function Home() {
             alt="Aplicativo ReUse"
             width={395}
             height={298}
-            className="absolute right-12 bottom-0 h-298px w-auto object-contain"
+            className="absolute bottom-0 right-12 hidden h-[298px] w-auto object-contain md:block"
           />
 
         </section>
