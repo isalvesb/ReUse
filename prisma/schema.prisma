@@ -16,6 +16,7 @@ model User {
   bio                 String?
   avatarUrl           String?
   rating              Float                @default(0)
+  sessionVersion      Int                  @default(0)
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
   accounts            Account[]
@@ -25,6 +26,7 @@ model User {
   sentMessages        Message[]            @relation("SentMessages")
   notifications       Notification[]
   passwordResetTokens PasswordResetToken[]
+  assistantConfirmations AssistantConfirmation[]
 
   @@map("users")
 }
@@ -52,6 +54,29 @@ model PasswordResetToken {
 
   @@index([userId])
   @@map("password_reset_tokens")
+}
+
+model RateLimitBucket {
+  key       String   @id
+  count     Int      @default(1)
+  expiresAt DateTime
+
+  @@index([expiresAt])
+  @@map("rate_limit_buckets")
+}
+
+model AssistantConfirmation {
+  id        String    @id @default(cuid())
+  jti       String    @unique
+  intent    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+  @@map("assistant_confirmations")
 }
 
 model Category {
@@ -124,6 +149,8 @@ model Conversation {
   messages  Message[]
 
   @@unique([itemId, buyerId])
+  @@index([buyerId])
+  @@index([sellerId])
   @@map("conversations")
 }
 
@@ -136,7 +163,7 @@ model Message {
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   sender         User         @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
 
-  @@index([conversationId])
+  @@index([conversationId, createdAt])
   @@map("messages")
 }
 
