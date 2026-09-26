@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# ReUse Web
 
-## Getting Started
+Plataforma de economia circular para publicar, vender, trocar e doar itens. O projeto usa Next.js, React, Prisma e PostgreSQL.
 
-First, run the development server:
+A branch `updates` concentra a evolução do projeto: um assistente integrado ao perfil, com IBM Watson Assistant opcional, ações autenticadas e confirmação antes de alterar ofertas.
+
+## Execução local
 
 ```bash
+npm ci
+cp .env.example .env
+npm run db:migrate
+npm run db:seed
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra `http://localhost:3000`. O banco PostgreSQL e as variáveis `DATABASE_URL` e `SESSION_SECRET` são obrigatórios. Para carregar os dados demonstrativos, defina também uma `SEED_PASSWORD` local com pelo menos oito caracteres antes de executar o seed.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Verificação
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run check
+```
 
-## Learn More
+O comando executa lint, testes unitários e build de produção.
 
-To learn more about Next.js, take a look at the following resources:
+As verificações cobrem classificação e confirmação do assistente, concorrência no vínculo OAuth, hash de tokens de redefinição, limites de upload e assinatura real dos arquivos de imagem. Fluxos com banco dependem de um PostgreSQL acessível.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Assistente
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+O assistente aparece no perfil autenticado e oferece quatro intenções permitidas:
 
-## Deploy on Vercel
+- resumir a vitrine;
+- orientar a publicação de um item;
+- pausar ofertas ativas, mediante confirmação;
+- retomar ofertas pausadas, mediante confirmação.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+As ações mutáveis usam uma confirmação assinada, vinculada ao usuário e válida por cinco minutos.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Sem credenciais IBM, as mesmas intenções são reconhecidas localmente para desenvolvimento. Esse modo não é evidência de integração real com o Watson. Veja [docs/projeto/watson.md](docs/projeto/watson.md).
+
+## Produção
+
+O upload local é usado somente em desenvolvimento. Em produção, configure um bucket público no Supabase Storage para que as imagens persistam entre deploys. O checklist completo está em [docs/projeto/deploy.md](docs/projeto/deploy.md).
+
+## Estado das integrações locais
+
+- Supabase Storage: upload real validado no bucket `reuse-items`.
+- Resend: recuperação e redefinição de senha validadas de ponta a ponta.
+- Google: login OAuth validado de ponta a ponta.
+- Facebook: OAuth e permissões validados, mas a conta de teste não recebeu sessão porque a Graph API não retornou o campo `email` mesmo com a permissão concedida. O sistema mantém o bloqueio seguro nesse caso.
+- IBM Watson Assistant: somente o classificador local foi validado; não há evidência de chamada real à IBM.
+
+Essas validações foram feitas no ambiente local. Elas não comprovam configuração de produção nem deploy.
+
+## Commits graduais
+
+O plano da branch está em [docs/projeto/plano-commits.md](docs/projeto/plano-commits.md). O comando `reuse next` prepara apenas o próximo grupo no stage e mostra o comando de commit, mas nunca cria o commit.

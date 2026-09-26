@@ -13,7 +13,7 @@ export default function SellerCard({
     sellerId
 }) {
     return (
-        <div className="h-[166px] w-[343px] rounded-2xl bg-[#F3E8D2] px-4 py-7">
+        <div className="min-h-[166px] w-full max-w-[343px] rounded-2xl bg-[#F3E8D2] px-4 py-7">
 
             {/* INFORMAÇÕES DO USUÁRIO */}
             <Link
@@ -27,6 +27,7 @@ export default function SellerCard({
                         src={image}
                         alt={name}
                         fill
+                        sizes="48px"
                         className="object-cover"
                     />
                 </div>
@@ -60,7 +61,7 @@ export default function SellerCard({
                 href={href}
                 className="mt-4 w-full rounded-[14px]"
             >
-                <span className="flex items-center justify-center gap-1 px-28">
+                <span className="flex items-center justify-center gap-1">
                     <MessageSquare size={24} />
                     <span className="text-sm">Conversar</span>
                 </span>

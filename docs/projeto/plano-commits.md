@@ -1,4 +1,4 @@
-# Plano de commits da Fase 13
+# Plano de commits
 
 Todo o trabalho fica na branch `updates`. O assistente não executa `git commit`, `git push` nem publicação.
 

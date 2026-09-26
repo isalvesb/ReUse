@@ -59,7 +59,7 @@ export async function GET(request) {
     const profile = await profileResponse.json();
 
     if (!profile.email) {
-        loginError("Não conseguimos obter seu e-mail do Facebook. Permita o acesso ao e-mail ou use outro método de login.");
+        loginError("O Facebook não forneceu um e-mail para esta conta. Use outro método de login.");
     }
 
     let user;

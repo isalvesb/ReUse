@@ -5,7 +5,7 @@
       "message": "prepara fluxo e dependencias",
       "paths": [
         "bin/reuse.mjs",
-        "docs/fase-13/plano-commits.md",
+        "docs/projeto/plano-commits.md",
         "prisma.config.ts",
         "package.json",
         "package-lock.json"
@@ -158,8 +158,8 @@
       "message": "documenta entrega e configuracao",
       "paths": [
         "README.md",
-        "docs/fase-13/watson.md",
-        "docs/fase-13/deploy.md"
+        "docs/projeto/watson.md",
+        "docs/projeto/deploy.md"
       ]
     }
   ]

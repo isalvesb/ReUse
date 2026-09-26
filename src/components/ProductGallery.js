@@ -6,15 +6,16 @@ export default function ProductGallery({
     thumbnails = [],
 }) {
     return (
-        <section>
+        <section className="min-w-0">
 
             {/* IMAGEM PRINCIPAL */}
-            <div className="relative h-[300px] w-[487px] overflow-hidden rounded-xl">
+            <div className="relative h-[300px] w-full max-w-[487px] overflow-hidden rounded-xl">
                 <Image
                     src={mainImage}
                     alt={mainAlt}
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"
+                    loading="eager"
                     className="object-cover"
                 />
             </div>
@@ -31,6 +32,7 @@ export default function ProductGallery({
                             src={image}
                             alt={`${mainAlt} - imagem ${index + 1}`}
                             fill
+                            sizes="48px"
                             className="object-cover"
                         />
                     </div>
