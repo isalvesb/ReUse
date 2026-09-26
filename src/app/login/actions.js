@@ -4,14 +4,35 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { verifyPassword } from "@/lib/auth";
 import { createSession, destroySession, } from "@/lib/session";
+import {
+    isValidEmail,
+    normalizeEmail,
+    FIELD_LIMITS,
+} from "@/lib/validation.mjs";
+import { consumeRateLimit } from "@/lib/rate-limit";
 
 
 export async function signIn(_prevState, formData) {
-    const email = formData.get("email")?.toString().trim().toLowerCase() ?? "";
+    const email = normalizeEmail(formData.get("email")?.toString());
     const password = formData.get("password")?.toString() ?? "";
 
-    if (!email || !password) {
+    if (
+        !isValidEmail(email)
+        || !password
+        || password.length > FIELD_LIMITS.password
+    ) {
         return { error: "Informe e-mail e senha." };
+    }
+
+    const rateLimit = await consumeRateLimit({
+        scope: "login",
+        identifier: email,
+        limit: 5,
+        windowMs: 15 * 60 * 1000,
+    });
+
+    if (!rateLimit.allowed) {
+        return { error: "Muitas tentativas. Aguarde alguns minutos antes de tentar novamente." };
     }
 
     const user = await prisma.user.findUnique({ where: { email } });

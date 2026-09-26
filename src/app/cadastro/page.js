@@ -21,6 +21,7 @@ export default function Cadastro() {
                     width={754}
                     height={1024}
                     alt="Calças jeans"
+                    loading="eager"
                     className="h-full w-full object-cover"
                 />
             </section>
@@ -37,6 +38,7 @@ export default function Cadastro() {
                             width={188}
                             height={26}
                             alt="ReUse logo rosa"
+                            loading="eager"
                         />
                     </div>
 
@@ -44,55 +46,63 @@ export default function Cadastro() {
                     <form action={formAction}>
 
                         {/* NOME */}
-                        <label className="mb-2 block text-sm font-bold text-reuse-cream">
+                        <label htmlFor="name" className="mb-2 block text-sm font-bold text-reuse-cream">
                             Nome
                         </label>
 
                         <input
+                            id="name"
                             name="name"
                             type="text"
                             required
+                            maxLength={100}
                             autoComplete="name"
                             className="h-12 w-full rounded-3xl bg-reuse-white px-4 outline-none"
                         />
 
                         {/* E-MAIL */}
-                        <label className="mb-2 mt-3 block text-sm font-bold text-reuse-cream">
+                        <label htmlFor="email" className="mb-2 mt-3 block text-sm font-bold text-reuse-cream">
                             E-mail
                         </label>
 
                         <input
+                            id="email"
                             name="email"
                             type="email"
                             required
+                            maxLength={254}
                             autoComplete="email"
                             className="h-12 w-full rounded-3xl bg-reuse-white px-4 outline-none"
                         />
 
                         {/* SENHA */}
-                        <label className="mb-2 mt-3 block text-sm font-bold text-reuse-cream">
+                        <label htmlFor="password" className="mb-2 mt-3 block text-sm font-bold text-reuse-cream">
                             Senha
                         </label>
 
                         <input
+                            id="password"
                             name="password"
                             type="password"
                             required
-                            minLength={6}
+                            minLength={8}
+                            maxLength={128}
                             autoComplete="new-password"
                             className="h-12 w-full rounded-3xl bg-reuse-white px-4 outline-none"
                         />
 
                         {/* CONFIRMAR SENHA */}
-                        <label className="mb-2 mt-3 block text-sm font-bold text-reuse-cream">
+                        <label htmlFor="confirmPassword" className="mb-2 mt-3 block text-sm font-bold text-reuse-cream">
                             Confirmar senha
                         </label>
 
                         <input
+                            id="confirmPassword"
                             name="confirmPassword"
                             type="password"
                             required
-                            minLength={6}
+                            minLength={8}
+                            maxLength={128}
                             autoComplete="new-password"
                             className="h-12 w-full rounded-3xl bg-reuse-white px-4 outline-none"
                         />
