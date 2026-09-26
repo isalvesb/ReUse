@@ -3,9 +3,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useActionState, useState } from "react";
-import { ArrowLeft, Camera, Check, X } from "lucide-react";
+import { ArrowLeft, Check, X } from "lucide-react";
 import FormField from "@/components/FormField";
 import { updateProfile } from "../actions";
+import { FIELD_LIMITS } from "@/lib/validation.mjs";
 
 const initialState = { error: null };
 
@@ -21,7 +22,7 @@ export default function EditarPerfilClient({ user }) {
         <>
             <Link
                 href='/perfil'
-                className="flex items-center gap-2 text-1rem font-medium mt-4 "
+                className="mt-4 flex items-center gap-2 text-base font-medium"
             >
                 <ArrowLeft size={20} strokeWidth={1.8} className="ml-5" />
                 Voltar
@@ -38,7 +39,7 @@ export default function EditarPerfilClient({ user }) {
                 {/* FOTO */}
                 <div className="relative mx-auto mt-[38px] h-[128px] w-[128px]">
 
-                    <div className="h-[128px] w[-128px] overflow-hidden rounded-full border-[3px] border-reuse-white bg-[#E5E7EB] shadow-lg">
+                    <div className="h-[128px] w-[128px] overflow-hidden rounded-full border-[3px] border-reuse-white bg-[#E5E7EB] shadow-lg">
                         <Image
                             src={user.avatarUrl || "/images/perfil/avatar.png"}
                             alt={`Foto de ${user.name}`}
@@ -48,16 +49,6 @@ export default function EditarPerfilClient({ user }) {
                         />
                     </div>
 
-                    {/* BOTÃO CÂMERA */}
-                    <button
-                        type="button"
-                        aria-label="Alterar foto"
-                        className="absolute bottom-0 right-0 flex h-9 w-9 items-center justify-center rounded-full bg-reuse-brown text-reuse-white shadow-md">
-                        <Camera
-                            size={20}
-                            strokeWidth={1.8}
-                        />
-                    </button>
                 </div>
 
                 {/* FORMULÁRIO */}
@@ -72,6 +63,7 @@ export default function EditarPerfilClient({ user }) {
                         name='name'
                         value={nome}
                         onChange={setNome}
+                        maxLength={FIELD_LIMITS.name}
                         active
                     />
 
@@ -81,6 +73,9 @@ export default function EditarPerfilClient({ user }) {
                         name='email'
                         value={email}
                         onChange={setEmail}
+                        type="email"
+                        maxLength={FIELD_LIMITS.email}
+                        readOnly
                         active
                     />
 
@@ -90,20 +85,23 @@ export default function EditarPerfilClient({ user }) {
                         name='location'
                         value={localizacao}
                         onChange={setLocalizacao}
+                        maxLength={FIELD_LIMITS.location}
                         active
                     />
 
                     {/* SOBRE MIM */}
                     <div className="mt-6">
-                        <label className="block text-sm font-medium leading-5 text-[#4A5565]">
+                        <label htmlFor="bio" className="block text-sm font-medium leading-5 text-[#4A5565]">
                             Sobre mim
                         </label>
 
                         <textarea
+                            id="bio"
                             name="bio"
                             value={sobre}
                             onChange={(event) => setSobre(event.target.value)}
-                            className="mt-2 h-[120px] w-full resize-none rounded-[10px] border border-reuse-brow bg-reuse-white px-3 py-2 text-1rem leading-[26px] text-reuse-brown outline-none"
+                            maxLength={FIELD_LIMITS.bio}
+                            className="mt-2 h-[120px] w-full resize-none rounded-[10px] border border-reuse-brown bg-reuse-white px-3 py-2 text-base leading-[26px] text-reuse-brown outline-none"
                         />
                     </div>
 

@@ -1,6 +1,8 @@
-export default function FieldLabel({ label, required }) {
+export default function FieldLabel({ label, required, htmlFor }) {
+    const Element = htmlFor ? "label" : "span";
+
     return (
-        <label className="mt-5 block text-sm font-medium leading-5 text-[#364153]">
+        <Element htmlFor={htmlFor} className="mt-5 block text-sm font-medium leading-5 text-[#364153]">
             {label}
 
             {required && (
@@ -8,6 +10,6 @@ export default function FieldLabel({ label, required }) {
                     {""}*
                 </span>
             )}
-        </label>
+        </Element>
     );
 }
