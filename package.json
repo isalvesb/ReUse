@@ -2,9 +2,6 @@
   "name": "reuse-web",
   "version": "0.1.0",
   "private": true,
-  "bin": {
-    "reuse": "./bin/reuse.mjs"
-  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

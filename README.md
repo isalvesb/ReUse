@@ -2,7 +2,7 @@
 
 Plataforma de economia circular para publicar, vender, trocar e doar itens. O projeto usa Next.js, React, Prisma e PostgreSQL.
 
-A branch `updates` concentra a evolução do projeto: um assistente integrado ao perfil, com IBM Watson Assistant opcional, ações autenticadas e confirmação antes de alterar ofertas.
+O projeto inclui um assistente integrado ao perfil, com IBM Watson Assistant opcional, ações autenticadas e confirmação antes de alterar ofertas.
 
 ## Execução local
 
@@ -52,7 +52,3 @@ O upload local é usado somente em desenvolvimento. Em produção, configure um 
 - IBM Watson Assistant: somente o classificador local foi validado; não há evidência de chamada real à IBM.
 
 Essas validações foram feitas no ambiente local. Elas não comprovam configuração de produção nem deploy.
-
-## Commits graduais
-
-O plano da branch está em [docs/projeto/plano-commits.md](docs/projeto/plano-commits.md). O comando `reuse next` prepara apenas o próximo grupo no stage e mostra o comando de commit, mas nunca cria o commit.
