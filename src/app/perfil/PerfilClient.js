@@ -10,6 +10,11 @@ import JourneyCard from "@/components/JourneyCard";
 import PhotoButton from "@/components/PhotoButton";
 import FieldLabel from "@/components/FieldLabel";
 import ConditionButton from "@/components/ConditionButton";
+import ReuseAssistant from "@/components/ReuseAssistant";
+import {
+    getItemPhotoValidationError,
+    ITEM_PHOTO_LIMITS,
+} from "@/lib/upload-constraints.mjs";
 import { logOut, publishItem } from "./actions";
 
 import {
@@ -26,9 +31,9 @@ const filters = [
 
 const FILTER_TYPE_MAP = {
     todos: null,
-    doacoes: "Doação",
-    trocas: "Troca",
-    vendas: "Venda",
+    doacoes: "DOACAO",
+    trocas: "TROCA",
+    vendas: "VENDA",
 };
 
 const initialState = { error: null, success: false };
@@ -37,25 +42,76 @@ function PublishFormFields() {
     const [condicao, setCondicao] = useState("");
     const [descricao, setDescricao] = useState("");
     const [negociacao, setNegociacao] = useState("");
-    const [photoPreviews, setPhotoPreviews] = useState([]);
+    const [photos, setPhotos] = useState([]);
+    const [photoError, setPhotoError] = useState("");
     const fileInputRef = useRef(null);
-    const photoPreviewsRef = useRef([]);
+    const photosRef = useRef([]);
 
     useEffect(() => {
-        photoPreviewsRef.current = photoPreviews;
-    });
+        photosRef.current = photos;
+    }, [photos]);
 
     useEffect(() => {
         return () => {
-            photoPreviewsRef.current.forEach((url) => URL.revokeObjectURL(url));
+            photosRef.current.forEach(({ preview }) => URL.revokeObjectURL(preview));
         };
     }, []);
 
-    function handlePhotosChange(event) {
-        photoPreviews.forEach((url) => URL.revokeObjectURL(url));
+    function syncPhotoInput(nextPhotos) {
+        if (!fileInputRef.current) return;
 
-        const files = Array.from(event.target.files ?? []).slice(0, 5);
-        setPhotoPreviews(files.map((file) => URL.createObjectURL(file)));
+        const transfer = new DataTransfer();
+        nextPhotos.forEach(({ file }) => transfer.items.add(file));
+        fileInputRef.current.files = transfer.files;
+    }
+
+    function handlePhotosChange(event) {
+        const incomingFiles = Array.from(event.target.files ?? []);
+        const existingKeys = new Set(
+            photos.map(({ file }) => `${file.name}:${file.size}:${file.lastModified}`)
+        );
+        const uniqueIncomingFiles = incomingFiles.filter((file) => {
+            const key = `${file.name}:${file.size}:${file.lastModified}`;
+
+            if (existingKeys.has(key)) return false;
+            existingKeys.add(key);
+            return true;
+        });
+
+        const nextFiles = [
+            ...photos.map(({ file }) => file),
+            ...uniqueIncomingFiles,
+        ];
+        const validationError = getItemPhotoValidationError(nextFiles);
+
+        if (validationError) {
+            setPhotoError(validationError);
+            syncPhotoInput(photos);
+            return;
+        }
+
+        const nextPhotos = [
+            ...photos,
+            ...uniqueIncomingFiles.map((file) => ({
+                file,
+                preview: URL.createObjectURL(file),
+            })),
+        ];
+
+        setPhotoError("");
+        setPhotos(nextPhotos);
+        syncPhotoInput(nextPhotos);
+    }
+
+    function removePhoto(index) {
+        const removedPhoto = photos[index];
+        if (!removedPhoto) return;
+
+        URL.revokeObjectURL(removedPhoto.preview);
+        const nextPhotos = photos.filter((_, photoIndex) => photoIndex !== index);
+        setPhotoError("");
+        setPhotos(nextPhotos);
+        syncPhotoInput(nextPhotos);
     }
 
     return (
@@ -93,28 +149,29 @@ function PublishFormFields() {
                     ref={fileInputRef}
                     type="file"
                     name="photos"
-                    accept="image/*"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
                     multiple
                     onChange={handlePhotosChange}
+                    aria-describedby={photoError ? "photo-error" : undefined}
                     className="hidden"
                 />
 
-                <div className="mt-4 flex gap-3">
-                    {[0, 1, 2, 3, 4].map((index) => (
+                <div className="mt-4 flex flex-wrap gap-3">
+                    {Array.from({ length: ITEM_PHOTO_LIMITS.maxFiles }, (_, index) => (
                         <PhotoButton
                             key={index}
-                            preview={photoPreviews[index]}
+                            preview={photos[index]?.preview}
                             onClick={() => fileInputRef.current?.click()}
-                            onRemove={() => {
-                                setPhotoPreviews((current) => {
-                                    const url = current[index];
-                                    if (url) URL.revokeObjectURL(url);
-                                    return current.filter((_, i) => i !== index);
-                                });
-                            }}
+                            onRemove={() => removePhoto(index)}
                         />
                     ))}
                 </div>
+
+                {photoError && (
+                    <p id="photo-error" role="alert" className="mt-3 text-sm font-medium text-red-600">
+                        {photoError}
+                    </p>
+                )}
 
             </section>
 
@@ -132,15 +189,18 @@ function PublishFormFields() {
 
                 <FieldLabel
                     label="Título"
+                    htmlFor="item-title"
                     required
                 />
 
                 <input
+                    id="item-title"
                     type="text"
                     name="title"
                     required
+                    maxLength={120}
                     placeholder="Ex: Cadeira de escritório ergonômica"
-                    className="mt-2 h-12 w-full rounded-[10px] border border-[#D1D5DC] bg-[#f3f3f5] px-3 text-1rem outline-none"
+                    className="mt-2 h-12 w-full rounded-[10px] border border-[#D1D5DC] bg-[#f3f3f5] px-3 text-base outline-none"
                 />
 
 
@@ -148,22 +208,27 @@ function PublishFormFields() {
 
                 <FieldLabel
                     label="Preço"
+                    htmlFor="item-price"
                     required={negociacao === "venda"}
                 />
 
                 <div className="relative mt-2 flex h-12 w-[160px] items-center rounded-[10px] border border-[#D1D5DC] bg-[#f3f3f5]">
 
-                    <span className="pl-3 text-1rem text-[#717182]">
+                    <span className="pl-3 text-base text-[#717182]">
                         R$
                     </span>
 
                     <input
+                        id="item-price"
                         type="number"
                         name="price"
                         placeholder="0,00"
-                        min="0"
+                        min="0.01"
+                        max="99999999.99"
                         step="0.01"
-                        className="h-full w-full bg-transparent px-2 text-1rem text-reuse-brown outline-none"
+                        required={negociacao === "venda"}
+                        disabled={negociacao !== "venda"}
+                        className="h-full w-full bg-transparent px-2 text-base text-reuse-brown outline-none disabled:cursor-not-allowed disabled:opacity-50"
                     />
 
                 </div>
@@ -173,16 +238,18 @@ function PublishFormFields() {
 
                 <FieldLabel
                     label="Categoria"
+                    htmlFor="item-category"
                     required
                 />
 
-                <div className="relative mt-2 w-[298px]">
+                <div className="relative mt-2 w-full max-w-[298px]">
 
                     <select
+                        id="item-category"
                         name="category"
                         defaultValue=""
                         required
-                        className="h-12 w-full appearance-none rounded-[10px] border border-[#D1D5DC] bg-reuse-white px-3 pr-10 text-1rem text-[#717182] outline-none"
+                        className="h-12 w-full appearance-none rounded-[10px] border border-[#D1D5DC] bg-reuse-white px-3 pr-10 text-base text-[#717182] outline-none"
                     >
                         <option value="" disabled>
                             Selecione uma categoria
@@ -230,7 +297,11 @@ function PublishFormFields() {
 
                 <input type="hidden" name="condition" value={condicao} />
 
-                <div className="mt-2 grid grid-cols-2 gap-3">
+                <div
+                    role="group"
+                    aria-label="Condição do item"
+                    className="mt-2 grid grid-cols-2 gap-3"
+                >
 
                     <ConditionButton
                         label="Novo"
@@ -275,19 +346,21 @@ function PublishFormFields() {
 
                 <FieldLabel
                     label="Categoria de Negociação"
+                    htmlFor="item-negotiation-type"
                     required
                 />
 
-                <div className="relative mt-2 w-[298px]">
+                <div className="relative mt-2 w-full max-w-[298px]">
 
                     <select
+                        id="item-negotiation-type"
                         name="negotiationType"
                         value={negociacao}
                         onChange={(event) =>
                             setNegociacao(event.target.value)
                         }
                         required
-                        className="h-12 w-full appearance-none rounded-[10px] border border-[#D1D5DC] bg-reuse-white px-3 pr-10 text-1rem text-[#717182] outline-none"
+                        className="h-12 w-full appearance-none rounded-[10px] border border-[#D1D5DC] bg-reuse-white px-3 pr-10 text-base text-[#717182] outline-none"
                     >
                         <option value="" disabled>
                             Selecione uma categoria
@@ -318,18 +391,22 @@ function PublishFormFields() {
 
                 <FieldLabel
                     label="Descrição"
+                    htmlFor="item-description"
                     required
                 />
 
                 <textarea
+                    id="item-description"
                     name="description"
                     value={descricao}
                     onChange={(event) =>
                         setDescricao(event.target.value)
                     }
                     required
+                    minLength={20}
+                    maxLength={3000}
                     placeholder="Descreva o item, suas características e motivo da doação..."
-                    className="mt-2 min-h-[120px] w-full resize-none rounded-[10px] border border-[#D1D5DC] bg-[#f3f3f5] px-3 py-2 text-1rem leading-6 outline-none"
+                    className="mt-2 min-h-[120px] w-full resize-none rounded-[10px] border border-[#D1D5DC] bg-[#f3f3f5] px-3 py-2 text-base leading-6 outline-none"
                 />
 
                 <p className="mt-1 text-xs text-[#6A7282]">
@@ -341,6 +418,7 @@ function PublishFormFields() {
 
                 <FieldLabel
                     label="Localização"
+                    htmlFor="item-location"
                 />
 
                 <div className="relative mt-2">
@@ -352,10 +430,12 @@ function PublishFormFields() {
                     />
 
                     <input
+                        id="item-location"
                         type="text"
                         name="location"
+                        maxLength={160}
                         placeholder="Bairro, cidade ou CEP"
-                        className="h-12 w-[298px] rounded-[10px] border border-[#D1D5DC] bg-[#f3f3f5] pl-10 pr-3 text-1rem outline-none"
+                        className="h-12 w-full max-w-[298px] rounded-[10px] border border-[#D1D5DC] bg-[#f3f3f5] pl-10 pr-3 text-base outline-none"
                     />
 
                 </div>
@@ -388,16 +468,16 @@ export default function PerfilClient({ user, items }) {
 
     return (
         <main className="w-full bg-reuse-cream">
-            <div className="mx-auto max-w-7xl px-10 py-13.25">
+            <div className="mx-auto max-w-7xl px-6 py-10 md:px-10 md:py-13.25">
                 {/* =========================
                 PERFIL
             ========================= */}
 
-                <div className="grid grid-cols-[421px_1fr] gap-24.75">
+                <div className="grid gap-12 lg:grid-cols-[minmax(0,421px)_minmax(0,1fr)] lg:gap-12 xl:gap-24.75">
 
                     {/* COLUNA ESQUERDA */}
 
-                    <aside className="flex flex-col">
+                    <aside className="mx-auto flex w-full max-w-[421px] flex-col lg:mx-0">
                         <ProfileHeader
                             name={user.name}
                             email={user.email}
@@ -412,13 +492,14 @@ export default function PerfilClient({ user, items }) {
                                 salesCount={items.filter((item) => item.negotiationType === "VENDA").length}
                                 rating={user.rating}
                                 bio={user.bio}
+                                canEdit
                             />
                         </div>
 
                         <Button
                             variant="outline"
                             onClick={() => logOut()}
-                            className="mt-5 text-center font-medium hover:underline rounded-[14px] w-96"
+                            className="mt-5 w-full max-w-96 rounded-[14px] text-center font-medium hover:underline"
                         >
                             Deslogar
                         </Button>
@@ -431,7 +512,7 @@ export default function PerfilClient({ user, items }) {
 
                         {/* FILTROS */}
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                             {filters.map((filter) => {
                                 const active =
                                     activeFilter === filter.value;
@@ -439,6 +520,7 @@ export default function PerfilClient({ user, items }) {
                                 return (
                                     <button
                                         key={filter.value}
+                                        type="button"
                                         onClick={() =>
                                             setActiveFilter(filter.value)
                                         }
@@ -463,8 +545,8 @@ export default function PerfilClient({ user, items }) {
 
                         {/* CARDS */}
 
-                        <div className="mt-5 grid grid-cols-4 gap-x-15 gap-y-10 pb-12">
-                            {filteredItems.map((item) => (
+                        <div className="mt-5 grid grid-cols-[repeat(auto-fit,minmax(173px,1fr))] justify-items-center gap-6 pb-12 lg:justify-items-start">
+                            {filteredItems.map((item, index) => (
                                 <ProfileItemCard
                                     key={item.id}
                                     id={item.id}
@@ -474,6 +556,7 @@ export default function PerfilClient({ user, items }) {
                                     type={item.type}
                                     price={item.price}
                                     image={item.image}
+                                    eager={index === 0}
                                 />
                             ))}
                         </div>
@@ -500,6 +583,8 @@ export default function PerfilClient({ user, items }) {
 
                     </section>
                 </div>
+
+                <ReuseAssistant />
 
                 {/* ==================================================FORMULÁRIO DE PUBLICAR ITEM=================================================*/}
 
@@ -536,13 +621,7 @@ export default function PerfilClient({ user, items }) {
                         {/* TERMOS */}
 
                         <p className="mt-4 text-center text-sm leading-5 text-[#6a7282]">
-                            Ao publicar, você concorda com nossos{" "}
-                            <a
-                                href="#"
-                                className="text-reuse-brown underline"
-                            >
-                                Termos de Uso
-                            </a>
+                            Ao publicar, você confirma que tem autorização para anunciar o item e que as informações fornecidas são verdadeiras.
                         </p>
 
 
