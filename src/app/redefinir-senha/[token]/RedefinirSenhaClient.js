@@ -54,7 +54,8 @@ export default function RedefinirSenhaClient({ token }) {
                             name="password"
                             type="password"
                             required
-                            minLength={6}
+                            minLength={8}
+                            maxLength={128}
                             placeholder="••••••••"
                             className="h-12 w-full rounded-3xl border border-[#99A1AF] bg-reuse-white pl-11 pr-2 text-sm text-reuse-brown outline-none transition focus:border-reuse-pink"
                         />
@@ -78,7 +79,8 @@ export default function RedefinirSenhaClient({ token }) {
                             name="confirmPassword"
                             type="password"
                             required
-                            minLength={6}
+                            minLength={8}
+                            maxLength={128}
                             placeholder="••••••••"
                             className="h-12 w-full rounded-3xl border border-[#99A1AF] bg-reuse-white pl-11 pr-2 text-sm text-reuse-brown outline-none transition focus:border-reuse-pink"
                         />

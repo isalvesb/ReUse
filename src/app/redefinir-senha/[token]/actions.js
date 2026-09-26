@@ -3,6 +3,8 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth";
+import { hashPasswordResetToken } from "@/lib/password-reset.mjs";
+import { validatePassword } from "@/lib/validation.mjs";
 
 export async function resetPassword(_prevState, formData) {
     const token = formData.get("token")?.toString();
@@ -13,17 +15,22 @@ export async function resetPassword(_prevState, formData) {
         return { error: "Token inválido." };
     }
 
-    if (password.length < 6) {
-        return { error: "A senha deve ter no mínimo 6 caracteres." };
+    const passwordError = validatePassword(password);
+
+    if (passwordError) {
+        return { error: passwordError };
     }
 
     if (password !== confirmPassword) {
         return { error: "As senhas não coincidem." };
     }
 
-    const resetToken = await prisma.passwordResetToken.findUnique({
-        where: { token },
-    });
+    const tokenHash = hashPasswordResetToken(token);
+    const resetToken = tokenHash
+        ? await prisma.passwordResetToken.findUnique({
+            where: { token: tokenHash },
+        })
+        : null;
 
     if (!resetToken || resetToken.usedAt || resetToken.expiresAt < new Date()) {
         return { error: "Link inválido ou expirado. Solicite um novo link." };
@@ -31,16 +38,44 @@ export async function resetPassword(_prevState, formData) {
 
     const passwordHash = await hashPassword(password);
 
-    await prisma.$transaction([
-        prisma.user.update({
+    const now = new Date();
+
+    const completed = await prisma.$transaction(async (transaction) => {
+        const consumed = await transaction.passwordResetToken.updateMany({
+            where: {
+                id: resetToken.id,
+                usedAt: null,
+                expiresAt: { gt: now },
+            },
+            data: { usedAt: now },
+        });
+
+        if (consumed.count !== 1) {
+            return false;
+        }
+
+        await transaction.user.update({
             where: { id: resetToken.userId },
-            data: { passwordHash },
-        }),
-        prisma.passwordResetToken.update({
-            where: { id: resetToken.id },
-            data: { usedAt: new Date() },
-        }),
-    ]);
+            data: {
+                passwordHash,
+                sessionVersion: { increment: 1 },
+            },
+        });
+
+        await transaction.passwordResetToken.updateMany({
+            where: {
+                userId: resetToken.userId,
+                usedAt: null,
+            },
+            data: { usedAt: now },
+        });
+
+        return true;
+    });
+
+    if (!completed) {
+        return { error: "Link inválido ou expirado. Solicite um novo link." };
+    }
 
     redirect("/login?reset=success");
 }

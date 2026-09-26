@@ -1,15 +1,19 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { hashPasswordResetToken } from "@/lib/password-reset.mjs";
 import RedefinirSenhaClient from "./RedefinirSenhaClient";
 
 export const dynamic = "force-dynamic";
 
 export default async function RedefinirSenha({ params }) {
     const { token } = await params;
+    const tokenHash = hashPasswordResetToken(token);
 
-    const resetToken = await prisma.passwordResetToken.findUnique({
-        where: { token },
-    });
+    const resetToken = tokenHash
+        ? await prisma.passwordResetToken.findUnique({
+            where: { token: tokenHash },
+        })
+        : null;
 
     const isValid = resetToken && !resetToken.usedAt && resetToken.expiresAt > new Date();
 
