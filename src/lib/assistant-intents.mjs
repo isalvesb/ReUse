@@ -18,7 +18,7 @@ export function normalizeAssistantText(value = "") {
 export function detectLocalIntent(message) {
   const text = normalizeAssistantText(message);
 
-  if (/\b(retom|reativ|reabr|ativ)/.test(text)) {
+  if (/\b(retom|reativ|reabr|ativar)/.test(text)) {
     return ASSISTANT_INTENTS.RETOMAR;
   }
 

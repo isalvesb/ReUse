@@ -12,7 +12,7 @@ test("normaliza acentos, caixa e pontuação", () => {
 });
 
 test("reconhece as quatro intenções locais permitidas", () => {
-    assert.equal(detectLocalIntent("Pause minhas ofertas"), ASSISTANT_INTENTS.PAUSAR);
+    assert.equal(detectLocalIntent("Pause minhas ofertas ativas"), ASSISTANT_INTENTS.PAUSAR);
     assert.equal(detectLocalIntent("Reative meus anúncios"), ASSISTANT_INTENTS.RETOMAR);
     assert.equal(detectLocalIntent("Resuma minha vitrine"), ASSISTANT_INTENTS.RESUMIR);
     assert.equal(detectLocalIntent("Como publicar um item?"), ASSISTANT_INTENTS.ORIENTAR_PUBLICACAO);

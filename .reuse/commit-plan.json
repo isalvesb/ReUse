@@ -4,7 +4,6 @@
     {
       "message": "prepara fluxo e dependencias",
       "paths": [
-        ".reuse/commit-plan.json",
         "bin/reuse.mjs",
         "docs/fase-13/plano-commits.md",
         "prisma.config.ts",
@@ -22,16 +21,17 @@
     {
       "message": "integra IBM Watson com intencoes permitidas",
       "paths": [
-        "src/lib/assistant-intents.mjs",
-        "src/lib/watson.js",
-        "test/assistant-intents.test.mjs"
+        "src/lib/watson.js"
       ]
     },
     {
       "message": "protege confirmacoes do assistente",
       "paths": [
+        ".reuse/commit-plan.json",
         "src/lib/assistant-confirmation.mjs",
-        "test/assistant-confirmation.test.mjs"
+        "test/assistant-confirmation.test.mjs",
+        "src/lib/assistant-intents.mjs",
+        "test/assistant-intents.test.mjs"
       ]
     },
     {
@@ -43,7 +43,9 @@
         "prisma/schema.prisma",
         "prisma/migrations/20260926000100_add_session_version/migration.sql",
         "prisma/migrations/20260926000200_add_rate_limit_buckets/migration.sql",
-        "prisma/migrations/20260926000300_add_chat_indexes/migration.sql"
+        "prisma/migrations/20260926000300_add_chat_indexes/migration.sql",
+        "prisma/migrations/20260926000400_add_assistant_confirmations/migration.sql",
+        "src/lib/assistant-confirmation-store.mjs"
       ]
     },
     {
@@ -53,7 +55,7 @@
       ]
     },
     {
-      "message": "integra assistente ao perfil",
+      "message": "integra assistente e aprimora publicacao no perfil",
       "paths": [
         "src/components/ReuseAssistant.js",
         "src/app/perfil/PerfilClient.js"
