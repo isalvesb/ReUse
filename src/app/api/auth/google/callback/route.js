@@ -26,6 +26,10 @@ export async function GET(request) {
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
     const redirectUri = `${getAppUrl()}/api/auth/google/callback`;
 
+    if (!clientId || !clientSecret) {
+        loginError("Login com Google não configurado.");
+    }
+
     const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -45,7 +49,7 @@ export async function GET(request) {
 
     const tokens = await tokenResponse.json();
 
-    const profileResponse = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+    const profileResponse = await fetch("https://openidconnect.googleapis.com/v1/userinfo", {
         headers: { Authorization: `Bearer ${tokens.access_token}` },
     });
 
@@ -56,13 +60,22 @@ export async function GET(request) {
 
     const profile = await profileResponse.json();
 
-    const user = await findOrCreateOAuthUser({
-        provider: "google",
-        providerAccountId: profile.sub,
-        email: profile.email,
-        name: profile.name,
-        avatarUrl: profile.picture,
-    });
+    let user;
+
+    try {
+        user = await findOrCreateOAuthUser({
+            provider: "google",
+            providerAccountId: profile.sub,
+            email: profile.email,
+            emailVerified: profile.email_verified === true,
+            requireVerifiedEmail: true,
+            name: profile.name,
+            avatarUrl: profile.picture,
+        });
+    } catch (error) {
+        console.error("[Google OAuth] Falha ao vincular conta:", error.message);
+        loginError("Não foi possível vincular esta conta Google.");
+    }
 
     await createSession(user.id);
 

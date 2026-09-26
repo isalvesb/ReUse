@@ -1,6 +1,7 @@
 import { randomBytes } from "crypto";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { findOrCreateOAuthUserWithDatabase } from "@/lib/oauth-user.mjs";
 
 const STATE_COOKIE = "oauth_state";
 const STATE_MAX_AGE_SECONDS = 10 * 60; // 10 minutos
@@ -38,39 +39,22 @@ export async function consumeOAuthState(receivedState) {
  * ligar por e-mail a uma conta já existente; caso contrário cria um usuário
  * novo (sem senha, já que o login é feito via provedor social).
  */
-export async function findOrCreateOAuthUser({ provider, providerAccountId, email, name, avatarUrl }) {
-    const existingAccount = await prisma.account.findUnique({
-        where: { provider_providerAccountId: { provider, providerAccountId } },
-        include: { user: true },
-    });
-
-    if (existingAccount) {
-        return existingAccount.user;
-    }
-
-    if (!email) {
-        throw new Error(`Não foi possível obter o e-mail da conta ${provider}.`);
-    }
-
-    const normalizedEmail = email.trim().toLowerCase();
-    const existingUser = await prisma.user.findUnique({ where: { email: normalizedEmail } });
-
-    if (existingUser) {
-        await prisma.account.create({
-            data: { provider, providerAccountId, userId: existingUser.id },
-        });
-
-        return existingUser;
-    }
-
-    return prisma.user.create({
-        data: {
-            name: name || normalizedEmail,
-            email: normalizedEmail,
-            avatarUrl: avatarUrl || null,
-            accounts: {
-                create: { provider, providerAccountId },
-            },
-        },
+export async function findOrCreateOAuthUser({
+    provider,
+    providerAccountId,
+    email,
+    emailVerified = false,
+    requireVerifiedEmail = false,
+    name,
+    avatarUrl,
+}) {
+    return findOrCreateOAuthUserWithDatabase(prisma, {
+        provider,
+        providerAccountId,
+        email,
+        emailVerified,
+        requireVerifiedEmail,
+        name,
+        avatarUrl,
     });
 }
