@@ -21,7 +21,7 @@ export default function ProfileHeader({
     memberSince,
 }) {
     return (
-        <section className="flex items-center gap-8">
+        <section className="flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:gap-8">
 
             {/* FOTO */}
             <div className="relative h-[117px] w-[117px] shrink-0 overflow-hidden rounded-full">
@@ -46,17 +46,19 @@ export default function ProfileHeader({
                 <div className="flex flex-col gap-1">
 
                     {/* EMAIL */}
-                    <div className="flex items-center gap-2">
-                        <Mail
-                            size={16}
-                            strokeWidth={1.8}
-                            className="text-reuse-brown"
-                        />
+                    {email && (
+                        <div className="flex items-center gap-2">
+                            <Mail
+                                size={16}
+                                strokeWidth={1.8}
+                                className="text-reuse-brown"
+                            />
 
-                        <span className="text-sm text-reuse-brown">
-                            {email}
-                        </span>
-                    </div>
+                            <span className="break-all text-sm text-reuse-brown">
+                                {email}
+                            </span>
+                        </div>
+                    )}
 
                     {/* LOCALIZAÇÃO */}
                     {location && (

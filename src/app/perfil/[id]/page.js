@@ -8,6 +8,7 @@ import {
     getCurrentUser,
     getUnreadNotificationCount,
 } from "@/lib/current-user";
+import { formatItemForCard } from "@/lib/format";
 
 import PerfilPublicoClient from "./PerfilPublicoClient";
 
@@ -33,6 +34,7 @@ export default async function PerfilUsuario({ params }) {
                             },
                             take: 1,
                         },
+                        category: true,
                     },
                     orderBy: {
                         createdAt: "desc",
@@ -52,39 +54,19 @@ export default async function PerfilUsuario({ params }) {
         ? await getUnreadNotificationCount(viewer.id)
         : 0;
 
-    /*
-     * Transformamos os dados do Prisma para o formato
-     * que o seu PerfilClient/ProfileItemCard já utiliza.
-     */
     const items = user.items.map((item) => ({
-        id: item.id,
-        name: item.title,
-        condition: item.condition,
-        distance: item.location || "",
-        type: item.type,
+        ...formatItemForCard(item),
         negotiationType: item.type,
-        price: item.price ? Number(item.price) : null,
-        image:
-            item.images[0]?.url ||
-            "/images/itens/cadeira.png",
     }));
-
-    const memberSince = user.createdAt
-        ? new Date(user.createdAt).toLocaleDateString("pt-BR", {
-            month: "long",
-            year: "numeric",
-        })
-        : null;
 
     const publicUser = {
         id: user.id,
         name: user.name,
-        email: user.email,
         location: user.location,
         avatarUrl: user.avatarUrl,
         rating: user.rating,
         bio: user.bio,
-        memberSince,
+        memberSince: user.createdAt,
     };
 
     return (

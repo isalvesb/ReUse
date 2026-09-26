@@ -10,9 +10,10 @@ export default function ProfileItemCard({
     type,
     price,
     image,
+    eager = false,
 }) {
     return (
-        <Link href={`/produto/${id}`} className="block">
+        <Link href={`/produto/${id}`} className="block w-fit">
             <article className="w-43.25 overflow-hidden rounded-2xl bg-reuse-cream shadow-sm">
 
                 {/* IMAGEM */}
@@ -22,6 +23,7 @@ export default function ProfileItemCard({
                         alt={name}
                         fill
                         sizes="173px"
+                        loading={eager ? "eager" : "lazy"}
                         className="object-cover"
                     />
                 </div>
