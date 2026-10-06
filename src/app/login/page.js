@@ -18,7 +18,7 @@ function OAuthErrorBanner() {
     }
 
     return (
-        <p className="mb-4 text-center text-sm font-medium text-red-300">
+        <p role="alert" className="mb-4 text-center text-sm font-medium text-red-300">
             {oauthError}
         </p>
     );
@@ -98,7 +98,7 @@ export default function Login() {
 
                         {/* ERRO */}
                         {state?.error && (
-                            <p className="mt-3 text-sm font-medium text-red-300">
+                            <p id="login-error" role="alert" className="mt-3 text-sm font-medium text-red-300">
                                 {state.error}
                             </p>
                         )}

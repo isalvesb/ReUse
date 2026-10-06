@@ -109,7 +109,7 @@ export default function Cadastro() {
 
                         {/* ERRO */}
                         {state?.error && (
-                            <p className="mt-3 text-sm font-medium text-red-300">
+                            <p id="signup-error" role="alert" className="mt-3 text-sm font-medium text-red-300">
                                 {state.error}
                             </p>
                         )}

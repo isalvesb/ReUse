@@ -26,6 +26,7 @@ export default function Header({
 }) {
     const [profileOpen, setProfileOpen] = useState(false);
     const profileRef = useRef(null);
+    const profileButtonRef = useRef(null);
 
     // Fecha o menu quando clicar fora dele
     useEffect(() => {
@@ -44,6 +45,24 @@ export default function Header({
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+
+    useEffect(() => {
+        if (!profileOpen) return;
+
+        function handleMenuKeyDown(event) {
+            if (event.key !== "Escape") return;
+
+            event.preventDefault();
+            setProfileOpen(false);
+            profileButtonRef.current?.focus();
+        }
+
+        document.addEventListener("keydown", handleMenuKeyDown);
+
+        return () => {
+            document.removeEventListener("keydown", handleMenuKeyDown);
+        };
+    }, [profileOpen]);
 
     return (
         <header className="w-full shrink-0 bg-reuse-brown px-6 py-3">
@@ -156,11 +175,13 @@ export default function Header({
                             className="relative"
                         >
                             <button
+                                ref={profileButtonRef}
                                 type="button"
                                 onClick={() => setProfileOpen(!profileOpen)}
                                 className="relative h-8 w-8 overflow-hidden rounded-full transition hover:ring-2 hover:ring-reuse-pink"
-                                aria-label="Abrir menu do perfil"
+                                aria-label={profileOpen ? "Fechar menu do perfil" : "Abrir menu do perfil"}
                                 aria-expanded={profileOpen}
+                                aria-controls="profile-menu"
                             >
                                 <Image
                                     src={
@@ -176,7 +197,11 @@ export default function Header({
 
                             {/* Dropdown */}
                             {profileOpen && (
-                                <div className="absolute right-0 top-11 z-50 w-[260px] overflow-hidden rounded-2xl bg-reuse-cream shadow-xl">
+                                <nav
+                                    id="profile-menu"
+                                    aria-label="Menu do perfil"
+                                    className="absolute right-0 top-11 z-50 w-[260px] overflow-hidden rounded-2xl bg-reuse-cream shadow-xl"
+                                >
 
                                     {/* Cabeçalho */}
                                     <Link
@@ -289,7 +314,7 @@ export default function Header({
                                         </div>
                                     </form>
 
-                                </div>
+                                </nav>
                             )}
                         </div>
                     </div>

@@ -606,13 +606,13 @@ export default function PerfilClient({ user, items }) {
                         {/* ERRO / SUCESSO */}
 
                         {state?.error && (
-                            <p className="mt-4 text-center text-sm font-medium text-red-600">
+                            <p role="alert" className="mt-4 text-center text-sm font-medium text-red-600">
                                 {state.error}
                             </p>
                         )}
 
                         {state?.success && (
-                            <p className="mt-4 text-center text-sm font-medium text-green-700">
+                            <p role="status" className="mt-4 text-center text-sm font-medium text-green-700">
                                 Item publicado com sucesso!
                             </p>
                         )}

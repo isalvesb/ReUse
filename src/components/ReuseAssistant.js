@@ -21,6 +21,23 @@ export default function ReuseAssistant() {
     const [conversation, setConversation] = useState([WELCOME_MESSAGE]);
     const [pendingConfirmation, setPendingConfirmation] = useState(null);
     const [sending, setSending] = useState(false);
+    const [assistantOrigin, setAssistantOrigin] = useState("unknown");
+
+    const assistantStatus = assistantOrigin === "watson"
+        ? "Watson conectado"
+        : assistantOrigin === "demonstracao"
+            ? "Demonstração local"
+            : assistantOrigin === "unavailable"
+                ? "Assistente indisponível"
+            : "Origem ainda não verificada";
+
+    const assistantStatusClasses = assistantOrigin === "watson"
+        ? "bg-green-50 text-green-700"
+        : assistantOrigin === "demonstracao"
+            ? "bg-amber-50 text-amber-800"
+            : assistantOrigin === "unavailable"
+                ? "bg-red-50 text-red-700"
+            : "bg-reuse-cream text-reuse-brown-light";
 
     function addAssistantMessage(text) {
         setConversation((current) => [
@@ -56,9 +73,17 @@ export default function ReuseAssistant() {
             });
             const data = await response.json();
 
+            if (data.origin === "watson" || data.origin === "demonstracao") {
+                setAssistantOrigin(data.origin);
+            }
+
             if (response.status === 401) {
                 router.push("/login");
                 return;
+            }
+
+            if (response.status === 503) {
+                setAssistantOrigin("unavailable");
             }
 
             addAssistantMessage(
@@ -75,6 +100,7 @@ export default function ReuseAssistant() {
                 router.refresh();
             }
         } catch {
+            setAssistantOrigin("unavailable");
             addAssistantMessage("Não consegui me conectar. Tente novamente.");
         } finally {
             setSending(false);
@@ -103,15 +129,18 @@ export default function ReuseAssistant() {
                     </span>
                     <div>
                         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-reuse-beige">
-                            ReUse com IBM Watson
+                            Assistente ReUse
                         </p>
                         <h2 id="reuse-assistant-title" className="mt-1 text-xl font-semibold text-reuse-brown">
                             Assistente da sua vitrine
                         </h2>
                     </div>
                 </div>
-                <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-medium text-green-700">
-                    Disponível
+                <span
+                    aria-live="polite"
+                    className={`rounded-full px-3 py-1 text-xs font-medium ${assistantStatusClasses}`}
+                >
+                    {assistantStatus}
                 </span>
             </div>
 
@@ -210,7 +239,7 @@ export default function ReuseAssistant() {
             </form>
 
             <p className="mt-3 text-xs leading-5 text-reuse-beige">
-                Ações que alteram ofertas exigem confirmação. Sem credenciais IBM, o fluxo local de demonstração permanece disponível.
+                Ações que alteram ofertas exigem confirmação. O status acima informa a origem real após a primeira resposta.
             </p>
         </section>
     );

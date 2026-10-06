@@ -106,7 +106,7 @@ export default function EditarPerfilClient({ user }) {
                     </div>
 
                     {state?.error && (
-                        <p className="mt-3 text-sm font-medium text-red-600">
+                        <p role="alert" className="mt-3 text-sm font-medium text-red-600">
                             {state.error}
                         </p>
                     )}

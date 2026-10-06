@@ -5,7 +5,7 @@
   --reuse-brown-light: #584c4c;
   --reuse-cream: #f7efde;
   --reuse-pink: #ebbbeb;
-  --reuse-beige: #a0947a;
+  --reuse-beige: #756a54;
   --reuse-white: #ffffff;
 }
 
@@ -43,4 +43,10 @@ input {
 
 a {
   text-decoration: none;
+}
+
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 3px solid var(--reuse-pink);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px var(--reuse-brown);
 }

@@ -118,7 +118,7 @@ export default function ChatWindow({ conversation, formAction, pending, error })
                 </button>
 
                 {error && (
-                    <p className="w-full text-sm font-medium text-red-600">
+                    <p id="chat-message-error" role="alert" className="w-full text-sm font-medium text-red-600">
                         {error}
                     </p>
                 )}
