@@ -34,7 +34,7 @@ export default function Cadastro() {
                     {/* LOGO */}
                     <div className="mb-8 flex justify-center">
                         <Image
-                            src="/images/logo/Reuse-rosa.png"
+                            src="/images/logo/ReUse-rosa.png"
                             width={188}
                             height={26}
                             alt="ReUse logo rosa"

@@ -126,7 +126,7 @@ export default async function DetalheProduto({ params }) {
                         {!isOwnItem && (
                             <SellerCard
                                 name={product.seller.name}
-                                image={product.seller.avatarUrl || "/images/perfil/avatar.png"}
+                                image={product.seller.avatarUrl || "/images/perfil/avatar-padrao.png"}
                                 itemsCount={sellerItemsCount}
                                 rating={product.seller.rating.toFixed(1)}
                                 sellerId={product.seller.id}

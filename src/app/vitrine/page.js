@@ -112,7 +112,7 @@ export default async function Vitrine({ searchParams }) {
                     </form>
                 </div>
 
-                <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-6">
+                <div className="mt-8 grid grid-cols-1 justify-items-center gap-6 sm:grid-cols-2 sm:justify-items-start lg:grid-cols-6">
                     {cards.map((product, index) => (
                         <ProfileItemCard
                             key={product.id}

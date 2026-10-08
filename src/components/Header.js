@@ -186,7 +186,7 @@ export default function Header({
                                 <Image
                                     src={
                                         avatarUrl ||
-                                        "/images/perfil/maria-silva.png"
+                                        "/images/perfil/avatar-padrao.png"
                                     }
                                     alt="Meu perfil"
                                     fill
@@ -213,7 +213,7 @@ export default function Header({
                                             <Image
                                                 src={
                                                     avatarUrl ||
-                                                    "/images/perfil/avatar.png"
+                                                    "/images/perfil/avatar-padrao.png"
                                                 }
                                                 alt="Meu perfil"
                                                 fill

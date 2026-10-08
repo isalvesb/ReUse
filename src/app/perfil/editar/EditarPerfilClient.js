@@ -41,7 +41,7 @@ export default function EditarPerfilClient({ user }) {
 
                     <div className="h-[128px] w-[128px] overflow-hidden rounded-full border-[3px] border-reuse-white bg-[#E5E7EB] shadow-lg">
                         <Image
-                            src={user.avatarUrl || "/images/perfil/avatar.png"}
+                            src={user.avatarUrl || "/images/perfil/avatar-padrao.png"}
                             alt={`Foto de ${user.name}`}
                             width={117}
                             height={117}

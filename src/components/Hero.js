@@ -71,7 +71,11 @@ export default function Hero() {
             >
                 {slides.map((slide) => (
                     <SwiperSlide key={slide.id}>
-                        <div className="relative h-96.75 w-full overflow-hidden rounded-lg">
+                        {({ isActive }) => (
+                            <div
+                                aria-hidden={!isActive}
+                                className="relative h-96.75 w-full overflow-hidden rounded-lg"
+                            >
 
                             {/* IMAGEM */}
                             <Image
@@ -100,6 +104,7 @@ export default function Hero() {
 
                                     <Link
                                         href={slide.href}
+                                        tabIndex={isActive ? 0 : -1}
                                         className="mt-6 inline-block rounded-xl bg-reuse-pink px-5 py-3 text-sm font-semibold text-reuse-brown transition hover:scale-105"
                                     >
                                         {slide.button}
@@ -108,7 +113,8 @@ export default function Hero() {
                                 </div>
                             </div>
 
-                        </div>
+                            </div>
+                        )}
                     </SwiperSlide>
                 ))}
             </Swiper>

@@ -23,7 +23,7 @@ function serializeConversation(conversation, userId) {
         itemId: conversation.itemId,
         itemTitle: conversation.item.title,
         name: otherUser.name,
-        image: otherUser.avatarUrl || "/images/perfil/avatar.png",
+        image: otherUser.avatarUrl || "/images/perfil/avatar-padrao.png",
         preview: lastMessage?.content || `Conversa sobre ${conversation.item.title}`,
         messages: orderedMessages.map((message) => ({
             id: message.id,
@@ -105,7 +105,7 @@ export default async function ChatPage({ searchParams }) {
                     itemId: item.id,
                     itemTitle: item.title,
                     name: item.seller.name,
-                    image: item.seller.avatarUrl || "/images/perfil/avatar.png",
+                    image: item.seller.avatarUrl || "/images/perfil/avatar-padrao.png",
                     preview: `Inicie uma conversa sobre ${item.title}`,
                     messages: [],
                     lastActivity: new Date().toISOString(),

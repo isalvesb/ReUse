@@ -27,6 +27,7 @@ if (process.env.SUPABASE_URL) {
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   agentRules: false,
+  devIndicators: false,
   reactCompiler: true,
 
   experimental: {

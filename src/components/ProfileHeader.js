@@ -26,7 +26,7 @@ export default function ProfileHeader({
             {/* FOTO */}
             <div className="relative h-[117px] w-[117px] shrink-0 overflow-hidden rounded-full">
                 <Image
-                    src={avatarUrl || "/images/perfil/maria-silva.png"}
+                    src={avatarUrl || "/images/perfil/avatar-padrao.png"}
                     alt={name}
                     fill
                     sizes="117px"
