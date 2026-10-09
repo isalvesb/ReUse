@@ -70,7 +70,7 @@ export default function Header({
 
     return (
         <header className="w-full shrink-0 bg-reuse-brown px-6 py-3">
-            <div className="mx-auto flex h-[46px] max-w-[1344px] items-center justify-between gap-6">
+            <div className="mx-auto flex h-[46px] max-w-[1344px] items-center justify-between gap-4 sm:gap-6">
 
                 {/* Logo */}
                 <Link href="/">
@@ -132,6 +132,13 @@ export default function Header({
                         Livros
                     </Link>
 
+                    <Link
+                        href="/sobre"
+                        className="transition hover:text-reuse-pink"
+                    >
+                        Sobre
+                    </Link>
+
                     {loggedIn && (
                         <Link
                             href="/perfil"
@@ -142,9 +149,16 @@ export default function Header({
                     )}
                 </nav>
 
+                <Link
+                    href="/sobre"
+                    className="ml-auto text-sm text-reuse-white transition hover:text-reuse-pink lg:hidden"
+                >
+                    Sobre
+                </Link>
+
                 {/* Área do usuário */}
                 {loggedIn ? (
-                    <div className="flex items-center gap-7">
+                    <div className="flex items-center gap-4 sm:gap-7">
 
                         {/* Notificações */}
                         <Link
