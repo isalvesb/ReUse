@@ -14,7 +14,8 @@ export const dynamic = "force-dynamic";
 export default async function Home() {
   const user = await getCurrentUser();
 
-  const items = await prisma.item.findMany({
+  // Prioriza a seleção demonstrativa por título, anunciante e localização.
+  const nearbyItems = await prisma.item.findMany({
     where: {
       status: "ATIVO",
       OR: NEARBY_DEMO_ITEMS.map(demoItemFilter),
@@ -27,13 +28,16 @@ export default async function Home() {
   });
 
   const itemOrder = new Map(demoItemOrderEntries(NEARBY_DEMO_ITEMS));
-  const products = items
+  const selectedItems = nearbyItems
     .sort((left, right) => {
       const leftKey = `${left.seller?.email}:${left.title}`;
       const rightKey = `${right.seller?.email}:${right.title}`;
       return itemOrder.get(leftKey) - itemOrder.get(rightKey);
     })
-    .map(formatItemForCard);
+    .slice(0, 6);
+
+  // Exibe apenas a curadoria demonstrativa de Bela Vista e Liberdade.
+  const products = selectedItems.map(formatItemForCard);
 
   const unreadCount = user ? await getUnreadNotificationCount(user.id) : 0;
 
@@ -53,31 +57,28 @@ export default async function Home() {
 
           <div className="mt-8 grid gap-8 md:grid-cols-2">
             <CategoryCard
-              title="Peças raras"
-              description="Se apaixone por peças clássicas"
-              image="/images/categorias/camera.png"
-              href="/vitrine?curadoria=pecas-raras"
-            />
-
-            <CategoryCard
-              title="Sapatos para todos os gostos"
-              description="Encontre seu par perfeito"
-              image="/images/categorias/tenis.png"
-              href="/vitrine?categoria=sapatos"
-            />
-
-            <CategoryCard
               title="Eletrônicos"
               description="Usados sim, mas continuam tinindo"
               image="/images/categorias/notebook.png"
               href="/vitrine?categoria=eletronicos"
             />
-
             <CategoryCard
               title="Para sua casa"
               description="Decoração com estilo único para você inovar"
               image="/images/categorias/sofa.png"
               href="/vitrine?categoria=moveis"
+            />
+            <CategoryCard
+              title="Peças raras"
+              description="Se apaixone por peças clássicas"
+              image="/images/categorias/camera.png"
+              href="/vitrine?curadoria=pecas-raras"
+            />
+            <CategoryCard
+              title="Sapatos para todos os gostos"
+              description="Encontre seu par perfeito"
+              image="/images/categorias/tenis.png"
+              href="/vitrine?categoria=sapatos"
             />
           </div>
         </section>
@@ -105,7 +106,7 @@ export default async function Home() {
 
             {products.length === 0 && (
               <p className="text-sm text-reuse-brown-light">
-                Nenhum item publicado ainda.
+                Nenhum item ativo disponível no momento.
               </p>
             )}
 
