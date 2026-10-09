@@ -33,7 +33,7 @@ body {
   padding: 0;
   background: var(--reuse-cream);
   color: var(--reuse-brown);
-  font-family: "Inter", "KronaOne", "Syne", sans-serif;
+  font-family: var(--font-inter), sans-serif;
 }
 
 button,

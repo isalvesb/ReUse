@@ -13,16 +13,16 @@ export default function ProfileItemCard({
     eager = false,
 }) {
     return (
-        <Link href={`/produto/${id}`} className="block w-fit">
-            <article className="w-43.25 overflow-hidden rounded-2xl bg-reuse-cream shadow-sm">
+        <Link href={`/produto/${id}`} className="block min-w-0 w-full sm:w-fit">
+            <article className="w-full overflow-hidden rounded-2xl bg-reuse-cream shadow-sm sm:w-43.25">
 
                 {/* IMAGEM */}
-                <div className="relative h-37.5 w-full">
+                <div className="relative aspect-square w-full sm:h-37.5 sm:aspect-auto">
                     <SpriteImage
                         src={image}
                         alt={name}
                         fill
-                        sizes="173px"
+                        sizes="(max-width: 639px) calc((100vw - 44px) / 2), 173px"
                         loading={eager ? "eager" : "lazy"}
                         className="object-cover"
                     />
@@ -53,7 +53,7 @@ export default function ProfileItemCard({
                     </div>
 
                     {/* TIPO + PREÇO */}
-                    <div className="mt-auto flex items-center justify-between pt-3">
+                    <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-3">
                         <span
                             className={`rounded-full px-2 py-1 text-xs font-medium ${type === "Venda"
                                     ? "bg-[#ffe4a1] text-[#78350f]"

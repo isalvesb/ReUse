@@ -62,7 +62,7 @@ export default async function Vitrine({ searchParams }) {
         <>
             <Header loggedIn={!!user} avatarUrl={user?.avatarUrl} avatarKey={user?.id} unreadCount={unreadCount} />
 
-            <main className="mx-auto max-w-7xl px-6 py-10">
+            <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
                 <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
                     <div>
                         <h1 className="text-3xl font-bold text-reuse-brown">Vitrine</h1>
@@ -112,7 +112,7 @@ export default async function Vitrine({ searchParams }) {
                     </form>
                 </div>
 
-                <div className="mt-8 grid grid-cols-1 justify-items-center gap-6 sm:grid-cols-2 sm:justify-items-start lg:grid-cols-6">
+                <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-6">
                     {cards.map((product, index) => (
                         <ProfileItemCard
                             key={product.id}
