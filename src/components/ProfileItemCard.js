@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import SpriteImage from "@/components/SpriteImage";
 
 export default function ProfileItemCard({
     id,
@@ -18,7 +18,7 @@ export default function ProfileItemCard({
 
                 {/* IMAGEM */}
                 <div className="relative h-37.5 w-full">
-                    <Image
+                    <SpriteImage
                         src={image}
                         alt={name}
                         fill

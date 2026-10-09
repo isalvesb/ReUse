@@ -1,5 +1,6 @@
-import Image from "next/image";
 import { CheckCheck } from "lucide-react";
+import SpriteImage from "@/components/SpriteImage";
+import { getAvatarSource } from "@/lib/sprite";
 
 export default function ChatList({
     conversations,
@@ -32,8 +33,8 @@ export default function ChatList({
                             >
                                 {/* AVATAR */}
                                 <div className="h-[60px] w-[60px] shrink-0 overflow-hidden rounded-full">
-                                    <Image
-                                        src={conversation.image}
+                                    <SpriteImage
+                                        src={getAvatarSource(conversation.image, conversation.avatarKey)}
                                         alt={conversation.name}
                                         width={60}
                                         height={60}

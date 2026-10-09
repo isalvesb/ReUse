@@ -32,10 +32,11 @@ export default async function Perfil() {
 
     return (
         <>
-            <Header loggedIn avatarUrl={user.avatarUrl} unreadCount={unreadCount} />
+            <Header loggedIn avatarUrl={user.avatarUrl} avatarKey={user.id} unreadCount={unreadCount} />
 
             <PerfilClient
                 user={{
+                    id: user.id,
                     name: user.name,
                     email: user.email,
                     location: user.location,

@@ -57,6 +57,7 @@ export default function PerfilPublicoClient({ user, items }) {
                             name={user.name}
                             location={user.location}
                             avatarUrl={user.avatarUrl}
+                            avatarKey={user.id}
                             memberSince={user.memberSince}
                         />
 

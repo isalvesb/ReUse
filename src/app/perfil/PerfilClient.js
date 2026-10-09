@@ -483,6 +483,7 @@ export default function PerfilClient({ user, items }) {
                             email={user.email}
                             location={user.location}
                             avatarUrl={user.avatarUrl}
+                            avatarKey={user.id || user.email}
                             memberSince={user.memberSince}
                         />
 

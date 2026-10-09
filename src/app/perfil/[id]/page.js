@@ -74,6 +74,7 @@ export default async function PerfilUsuario({ params }) {
             <Header
                 loggedIn={!!viewer}
                 avatarUrl={viewer?.avatarUrl}
+                avatarKey={viewer?.id}
                 unreadCount={unreadCount}
             />
 

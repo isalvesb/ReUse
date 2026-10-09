@@ -1,4 +1,4 @@
-import Image from "next/image";
+import SpriteImage from "@/components/SpriteImage";
 
 export default function ProductCard({
     name,
@@ -11,7 +11,7 @@ export default function ProductCard({
         <article className="flex self-stretch flex-col items-stretch justify-between sm:flex-row sm:items-center">
             {/* Imagem do produto */}
             <div className="relative h-44 w-full shrink-0 sm:w-80">
-                <Image
+                <SpriteImage
                     src={image}
                     alt={name}
                     fill

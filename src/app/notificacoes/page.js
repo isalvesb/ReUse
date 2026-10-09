@@ -23,7 +23,7 @@ export default async function Notificacoes() {
 
     return (
         <>
-            <Header loggedIn avatarUrl={user.avatarUrl} unreadCount={unreadCount} />
+            <Header loggedIn avatarUrl={user.avatarUrl} avatarKey={user.id} unreadCount={unreadCount} />
 
             <main className="mx-auto min-h-screen w-full max-w-2xl bg-reuse-cream px-6 py-10">
                 <div className="flex items-center justify-between">

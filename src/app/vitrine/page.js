@@ -60,7 +60,7 @@ export default async function Vitrine({ searchParams }) {
 
     return (
         <>
-            <Header loggedIn={!!user} avatarUrl={user?.avatarUrl} unreadCount={unreadCount} />
+            <Header loggedIn={!!user} avatarUrl={user?.avatarUrl} avatarKey={user?.id} unreadCount={unreadCount} />
 
             <main className="mx-auto max-w-7xl px-6 py-10">
                 <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">

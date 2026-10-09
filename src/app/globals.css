@@ -50,3 +50,41 @@ a {
   outline-offset: 2px;
   box-shadow: 0 0 0 5px var(--reuse-brown);
 }
+
+.reuse-hero.swiper-horizontal > .swiper-pagination-bullets {
+  bottom: 12px;
+  left: 50%;
+  display: flex;
+  width: auto;
+  align-items: center;
+  gap: 7px;
+  transform: translateX(-50%);
+  border: 1px solid rgb(247 239 222 / 35%);
+  border-radius: 9999px;
+  background: rgb(52 42 42 / 82%);
+  padding: 6px 9px;
+  backdrop-filter: blur(4px);
+}
+
+.reuse-hero .swiper-pagination-bullet {
+  display: block;
+  width: 8px;
+  height: 8px;
+  margin: 0;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--reuse-cream);
+  padding: 0;
+  opacity: 0.6;
+}
+
+.reuse-hero .swiper-pagination-bullet-active {
+  background: var(--reuse-pink);
+  opacity: 1;
+}
+
+.reuse-hero .swiper-pagination-bullet:focus-visible {
+  outline: 2px solid var(--reuse-cream);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 2px var(--reuse-brown);
+}

@@ -1,8 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
 import { MessageSquare } from "lucide-react";
 import { FaStar } from "react-icons/fa";
 import Button from "@/components/Button";
+import SpriteImage from "@/components/SpriteImage";
+import { getAvatarSource } from "@/lib/sprite";
 
 export default function SellerCard({
     name,
@@ -23,8 +24,8 @@ export default function SellerCard({
 
                 {/* FOTO */}
                 <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full">
-                    <Image
-                        src={image}
+                    <SpriteImage
+                        src={getAvatarSource(image, sellerId)}
                         alt={name}
                         fill
                         sizes="48px"

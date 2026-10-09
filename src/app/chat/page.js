@@ -23,7 +23,8 @@ function serializeConversation(conversation, userId) {
         itemId: conversation.itemId,
         itemTitle: conversation.item.title,
         name: otherUser.name,
-        image: otherUser.avatarUrl || "/images/perfil/avatar-padrao.png",
+        image: otherUser.avatarUrl,
+        avatarKey: otherUser.id,
         preview: lastMessage?.content || `Conversa sobre ${conversation.item.title}`,
         messages: orderedMessages.map((message) => ({
             id: message.id,
@@ -93,7 +94,7 @@ export default async function ChatPage({ searchParams }) {
                     id: true,
                     title: true,
                     seller: {
-                        select: { name: true, avatarUrl: true },
+                        select: { id: true, name: true, avatarUrl: true },
                     },
                 },
             });
@@ -105,7 +106,8 @@ export default async function ChatPage({ searchParams }) {
                     itemId: item.id,
                     itemTitle: item.title,
                     name: item.seller.name,
-                    image: item.seller.avatarUrl || "/images/perfil/avatar-padrao.png",
+                    image: item.seller.avatarUrl,
+                    avatarKey: item.seller.id,
                     preview: `Inicie uma conversa sobre ${item.title}`,
                     messages: [],
                     lastActivity: new Date().toISOString(),
@@ -126,6 +128,7 @@ export default async function ChatPage({ searchParams }) {
             <Header
                 loggedIn
                 avatarUrl={user.avatarUrl}
+                avatarKey={user.id}
                 unreadCount={unreadCount}
             />
 

@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import SpriteImage from "@/components/SpriteImage";
+import { getAvatarSource } from "@/lib/sprite";
 
 import {
     Search,
@@ -22,11 +24,13 @@ import { signOut } from "@/app/login/actions";
 export default function Header({
     loggedIn = false,
     avatarUrl,
+    avatarKey,
     unreadCount = 0,
 }) {
     const [profileOpen, setProfileOpen] = useState(false);
     const profileRef = useRef(null);
     const profileButtonRef = useRef(null);
+    const avatarSource = getAvatarSource(avatarUrl, avatarKey);
 
     // Fecha o menu quando clicar fora dele
     useEffect(() => {
@@ -183,11 +187,8 @@ export default function Header({
                                 aria-expanded={profileOpen}
                                 aria-controls="profile-menu"
                             >
-                                <Image
-                                    src={
-                                        avatarUrl ||
-                                        "/images/perfil/avatar-padrao.png"
-                                    }
+                                <SpriteImage
+                                    src={avatarSource}
                                     alt="Meu perfil"
                                     fill
                                     sizes="32px"
@@ -210,11 +211,8 @@ export default function Header({
                                         className="flex items-center gap-3 px-4 py-4 transition hover:bg-reuse-pink/20"
                                     >
                                         <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full">
-                                            <Image
-                                                src={
-                                                    avatarUrl ||
-                                                    "/images/perfil/avatar-padrao.png"
-                                                }
+                                            <SpriteImage
+                                                src={avatarSource}
                                                 alt="Meu perfil"
                                                 fill
                                                 sizes="40px"

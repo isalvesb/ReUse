@@ -1,5 +1,6 @@
-import Image from "next/image";
 import { Mail, MapPin } from 'lucide-react';
+import SpriteImage from "@/components/SpriteImage";
+import { getAvatarSource } from "@/lib/sprite";
 
 const MONTHS = [
     "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -18,6 +19,7 @@ export default function ProfileHeader({
     email,
     location,
     avatarUrl,
+    avatarKey,
     memberSince,
 }) {
     return (
@@ -25,8 +27,8 @@ export default function ProfileHeader({
 
             {/* FOTO */}
             <div className="relative h-[117px] w-[117px] shrink-0 overflow-hidden rounded-full">
-                <Image
-                    src={avatarUrl || "/images/perfil/avatar-padrao.png"}
+                <SpriteImage
+                    src={getAvatarSource(avatarUrl, avatarKey)}
                     alt={name}
                     fill
                     sizes="117px"

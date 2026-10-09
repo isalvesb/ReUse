@@ -1,4 +1,4 @@
-import Image from "next/image";
+import SpriteImage from "@/components/SpriteImage";
 
 export default function ProductGallery({
     mainImage,
@@ -10,7 +10,7 @@ export default function ProductGallery({
 
             {/* IMAGEM PRINCIPAL */}
             <div className="relative h-[300px] w-full max-w-[487px] overflow-hidden rounded-xl">
-                <Image
+                <SpriteImage
                     src={mainImage}
                     alt={mainAlt}
                     fill
@@ -28,7 +28,7 @@ export default function ProductGallery({
                         key={index}
                         className="relative h-12 w-12 overflow-hidden rounded-md"
                     >
-                        <Image
+                        <SpriteImage
                             src={image}
                             alt={`${mainAlt} - imagem ${index + 1}`}
                             fill

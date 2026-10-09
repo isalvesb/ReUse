@@ -44,7 +44,7 @@ export default async function DetalheProduto({ params }) {
 
     return (
         <>
-            <Header loggedIn={!!viewer} avatarUrl={viewer?.avatarUrl} unreadCount={unreadCount} />
+            <Header loggedIn={!!viewer} avatarUrl={viewer?.avatarUrl} avatarKey={viewer?.id} unreadCount={unreadCount} />
 
             <main className="mx-auto max-w-6xl px-6 py-12 md:py-20">
 
@@ -126,7 +126,7 @@ export default async function DetalheProduto({ params }) {
                         {!isOwnItem && (
                             <SellerCard
                                 name={product.seller.name}
-                                image={product.seller.avatarUrl || "/images/perfil/avatar-padrao.png"}
+                                image={product.seller.avatarUrl}
                                 itemsCount={sellerItemsCount}
                                 rating={product.seller.rating.toFixed(1)}
                                 sellerId={product.seller.id}

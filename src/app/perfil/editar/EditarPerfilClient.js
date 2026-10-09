@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useActionState, useState } from "react";
 import { ArrowLeft, Check, X } from "lucide-react";
 import FormField from "@/components/FormField";
 import { updateProfile } from "../actions";
 import { FIELD_LIMITS } from "@/lib/validation.mjs";
+import SpriteImage from "@/components/SpriteImage";
+import { getAvatarSource } from "@/lib/sprite";
 
 const initialState = { error: null };
 
@@ -40,8 +41,8 @@ export default function EditarPerfilClient({ user }) {
                 <div className="relative mx-auto mt-[38px] h-[128px] w-[128px]">
 
                     <div className="h-[128px] w-[128px] overflow-hidden rounded-full border-[3px] border-reuse-white bg-[#E5E7EB] shadow-lg">
-                        <Image
-                            src={user.avatarUrl || "/images/perfil/avatar-padrao.png"}
+                        <SpriteImage
+                            src={getAvatarSource(user.avatarUrl, user.id || user.email)}
                             alt={`Foto de ${user.name}`}
                             width={117}
                             height={117}

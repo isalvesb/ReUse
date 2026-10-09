@@ -4,7 +4,6 @@ import Hero from "@/components/Hero";
 import CategoryCard from "@/components/CategoryCard";
 import ProductCard from "@/components/ProductCard";
 import Footer from "@/components/Footer";
-import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser, getUnreadNotificationCount } from "@/lib/current-user";
 import { formatItemForCard } from "@/lib/format";
@@ -30,7 +29,7 @@ export default async function Home() {
 
   return (
     <>
-      <Header loggedIn={!!user} avatarUrl={user?.avatarUrl} unreadCount={unreadCount} />
+      <Header loggedIn={!!user} avatarUrl={user?.avatarUrl} avatarKey={user?.id} unreadCount={unreadCount} />
 
       <main className="min-h-screen w-full bg-reuse-cream pb-20">
 
@@ -113,49 +112,6 @@ export default async function Home() {
 
         </section>
 
-        {/* BANNER APP */}
-
-        <section
-          id="reuse"
-          className="relative mx-6 mt-20 flex min-h-64 max-w-275 overflow-hidden rounded-2xl bg-reuse-pink px-6 py-10 md:mx-auto md:mt-30 md:h-64 md:items-center md:overflow-visible md:px-0 md:py-0"
-        >
-
-          {/* Conteúdo */}
-          <div className="relative z-10 flex w-full max-w-sm flex-col items-start gap-2 md:absolute md:left-27.25 md:top-1/2 md:w-96 md:-translate-y-1/2">
-
-            {/* Logo */}
-            <Image
-              src="/images/logo/ReUse-marrom.png"
-              alt="ReUse"
-              width={351}
-              height={39}
-              className="h-auto w-full max-w-[351px] object-contain"
-            />
-
-            {/* Título */}
-            <h2 className="font-(--font-krona) text-2xl leading-8 text-reuse-brown md:text-3xl md:leading-9">
-              BAIXE AGORA O APP
-            </h2>
-
-            {/* Texto */}
-            <p className="font-(--font-krona) text-base leading-6 text-reuse-brown">
-              <span className="font-bold">+ 1.240 itens</span>{" "}
-              ganharam um novo destino este mês.
-            </p>
-
-
-          </div>
-
-          {/* Imagem */}
-          <Image
-            src="/images/app/celular.png"
-            alt="Aplicativo ReUse"
-            width={395}
-            height={298}
-            className="absolute bottom-0 right-12 hidden h-[298px] w-auto object-contain md:block"
-          />
-
-        </section>
       </main>
 
       <Footer />

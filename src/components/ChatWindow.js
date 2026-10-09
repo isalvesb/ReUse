@@ -1,5 +1,6 @@
-import Image from "next/image";
 import { Send } from "lucide-react";
+import SpriteImage from "@/components/SpriteImage";
+import { getAvatarSource } from "@/lib/sprite";
 
 function formatTime(value) {
     return new Intl.DateTimeFormat("pt-BR", {
@@ -34,8 +35,8 @@ export default function ChatWindow({ conversation, formAction, pending, error })
         <section className="flex min-h-[640px] min-w-0 flex-1 flex-col">
             <div className="flex min-h-[88px] shrink-0 items-center gap-3 border-b border-reuse-brown/20 px-7 py-3">
                 <div className="h-[60px] w-[60px] shrink-0 overflow-hidden rounded-full">
-                    <Image
-                        src={conversation.image}
+                    <SpriteImage
+                        src={getAvatarSource(conversation.image, conversation.avatarKey)}
                         alt={conversation.name}
                         width={60}
                         height={60}

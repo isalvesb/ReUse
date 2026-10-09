@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Pagination } from "swiper/modules";
+import { A11y, Autoplay, Pagination } from "swiper/modules";
 
 import "swiper/css";
 import "swiper/css/pagination";
@@ -48,8 +48,8 @@ const slides = [
             </>
         ),
         description: "Faça parte de uma comunidade que acredita em novos propósitos.",
-        button: "Conhecer a ReUse",
-        href: "/#reuse",
+        button: "Explorar vitrine",
+        href: "/vitrine",
         image: "/images/banners/banner-3.png",
     },
 ];
@@ -58,16 +58,19 @@ export default function Hero() {
     return (
         <section className="mx-auto mt-10 w-full max-w-7xl px-6">
             <Swiper
-                modules={[Autoplay, Pagination]}
+                modules={[A11y, Autoplay, Pagination]}
                 autoplay={{
                     delay: 5000,
                     disableOnInteraction: false,
                 }}
                 pagination={{
                     clickable: true,
+                    renderBullet(index, className) {
+                        return `<button class="${className}" type="button" aria-label="Ir para o slide ${index + 1}"></button>`;
+                    },
                 }}
                 loop={true}
-                className="overflow-hidden rounded-lg"
+                className="reuse-hero overflow-hidden rounded-lg"
             >
                 {slides.map((slide) => (
                     <SwiperSlide key={slide.id}>

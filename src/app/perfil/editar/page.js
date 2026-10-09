@@ -16,10 +16,11 @@ export default async function EditarPerfilPage() {
 
     return (
         <main className="min-h-screen bg-reuse-cream">
-            <Header loggedIn avatarUrl={user.avatarUrl} unreadCount={unreadCount} />
+            <Header loggedIn avatarUrl={user.avatarUrl} avatarKey={user.id} unreadCount={unreadCount} />
 
             <EditarPerfilClient
                 user={{
+                    id: user.id,
                     name: user.name,
                     email: user.email,
                     location: user.location,
