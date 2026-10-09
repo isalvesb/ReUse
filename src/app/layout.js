@@ -1,4 +1,6 @@
 import { Krona_One, Inter } from "next/font/google";
+import { Suspense } from "react";
+import InternalNavigationTracker from "@/components/InternalNavigationTracker";
 import "./globals.css";
 
 const kronaOne = Krona_One({
@@ -16,6 +18,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="pt-BR" data-scroll-behavior="smooth">
       <body className={`${kronaOne.variable} ${inter.variable}`}>
+        <Suspense fallback={null}>
+          <InternalNavigationTracker />
+        </Suspense>
         {children}
       </body>
     </html>

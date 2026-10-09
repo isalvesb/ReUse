@@ -14,12 +14,12 @@ export default function SellerCard({
     sellerId
 }) {
     return (
-        <div className="min-h-[166px] w-full max-w-[343px] rounded-2xl bg-[#F3E8D2] px-4 py-7">
+        <div className="flex w-full flex-col gap-4 rounded-2xl border border-reuse-brown/10 bg-[#F3E8D2] p-4 sm:flex-row sm:items-center sm:justify-between">
 
             {/* INFORMAÇÕES DO USUÁRIO */}
             <Link
                 href={`/perfil/${sellerId}`}
-                className="flex items-center gap-3">
+                className="flex min-w-0 items-center gap-3 rounded-lg transition hover:opacity-80 active:opacity-65">
 
 
                 {/* FOTO */}
@@ -34,8 +34,8 @@ export default function SellerCard({
                 </div>
 
                 {/* NOME E AVALIAÇÃO */}
-                <div>
-                    <p className="text-base font-bold text-reuse-brown">
+                <div className="min-w-0">
+                    <p className="break-words text-base font-bold text-reuse-brown">
                         {name}
                     </p>
 
@@ -60,10 +60,10 @@ export default function SellerCard({
             <Button
                 variant="secondary"
                 href={href}
-                className="mt-4 w-full rounded-[14px]"
+                className="w-full shrink-0 rounded-[14px] sm:w-auto sm:min-w-[135px]"
             >
                 <span className="flex items-center justify-center gap-1">
-                    <MessageSquare size={24} />
+                    <MessageSquare size={19} aria-hidden="true" />
                     <span className="text-sm">Conversar</span>
                 </span>
             </Button>

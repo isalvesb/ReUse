@@ -16,7 +16,8 @@ const DEMO_USERS = [
     {
         key: "maria",
         name: "Maria Silva",
-        email: "maria.silva@email.com",
+        email: "mariasilva@reuse.com",
+        legacyEmails: ["maria.silva@email.com"],
         location: "Vila Madalena, São Paulo, SP",
         bio: "Sou mãe da Beatriz e do Pedro. Quero um futuro mais sustentável para os meus netos, e acredito que temos que consumir com mais consciência. Reutilizar as coisas nos aproxima mais dessa meta. Hoje tenho praticado mais o desapego e focado mais em realizar trocas que fazem produtos usados circular.",
         avatarUrl: "/images/pranchas/prancha7.png#sprite=1",
@@ -25,7 +26,8 @@ const DEMO_USERS = [
     {
         key: "joao",
         name: "João Souza",
-        email: "joao.souza@email.com",
+        email: "joaosouza@reuse.com",
+        legacyEmails: ["joao.souza@email.com"],
         location: "Mooca, São Paulo, SP",
         bio: "Interessado em achar peças com história e dar novo uso a itens que ainda têm valor.",
         avatarUrl: "/images/pranchas/prancha7.png#sprite=2",
@@ -34,7 +36,8 @@ const DEMO_USERS = [
     {
         key: "luana",
         name: "Luana Maranhão",
-        email: "luana.maranhao@email.com",
+        email: "luanamaranhao@reuse.com",
+        legacyEmails: ["luana.maranhao@email.com"],
         location: "Pinheiros, São Paulo, SP",
         bio: "Leitora, fotógrafa amadora e adepta do consumo consciente. Gosto de circular livros e objetos que possam ganhar novas histórias.",
         avatarUrl: "/images/pranchas/prancha7.png#sprite=3",
@@ -43,7 +46,8 @@ const DEMO_USERS = [
     {
         key: "paulo",
         name: "Paulo Silva",
-        email: "paulo.silva@email.com",
+        email: "paulosilva@reuse.com",
+        legacyEmails: ["paulo.silva@email.com"],
         location: "Campinas, SP",
         bio: "Estudante de tecnologia em busca de trocas úteis e equipamentos bem conservados.",
         avatarUrl: "/images/pranchas/prancha7.png#sprite=4",
@@ -52,7 +56,8 @@ const DEMO_USERS = [
     {
         key: "cristina",
         name: "Cristina Martins",
-        email: "cristina.martins@email.com",
+        email: "cristinamartins@reuse.com",
+        legacyEmails: ["cristina.martins@email.com"],
         location: "Santos, SP",
         bio: "Apaixonada por moda circular e por encontrar novos donos para peças que ainda têm muito uso pela frente.",
         avatarUrl: "/images/pranchas/prancha7.png#sprite=5",
@@ -61,7 +66,8 @@ const DEMO_USERS = [
     {
         key: "daniel",
         name: "Daniel Matos",
-        email: "daniel.matos@email.com",
+        email: "danielmatos@reuse.com",
+        legacyEmails: ["daniel.matos@email.com"],
         location: "São José dos Campos, SP",
         bio: "Garimpo móveis e objetos para casa. Prefiro recuperar, trocar e reutilizar antes de comprar algo novo.",
         avatarUrl: "/images/pranchas/prancha7.png#sprite=6",
@@ -235,7 +241,7 @@ const ITEMS = [
         condition: "USADO_COMO_NOVO",
         status: "ATIVO",
         categorySlug: "eletronicos",
-        location: "Campinas, SP",
+        location: "Bela Vista, São Paulo, SP",
         images: ["/images/pranchas/prancha1.png#sprite=1"],
     },
     {
@@ -248,7 +254,7 @@ const ITEMS = [
         condition: "USADO_BOM_ESTADO",
         status: "ATIVO",
         categorySlug: "eletronicos",
-        location: "Mooca, São Paulo, SP",
+        location: "Liberdade, São Paulo, SP",
         images: ["/images/pranchas/prancha1.png#sprite=2"],
     },
     {
@@ -456,7 +462,7 @@ const ITEMS = [
         condition: "USADO_COMO_NOVO",
         status: "ATIVO",
         categorySlug: "moveis",
-        location: "Vila Madalena, São Paulo, SP",
+        location: "Bela Vista, São Paulo, SP",
         images: ["/images/pranchas/prancha3.png#sprite=6"],
     },
     {
@@ -495,21 +501,8 @@ const ITEMS = [
         condition: "USADO_BOM_ESTADO",
         status: "ATIVO",
         categorySlug: "livros",
-        location: "Pinheiros, São Paulo, SP",
+        location: "Liberdade, São Paulo, SP",
         images: ["/images/pranchas/prancha4.png#sprite=3"],
-    },
-    {
-        key: "p4-4",
-        sellerKey: "cristina",
-        title: "Tênis branco urbano",
-        description: "Tênis branco de estilo urbano, com aparência de pouco uso e acabamento bem conservado.",
-        price: 140,
-        type: "VENDA",
-        condition: "USADO_COMO_NOVO",
-        status: "ATIVO",
-        categorySlug: "sapatos",
-        location: "Santos, SP",
-        images: ["/images/pranchas/prancha4.png#sprite=4"],
     },
     {
         key: "p4-5",
@@ -547,7 +540,7 @@ const ITEMS = [
         condition: "USADO_BOM_ESTADO",
         status: "ATIVO",
         categorySlug: "outros",
-        location: "Mooca, São Paulo, SP",
+        location: "Bela Vista, São Paulo, SP",
         images: ["/images/pranchas/prancha5.png#sprite=1"],
     },
     {
@@ -599,7 +592,7 @@ const ITEMS = [
         condition: "USADO_BOM_ESTADO",
         status: "ATIVO",
         categorySlug: "outros",
-        location: "Campinas, SP",
+        location: "Liberdade, São Paulo, SP",
         images: ["/images/pranchas/prancha5.png#sprite=5"],
     },
     {
@@ -693,6 +686,10 @@ const ITEMS = [
         location: "Vila Madalena, São Paulo, SP",
         images: ["/images/pranchas/prancha6.png#sprite=6"],
     },
+];
+
+const RETIRED_DEMO_ITEMS = [
+    { sellerKey: "cristina", title: "Tênis branco urbano" },
 ];
 
 async function upsertCategories() {
@@ -792,6 +789,12 @@ async function main() {
     const categoriesOnly = process.argv.includes("--categories-only");
     const seedPassword = process.env.SEED_PASSWORD;
 
+    if (!categoriesOnly && process.env.DEMO_SEED_ALLOWED !== "true") {
+        throw new Error(
+            "O seed completo exige DEMO_SEED_ALLOWED=true em um ambiente demonstrativo controlado."
+        );
+    }
+
     if (!categoriesOnly && (!seedPassword || seedPassword.length < 8)) {
         throw new Error("Defina SEED_PASSWORD com pelo menos 8 caracteres antes de executar o seed.");
     }
@@ -809,12 +812,26 @@ async function main() {
     const users = {};
 
     for (const user of DEMO_USERS) {
-        const { key, ...data } = user;
-        users[key] = await prisma.user.upsert({
-            where: { email: data.email },
-            update: data,
-            create: { ...data, passwordHash },
+        const { key, legacyEmails = [], ...data } = user;
+        const matches = await prisma.user.findMany({
+            where: { email: { in: [data.email, ...legacyEmails] } },
+            take: 2,
         });
+
+        if (matches.length > 1) {
+            throw new Error(
+                `Foram encontradas contas demonstrativas duplicadas para ${data.name}. Resolva manualmente antes do seed.`
+            );
+        }
+
+        users[key] = matches[0]
+            ? await prisma.user.update({
+                where: { id: matches[0].id },
+                data: { ...data, passwordHash },
+            })
+            : await prisma.user.create({
+                data: { ...data, passwordHash },
+            });
     }
 
     console.log("Seed: garantindo itens demonstrativos...");
@@ -865,6 +882,16 @@ async function main() {
         });
     }
 
+    for (const retiredItem of RETIRED_DEMO_ITEMS) {
+        await prisma.item.updateMany({
+            where: {
+                sellerId: users[retiredItem.sellerKey].id,
+                title: retiredItem.title,
+            },
+            data: { status: "INATIVO" },
+        });
+    }
+
     console.log("Seed: garantindo notificações demonstrativas...");
     await ensureNotifications(users, items);
 
@@ -887,6 +914,49 @@ async function main() {
         messages: [
             { sender: "buyer", content: "Olá! A câmera acompanha alça e estojo?" },
             { sender: "seller", content: "Acompanha a alça original. Posso incluir um estojo simples também." },
+        ],
+    });
+
+    await ensureConversation({
+        item: items["p1-2"],
+        buyer: users.luana,
+        seller: users.joao,
+        messages: [
+            { sender: "buyer", content: "Oi, João! O smartphone está sem marcas na tela?" },
+            { sender: "seller", content: "Oi, Luana! A tela está bem conservada. Posso mostrar mais detalhes na retirada." },
+            { sender: "buyer", content: "Ótimo. Consigo buscar na Liberdade no fim da tarde." },
+        ],
+    });
+
+    await ensureConversation({
+        item: items["p2-2"],
+        buyer: users.daniel,
+        seller: users.luana,
+        messages: [
+            { sender: "buyer", content: "Olá, Luana! O suéter ainda está disponível para doação?" },
+            { sender: "seller", content: "Está sim, Daniel. Posso separar para você." },
+            { sender: "buyer", content: "Obrigado! Podemos combinar a retirada em Pinheiros." },
+        ],
+    });
+
+    await ensureConversation({
+        item: items["p1-3"],
+        buyer: users.maria,
+        seller: users.paulo,
+        messages: [
+            { sender: "buyer", content: "Paulo, você consideraria trocar o notebook por um tablet bem conservado?" },
+            { sender: "seller", content: "Considero sim, Maria. Podemos comparar os itens e combinar os detalhes." },
+        ],
+    });
+
+    await ensureConversation({
+        item: items["p5-5"],
+        buyer: users.cristina,
+        seller: users.paulo,
+        messages: [
+            { sender: "buyer", content: "Oi! A caixa de transporte fecha corretamente?" },
+            { sender: "seller", content: "Fecha sim, e a trava está funcionando bem." },
+            { sender: "buyer", content: "Perfeito. Posso retirar na Liberdade no sábado?" },
         ],
     });
 

@@ -24,7 +24,7 @@ export default function Button({
     };
 
     const baseClasses =
-        "inline-flex items-center justify-center rounded-3xl px-5 py-3 text-sm font-medium transition-all duration-200 hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100";
+        "inline-flex items-center justify-center rounded-3xl px-5 py-3 text-sm font-medium transition-all duration-200 hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98] active:brightness-95 disabled:hover:scale-100 disabled:active:scale-100";
 
     const classes = `${baseClasses} ${variants[variant]} ${className}`;
 

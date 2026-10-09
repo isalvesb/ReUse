@@ -1,23 +1,31 @@
-import {
-    Gift, Package, Pencil, Star,
-} from 'lucide-react';
-import Link from 'next/link';
+import { Gift, Package, Star } from 'lucide-react';
 
 export default function ProfileInfo({
     tradesCount = 0,
     salesCount = 0,
     rating = 0,
     bio,
-    canEdit = false,
+    showBio = true,
+    showStats = true,
 }) {
     return (
         <div className='flex w-full flex-col gap-6'>
 
+            {/* SOBRE MIM — edição disponível somente nas configurações */}
+            {showBio && <section aria-labelledby="perfil-sobre-mim" className="w-full">
+                <h2 id="perfil-sobre-mim" className="mb-3 text-xl font-bold text-reuse-brown">Sobre mim</h2>
+                <div className="min-h-[110px] rounded-2xl bg-[#F3E8D2] px-5 py-5">
+                    <p className={`whitespace-pre-line break-words text-base leading-7 ${bio?.trim() ? "text-reuse-brown" : "text-reuse-brown-light/75"}`}>
+                        {bio?.trim() || "Você ainda não escreveu uma descrição sobre você."}
+                    </p>
+                </div>
+            </section>}
+
             {/* ESTATÍSTICAS */}
-            <div className='flex justify-center gap-4'>
+            {showStats && <div className='grid w-full grid-cols-3 gap-2 sm:gap-3'>
 
                 {/* TROCAS */}
-                <div className='flex h-26.75 w-21.75 flex-col items-center justify-center rounded-3xl border border-reuse-white/60 bg-reuse-pink shadow-lg'>
+                <div className='flex min-h-[96px] min-w-0 flex-col items-center justify-center rounded-3xl border border-reuse-white/60 bg-reuse-pink px-2 shadow-sm'>
                     <div className='mb-1 flex h-8 w-8 items-center justify-center rounded-full bg-reuse-white/60'>
                         <Gift
                             size={16}
@@ -35,7 +43,7 @@ export default function ProfileInfo({
                 </div>
 
                 {/* VENDAS */}
-                <div className='flex h-26.75 w-21.75 flex-col items-center justify-center rounded-3xl border border-reuse-white/60 bg-reuse-pink shadow-lg'>
+                <div className='flex min-h-[96px] min-w-0 flex-col items-center justify-center rounded-3xl border border-reuse-white/60 bg-reuse-pink px-2 shadow-sm'>
                     <div className='mb-1 flex h-8 w-8 items-center justify-center rounded-full bg-reuse-white/60'>
                         <Package
                             size={16}
@@ -53,7 +61,7 @@ export default function ProfileInfo({
                 </div>
 
                 {/* AVALIAÇÕES */}
-                <div className='flex h-26.75 w-21.75 flex-col items-center justify-center rounded-3xl border border-reuse-white/60 bg-reuse-pink shadow-lg'>
+                <div className='flex min-h-[96px] min-w-0 flex-col items-center justify-center rounded-3xl border border-reuse-white/60 bg-reuse-pink px-2 shadow-sm'>
                     <div className='mb-1 flex h-8 w-8 items-center justify-center rounded-full bg-reuse-white/60'>
                         <Star
                             size={16}
@@ -69,30 +77,8 @@ export default function ProfileInfo({
                         Avaliações
                     </span>
                 </div>
-            </div>
+            </div>}
 
-            {/* SOBRE MIM */}
-            <div className='min-h-[281px] w-full rounded-2xl bg-[#F3E8D2] px-4 pb-5 pt-6'>
-                <div className="flex justify-between">
-                    <h2 className="mb-3 text-xl font-bold text-reuse-brown">
-                        Sobre mim
-                    </h2>
-
-                    {canEdit && (
-                        <Link
-                            href="/perfil/editar"
-                            aria-label="Editar perfil"
-                            className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F2D5AB]"
-                        >
-                            <Pencil aria-hidden="true" size={20} />
-                        </Link>
-                    )}
-                </div>
-
-                <p className='whitespace-pre-line text-base leading-6.5 text-reuse-brown'>
-                    {bio || "Você ainda não escreveu nada sobre você. Clique no lápis para editar seu perfil."}
-                </p>
-            </div>
         </div >
     );
 }

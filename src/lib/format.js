@@ -26,6 +26,16 @@ export function formatPrice(price) {
     });
 }
 
+export function truncateCardText(value, maxLength) {
+    const text = String(value ?? "").trim();
+
+    if (text.length <= maxLength) {
+        return text;
+    }
+
+    return `${text.slice(0, maxLength - 1).trimEnd()}…`;
+}
+
 export function formatItemForCard(item) {
     return {
         id: item.id,

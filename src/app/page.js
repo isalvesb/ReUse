@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser, getUnreadNotificationCount } from "@/lib/current-user";
 import { formatItemForCard } from "@/lib/format";
+import { NEARBY_DEMO_ITEMS, demoItemFilter, demoItemOrderEntries } from "@/lib/demo-curations";
 
 export const dynamic = "force-dynamic";
 
@@ -14,16 +15,25 @@ export default async function Home() {
   const user = await getCurrentUser();
 
   const items = await prisma.item.findMany({
-    where: { status: "ATIVO" },
+    where: {
+      status: "ATIVO",
+      OR: NEARBY_DEMO_ITEMS.map(demoItemFilter),
+    },
     include: {
       images: { orderBy: { position: "asc" }, take: 1 },
       category: true,
+      seller: { select: { email: true } },
     },
-    orderBy: { createdAt: "desc" },
-    take: 6,
   });
 
-  const products = items.map(formatItemForCard);
+  const itemOrder = new Map(demoItemOrderEntries(NEARBY_DEMO_ITEMS));
+  const products = items
+    .sort((left, right) => {
+      const leftKey = `${left.seller?.email}:${left.title}`;
+      const rightKey = `${right.seller?.email}:${right.title}`;
+      return itemOrder.get(leftKey) - itemOrder.get(rightKey);
+    })
+    .map(formatItemForCard);
 
   const unreadCount = user ? await getUnreadNotificationCount(user.id) : 0;
 
@@ -36,7 +46,7 @@ export default async function Home() {
         <Hero />
 
         {/* CATEGORIAS */}
-        <section className="mx-auto mt-16 w-full max-w-7xl px-6">
+        <section id="categorias" className="mx-auto mt-16 w-full max-w-7xl scroll-mt-28 px-6">
           <h2 className="text-2xl font-bold text-reuse-brown">
             Descubra por categorias
           </h2>
@@ -46,7 +56,7 @@ export default async function Home() {
               title="Peças raras"
               description="Se apaixone por peças clássicas"
               image="/images/categorias/camera.png"
-              href="/vitrine?q=vintage"
+              href="/vitrine?curadoria=pecas-raras"
             />
 
             <CategoryCard

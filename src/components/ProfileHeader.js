@@ -26,13 +26,13 @@ export default function ProfileHeader({
         <section className="flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:gap-8">
 
             {/* FOTO */}
-            <div className="relative h-[117px] w-[117px] shrink-0 overflow-hidden rounded-full">
+            <div className="relative h-[117px] w-[117px] shrink-0 overflow-hidden rounded-full bg-reuse-white">
                 <SpriteImage
                     src={getAvatarSource(avatarUrl, avatarKey)}
                     alt={name}
                     fill
                     sizes="117px"
-                    className="object-cover"
+                    className="object-contain"
                 />
             </div>
 

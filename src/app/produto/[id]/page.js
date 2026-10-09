@@ -2,14 +2,20 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductGallery from "@/components/ProductGallery";
 import SellerCard from "@/components/SellerCard";
-import { MapPin, ArrowLeft } from "lucide-react";
+import BackButton from "@/components/BackButton";
+import { MapPin } from "lucide-react";
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser, getUnreadNotificationCount } from "@/lib/current-user";
 import { CONDITION_LABELS, TYPE_LABELS, formatPrice } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
+
+const TYPE_BADGE_CLASSES = {
+    VENDA: "bg-[#ffe4a1] text-[#78350f]",
+    TROCA: "bg-[#e0c3fc] text-[#4a1d96]",
+    DOACAO: "bg-[#d9ead3] text-[#285430]",
+};
 
 export default async function DetalheProduto({ params }) {
     const { id } = await params;
@@ -49,93 +55,69 @@ export default async function DetalheProduto({ params }) {
             <main className="mx-auto max-w-6xl px-6 py-12 md:py-20">
 
                 {/* Voltar */}
-                <Link
-                    href="/vitrine"
+                <BackButton
+                    fallback="/vitrine"
                     className="mb-8 inline-flex items-center gap-2 text-base font-medium text-[#342a2a] md:-ml-8"
                 >
-                    <ArrowLeft size={20} />
                     Voltar
-                </Link>
+                </BackButton>
 
 
-                <div className="grid gap-10 md:grid-cols-2">
-
-                    {/* GALERIA */}
+                <div className="grid gap-8 lg:grid-cols-[minmax(0,487px)_minmax(0,1fr)] lg:items-stretch lg:gap-12">
                     <ProductGallery
                         mainImage={product.images[0]?.url ?? "/images/itens/cadeira.png"}
                         mainAlt={product.title}
                         thumbnails={product.images.map((image) => image.url)}
+                        ribbonLabel={TYPE_LABELS[product.type] ?? product.type}
+                        ribbonClasses={TYPE_BADGE_CLASSES[product.type] ?? "bg-reuse-cream text-reuse-brown"}
                     />
 
-                    {/* INFORMAÇÕES */}
-                    <section>
-
-                        {/* INFORMAÇÕES DO PRODUTO */}
-                        <div className="mb-8 w-full max-w-[343px]">
-
-                            <p className="mb-3 text-sm font-medium text-reuse-brown-light">
+                    <section className="flex min-w-0 flex-col lg:min-h-[487px]">
+                        <div>
+                            <p className="text-sm font-medium text-reuse-brown-light">
                                 {product.category.name}
                             </p>
-
-                            <h1 className="text-2xl font-bold text-reuse-brown">
+                            <h1 className="mt-2 text-2xl font-bold leading-tight text-reuse-brown">
                                 {product.title}
                             </h1>
 
-                            <p className="mt-2 text-sm text-[#584C4C]">
-                                {CONDITION_LABELS[product.condition] ?? product.condition}
-                            </p>
-
-                            {product.location && (
-                                <p className="mt-2 flex gap-1 text-sm text-[#584C4C]">
-                                    <MapPin size={20} />
-                                    {product.location}
+                            {product.type === "VENDA" && product.price && (
+                                <p className="mt-4 text-2xl font-bold text-reuse-brown">
+                                    {formatPrice(product.price)}
                                 </p>
                             )}
 
-                            <div className="mt-4 flex items-center justify-between">
-
-                                {product.type === "VENDA" && product.price && (
-                                    <p className="mt-5 text-3xl font-bold text-reuse-brown">
-                                        {formatPrice(product.price)}
-                                    </p>
-                                )}
-
-
-                                <span className=" rounded-full bg-[#FFE4A1] w-fit h-8 px-4 py-1 text-sm font-medium text-[#78350F]">
-                                    {TYPE_LABELS[product.type] ?? product.type}
-                                </span>
-
-
-
-                            </div>
-
+                            <p className="mt-4 text-sm text-reuse-brown-light">
+                                {CONDITION_LABELS[product.condition] ?? product.condition}
+                            </p>
+                            {product.location && (
+                                <p className="mt-2 flex items-start gap-2 text-sm text-reuse-brown-light">
+                                    <MapPin size={17} className="mt-0.5 shrink-0" aria-hidden="true" />
+                                    <span className="break-words">{product.location}</span>
+                                </p>
+                            )}
                         </div>
 
-                        {/* DESCRIÇÃO */}
-                        <div className="mt-6">
-                            <h2 className="text-lg font-semibold text-reuse-brown">
-                                Descrição do item
-                            </h2>
-
-                            <p className="mb-9 mt-3 w-full max-w-[491px] whitespace-pre-line leading-7 text-reuse-brown-light">
+                        <section aria-labelledby="product-description-title" className="mt-6 rounded-2xl border border-reuse-brown/15 bg-reuse-white/65 px-5 py-4">
+                            <h2 id="product-description-title" className="text-base font-semibold text-reuse-brown">Descrição do item</h2>
+                            <p className="mt-2 whitespace-pre-line break-words text-sm leading-6 text-reuse-brown-light">
                                 {product.description}
                             </p>
-                        </div>
+                        </section>
 
-                        {/* VENDEDOR */}
                         {!isOwnItem && (
-                            <SellerCard
-                                name={product.seller.name}
-                                image={product.seller.avatarUrl}
-                                itemsCount={sellerItemsCount}
-                                rating={product.seller.rating.toFixed(1)}
-                                sellerId={product.seller.id}
-                                href={viewer ? `/chat?itemId=${product.id}` : "/login"}
-                            />
+                            <div className="mt-auto pt-5">
+                                <SellerCard
+                                    name={product.seller.name}
+                                    image={product.seller.avatarUrl}
+                                    itemsCount={sellerItemsCount}
+                                    rating={product.seller.rating.toFixed(1)}
+                                    sellerId={product.seller.id}
+                                    href={viewer ? `/chat?itemId=${product.id}` : "/login"}
+                                />
+                            </div>
                         )}
-
                     </section>
-
                 </div>
 
             </main>

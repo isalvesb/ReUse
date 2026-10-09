@@ -69,11 +69,11 @@ export default function Header({
     }, [profileOpen]);
 
     return (
-        <header className="w-full shrink-0 bg-reuse-brown px-6 py-3">
-            <div className="mx-auto flex h-[46px] max-w-[1344px] items-center justify-between gap-4 sm:gap-6">
+        <header className="w-full shrink-0 bg-reuse-brown px-4 py-3 sm:px-6">
+            <div className="mx-auto flex h-[46px] max-w-7xl items-center justify-between gap-4 sm:gap-6">
 
                 {/* Logo */}
-                <Link href="/">
+                <Link href="/" className="inline-flex rounded-md transition-opacity hover:opacity-75 active:opacity-60">
                     <Image
                         src="/images/logo/ReUse-creme.png"
                         width={130}
@@ -93,7 +93,7 @@ export default function Header({
                             maxLength={80}
                             placeholder="Busque sapato, poltrona, notebook..."
                             aria-label="Buscar na vitrine"
-                            className="w-full bg-transparent text-sm text-reuse-brown outline-none placeholder:text-reuse-brown-light"
+                            className="w-full bg-transparent text-sm text-reuse-brown outline-none placeholder:text-xs placeholder:text-reuse-brown-light placeholder:opacity-60"
                         />
 
                         <button type="submit" aria-label="Buscar" className="text-reuse-brown">
@@ -103,33 +103,19 @@ export default function Header({
                 </form>
 
                 {/* Navegação */}
-                <nav className="hidden items-center gap-8 text-sm text-reuse-white lg:flex">
+                <nav className="hidden items-center gap-7 text-sm text-reuse-white lg:flex">
                     <Link
-                        href="/vitrine?categoria=eletronicos"
+                        href="/vitrine"
                         className="transition hover:text-reuse-pink"
                     >
-                        Eletrônicos
+                        Vitrine
                     </Link>
 
                     <Link
-                        href="/vitrine?categoria=roupas"
+                        href="/#categorias"
                         className="transition hover:text-reuse-pink"
                     >
-                        Roupas
-                    </Link>
-
-                    <Link
-                        href="/vitrine?categoria=moveis"
-                        className="transition hover:text-reuse-pink"
-                    >
-                        Móveis
-                    </Link>
-
-                    <Link
-                        href="/vitrine?categoria=livros"
-                        className="transition hover:text-reuse-pink"
-                    >
-                        Livros
+                        Categorias
                     </Link>
 
                     <Link
@@ -139,26 +125,20 @@ export default function Header({
                         Sobre
                     </Link>
 
-                    {loggedIn && (
-                        <Link
-                            href="/perfil"
-                            className="font-bold transition hover:text-reuse-pink"
-                        >
-                            Minha Vitrine
-                        </Link>
-                    )}
                 </nav>
-
-                <Link
-                    href="/sobre"
-                    className="ml-auto text-sm text-reuse-white transition hover:text-reuse-pink lg:hidden"
-                >
-                    Sobre
-                </Link>
 
                 {/* Área do usuário */}
                 {loggedIn ? (
                     <div className="flex items-center gap-4 sm:gap-7">
+
+                        {/* Mensagens */}
+                        <Link
+                            href="/chat"
+                            className="text-reuse-white transition hover:text-reuse-pink"
+                            aria-label="Mensagens"
+                        >
+                            <MessageCircle size={22} strokeWidth={1.8} />
+                        </Link>
 
                         {/* Notificações */}
                         <Link
@@ -269,15 +249,6 @@ export default function Header({
                                         </Link>
 
                                         <Link
-                                            href="/chat"
-                                            onClick={() => setProfileOpen(false)}
-                                            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-reuse-brown transition hover:bg-reuse-pink/20"
-                                        >
-                                            <MessageCircle size={18} />
-                                            <span>Mensagens</span>
-                                        </Link>
-
-                                        <Link
                                             href="/notificacoes"
                                             onClick={() => setProfileOpen(false)}
                                             className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-reuse-brown transition hover:bg-reuse-pink/20"
@@ -336,6 +307,21 @@ export default function Header({
                     </Button>
                 )}
             </div>
+
+            <nav
+                aria-label="Navegação principal"
+                className="mx-auto mt-3 flex max-w-7xl items-center justify-center gap-7 border-t border-reuse-cream/15 pt-3 text-sm text-reuse-white lg:hidden"
+            >
+                <Link href="/vitrine" className="transition hover:text-reuse-pink">
+                    Vitrine
+                </Link>
+                <Link href="/#categorias" className="transition hover:text-reuse-pink">
+                    Categorias
+                </Link>
+                <Link href="/sobre" className="transition hover:text-reuse-pink">
+                    Sobre
+                </Link>
+            </nav>
         </header >
     );
 }

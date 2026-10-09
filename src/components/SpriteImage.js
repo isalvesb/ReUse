@@ -1,8 +1,5 @@
 import Image from "next/image";
-import { parseSpriteSource } from "@/lib/sprite";
-
-const HORIZONTAL_POSITIONS = ["0%", "50%", "100%"];
-const VERTICAL_POSITIONS = ["0%", "100%"];
+import { getSpriteCrop, parseSpriteSource } from "@/lib/sprite";
 
 export default function SpriteImage({
     src,
@@ -29,9 +26,7 @@ export default function SpriteImage({
         );
     }
 
-    const zeroBasedPosition = sprite.position - 1;
-    const column = zeroBasedPosition % 3;
-    const row = Math.floor(zeroBasedPosition / 3);
+    const crop = getSpriteCrop(sprite);
     const dimensions = fill ? undefined : { width, height };
 
     return (
@@ -39,14 +34,32 @@ export default function SpriteImage({
             role={alt ? "img" : undefined}
             aria-label={alt || undefined}
             aria-hidden={alt ? undefined : true}
-            className={`${fill ? "absolute inset-0" : "inline-block"} ${className}`.trim()}
-            style={{
-                ...dimensions,
-                backgroundImage: `url("${sprite.sheet}")`,
-                backgroundPosition: `${HORIZONTAL_POSITIONS[column]} ${VERTICAL_POSITIONS[row]}`,
-                backgroundRepeat: "no-repeat",
-                backgroundSize: "300% auto",
-            }}
-        />
+            className={`${fill ? "absolute inset-0" : "relative inline-block"} overflow-hidden ${className}`.trim()}
+            style={dimensions}
+        >
+            {/*
+              O viewBox mostra apenas a célula correspondente da prancha.
+              Usamos slice para preencher a área sem exibir as fileiras vizinhas.
+              Na prancha 6, as células não são quadradas: meet criava faixas
+              na borda mostrando pedaços da célula ao lado.
+              O recorte permanece proporcional, sem deformar o produto.
+            */}
+            <svg
+                className="absolute inset-0 block h-full w-full overflow-hidden"
+                viewBox={`${crop.x} ${crop.y} ${crop.width} ${crop.height}`}
+                preserveAspectRatio="xMidYMid slice"
+                aria-hidden="true"
+                focusable="false"
+            >
+                <image
+                    href={sprite.sheet}
+                    x="0"
+                    y="0"
+                    width={crop.sheetWidth}
+                    height={crop.sheetHeight}
+                    preserveAspectRatio="none"
+                />
+            </svg>
+        </span>
     );
 }

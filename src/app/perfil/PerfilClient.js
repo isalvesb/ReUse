@@ -15,7 +15,7 @@ import {
     getItemPhotoValidationError,
     ITEM_PHOTO_LIMITS,
 } from "@/lib/upload-constraints.mjs";
-import { logOut, publishItem } from "./actions";
+import { publishItem } from "./actions";
 
 import {
     ChevronDown,
@@ -447,6 +447,7 @@ function PublishFormFields() {
 
 export default function PerfilClient({ user, items }) {
     const [activeFilter, setActiveFilter] = useState("todos");
+    const [showAllItems, setShowAllItems] = useState(false);
 
     const publicarRef = useRef(null);
 
@@ -456,6 +457,7 @@ export default function PerfilClient({ user, items }) {
     const filteredItems = filterType
         ? items.filter((item) => item.negotiationType === filterType)
         : items;
+    const visibleItems = showAllItems ? filteredItems : filteredItems.slice(0, 3);
 
     function scrollToPublicar() {
         publicarRef.current?.scrollIntoView({
@@ -473,43 +475,36 @@ export default function PerfilClient({ user, items }) {
                 PERFIL
             ========================= */}
 
-                <div className="grid gap-12 lg:grid-cols-[minmax(0,421px)_minmax(0,1fr)] lg:gap-12 xl:gap-24.75">
-
-                    {/* COLUNA ESQUERDA */}
-
-                    <aside className="mx-auto flex w-full max-w-[421px] flex-col lg:mx-0">
-                        <ProfileHeader
-                            name={user.name}
-                            email={user.email}
-                            location={user.location}
-                            avatarUrl={user.avatarUrl}
-                            avatarKey={user.id || user.email}
-                            memberSince={user.memberSince}
-                        />
-
-                        <div className="mt-11.75">
-                            <ProfileInfo
-                                tradesCount={items.filter((item) => item.negotiationType === "TROCA").length}
-                                salesCount={items.filter((item) => item.negotiationType === "VENDA").length}
-                                rating={user.rating}
-                                bio={user.bio}
-                                canEdit
-                            />
+                <div className="grid gap-8 lg:grid-cols-[minmax(0,1.65fr)_minmax(320px,0.95fr)] lg:items-stretch lg:gap-10">
+                    {/* ESQUERDA: identificação, biografia, estatísticas e anúncios */}
+                    <section className="min-w-0 space-y-8">
+                        <div className="flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between xl:gap-4">
+                            <div className="min-w-0 flex-1">
+                                <ProfileHeader
+                                    name={user.name}
+                                    email={user.email}
+                                    location={user.location}
+                                    avatarUrl={user.avatarUrl}
+                                    avatarKey={user.id || user.email}
+                                    memberSince={user.memberSince}
+                                />
+                            </div>
+                            <div className="w-full shrink-0 xl:w-[274px]">
+                                <ProfileInfo
+                                    tradesCount={items.filter((item) => item.negotiationType === "TROCA").length}
+                                    salesCount={items.filter((item) => item.negotiationType === "VENDA").length}
+                                    rating={user.rating}
+                                    showBio={false}
+                                />
+                            </div>
                         </div>
-
-                        <Button
-                            variant="outline"
-                            onClick={() => logOut()}
-                            className="mt-5 w-full max-w-96 rounded-[14px] text-center font-medium hover:underline"
-                        >
-                            Deslogar
-                        </Button>
-                    </aside>
-
-
-                    {/* COLUNA DIREITA */}
-
-                    <section>
+                        <ProfileInfo bio={user.bio} showStats={false} />
+                        {/* MINHA VITRINE */}
+                        <div className="rounded-[22px] bg-reuse-white/55 p-4 sm:p-6">
+                            <div className="flex flex-wrap items-center justify-between gap-4">
+                                <div>
+                                    <h2 className="text-2xl font-bold text-reuse-brown">Minha Vitrine</h2>
+                                </div>
 
                         {/* FILTROS */}
 
@@ -522,9 +517,10 @@ export default function PerfilClient({ user, items }) {
                                     <button
                                         key={filter.value}
                                         type="button"
-                                        onClick={() =>
-                                            setActiveFilter(filter.value)
-                                        }
+                                        onClick={() => {
+                                            setActiveFilter(filter.value);
+                                            setShowAllItems(false);
+                                        }}
                                         className={`rounded-full border px-4 py-2 text-[13px] font-medium transition ${active
                                             ? "border-reuse-brown bg-reuse-brown text-reuse-white"
                                             : "border-reuse-brown/10 bg-reuse-white text-reuse-brown-light hover:bg-reuse-cream"
@@ -535,6 +531,7 @@ export default function PerfilClient({ user, items }) {
                                 );
                             })}
                         </div>
+                            </div>
 
 
                         {/* QUANTIDADE */}
@@ -546,12 +543,13 @@ export default function PerfilClient({ user, items }) {
 
                         {/* CARDS */}
 
-                        <div className="mt-5 grid grid-cols-[repeat(auto-fit,minmax(173px,1fr))] justify-items-center gap-6 pb-12 lg:justify-items-start">
-                            {filteredItems.map((item, index) => (
+                        <div className="mt-5 grid grid-cols-2 justify-items-center gap-4 sm:grid-cols-[repeat(auto-fit,minmax(173px,1fr))] sm:gap-6 lg:justify-items-start">
+                            {visibleItems.map((item, index) => (
                                 <ProfileItemCard
                                     key={item.id}
                                     id={item.id}
                                     name={item.name}
+                                    category={item.category}
                                     condition={item.condition}
                                     distance={item.distance}
                                     type={item.type}
@@ -568,10 +566,25 @@ export default function PerfilClient({ user, items }) {
                             </p>
                         )}
 
+                        {filteredItems.length > 3 && (
+                            <div className="mt-6 flex justify-center">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowAllItems((current) => !current)}
+                                    aria-expanded={showAllItems}
+                                    className="rounded-xl border border-reuse-brown/20 bg-reuse-white px-5 py-2.5 text-sm font-medium text-reuse-brown transition hover:bg-reuse-cream"
+                                >
+                                    {showAllItems
+                                        ? "Mostrar menos"
+                                        : `Ver todos os ${filteredItems.length} itens`}
+                                </button>
+                            </div>
+                        )}
+
 
                         {/* BOTÃO PUBLICAR */}
 
-                        <div className="mt-4 flex justify-center">
+                        <div className="mt-7 flex justify-center">
                             <Button
                                 type="button"
                                 variant="secondary"
@@ -582,10 +595,14 @@ export default function PerfilClient({ user, items }) {
                             </Button>
                         </div>
 
+                        </div>
                     </section>
-                </div>
 
-                <ReuseAssistant />
+                    {/* DIREITA: assistente com destaque, sem empurrá-lo abaixo da Vitrine */}
+                    <aside className="min-w-0 self-stretch [&>section]:mt-0! [&>section]:max-w-none! lg:[&>section]:h-full!">
+                        <ReuseAssistant />
+                    </aside>
+                </div>
 
                 {/* ==================================================FORMULÁRIO DE PUBLICAR ITEM=================================================*/}
 

@@ -48,8 +48,8 @@ const slides = [
             </>
         ),
         description: "Faça parte de uma comunidade que acredita em novos propósitos.",
-        button: "Explorar vitrine",
-        href: "/vitrine",
+        button: "Conheça o ReUse",
+        href: "/sobre",
         image: "/images/banners/banner-3.png",
     },
 ];

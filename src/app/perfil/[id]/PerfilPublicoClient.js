@@ -116,6 +116,7 @@ export default function PerfilPublicoClient({ user, items }) {
                                         key={item.id}
                                         id={item.id}
                                         name={item.name}
+                                        category={item.category}
                                         condition={item.condition}
                                         distance={item.distance}
                                         type={item.type}

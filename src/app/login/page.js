@@ -43,7 +43,14 @@ export default function Login() {
             </section>
 
             {/* LOGIN */}
-            <section className="flex min-h-screen w-full items-center justify-center bg-reuse-brown px-8 md:w-1/2">
+            <section className="relative flex min-h-screen w-full items-center justify-center bg-reuse-brown px-8 md:w-1/2">
+
+                <Link
+                    href="/"
+                    className="absolute right-6 top-6 text-sm text-reuse-cream/75 underline-offset-4 transition hover:text-reuse-pink hover:underline sm:right-8 sm:top-8"
+                >
+                    Pular login
+                </Link>
 
                 {/* CAIXA DO LOGIN */}
                 <div className="w-full max-w-md">

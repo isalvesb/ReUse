@@ -38,8 +38,8 @@ function encodeStoragePath(value) {
     return value.split("/").map(encodeURIComponent).join("/");
 }
 
-async function uploadToSupabase(file, buffer, extension, config) {
-    const objectPath = `items/${randomUUID()}.${extension}`;
+async function uploadToSupabase(file, buffer, extension, config, folder) {
+    const objectPath = `${folder}/${randomUUID()}.${extension}`;
     const endpoint = `${config.url}/storage/v1/object/${encodeURIComponent(config.bucket)}/${encodeStoragePath(objectPath)}`;
     const response = await fetch(endpoint, {
         method: "POST",
@@ -69,9 +69,9 @@ async function uploadToSupabase(file, buffer, extension, config) {
     };
 }
 
-async function uploadLocally(buffer, extension) {
+async function uploadLocally(buffer, extension, folder) {
     const filename = `${randomUUID()}.${extension}`;
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "items");
+    const uploadDir = path.join(process.cwd(), "public", "uploads", folder);
     await mkdir(uploadDir, { recursive: true });
     await writeFile(
         path.join(uploadDir, filename),
@@ -80,11 +80,11 @@ async function uploadLocally(buffer, extension) {
     return {
         provider: "local",
         storageKey: filename,
-        url: `/uploads/items/${filename}`,
+        url: `/uploads/${folder}/${filename}`,
     };
 }
 
-export async function storeItemImage(file) {
+async function storeImage(file, folder) {
     const extension = validateImage(file);
     const buffer = Buffer.from(await file.arrayBuffer());
 
@@ -95,14 +95,22 @@ export async function storeItemImage(file) {
     const supabase = getSupabaseConfig();
 
     if (supabase) {
-        return uploadToSupabase(file, buffer, extension, supabase);
+        return uploadToSupabase(file, buffer, extension, supabase, folder);
     }
 
     if (process.env.NODE_ENV === "production") {
         throw new Error("Configure o Supabase Storage antes de publicar imagens em produção.");
     }
 
-    return uploadLocally(buffer, extension);
+    return uploadLocally(buffer, extension, folder);
+}
+
+export function storeItemImage(file) {
+    return storeImage(file, "items");
+}
+
+export function storeProfileImage(file) {
+    return storeImage(file, "avatars");
 }
 
 export async function deleteStoredItemImage(storedImage) {

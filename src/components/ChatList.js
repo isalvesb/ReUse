@@ -1,4 +1,3 @@
-import { CheckCheck } from "lucide-react";
 import SpriteImage from "@/components/SpriteImage";
 import { getAvatarSource } from "@/lib/sprite";
 
@@ -49,14 +48,7 @@ export default function ChatList({
                                         {conversation.name}
                                     </h2>
 
-                                    <div className="mt-2 flex items-start gap-2">
-
-                                        <CheckCheck
-                                            size={12}
-                                            strokeWidth={1.5}
-                                            className="mt-0.5 shrink-0 text-reuse-brown"
-                                        />
-
+                                    <div className="mt-2">
                                         <p className="line-clamp-2 text-sm leading-[18px]">
                                             {conversation.preview}
                                         </p>

@@ -1,9 +1,15 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Button from "@/components/Button";
+import Image from "next/image";
+import { Syne } from "next/font/google";
+import Link from "next/link";
 import { getCurrentUser, getUnreadNotificationCount } from "@/lib/current-user";
+import { CheckCircle2 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
+
+const syne = Syne({ subsets: ["latin"], weight: "800", display: "swap" });
 
 export const metadata = {
     title: "Sobre | ReUse",
@@ -53,10 +59,7 @@ export default async function Sobre() {
             <main className="bg-reuse-cream">
                 <section className="mx-auto grid w-full max-w-7xl gap-10 px-6 py-16 md:px-10 md:py-24 lg:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)] lg:items-center">
                     <div className="max-w-2xl">
-                        <p className="text-sm font-bold uppercase tracking-[0.2em] text-reuse-beige">
-                            Sobre o ReUse
-                        </p>
-                        <h1 className="mt-4 font-(--font-krona) text-5xl leading-tight text-reuse-brown md:text-6xl">
+                        <h1 className={`${syne.className} text-[clamp(2.5rem,4vw,3.25rem)] font-extrabold leading-none tracking-[-0.055em] text-reuse-brown`}>
                             ReUse
                         </h1>
                         <p className="mt-6 text-2xl font-semibold leading-9 text-reuse-brown md:text-3xl md:leading-10">
@@ -70,10 +73,8 @@ export default async function Sobre() {
                         </Button>
                     </div>
 
-                    <div className="relative overflow-hidden rounded-[32px] bg-reuse-brown px-8 py-10 text-reuse-cream md:px-10 md:py-12">
-                        <div className="absolute -right-12 -top-14 h-44 w-44 rounded-full bg-reuse-pink/20" />
-                        <div className="absolute -bottom-16 -left-10 h-40 w-40 rounded-full bg-reuse-beige/20" />
-                        <div className="relative">
+                    <div className="overflow-hidden rounded-[32px] bg-reuse-brown px-8 py-10 text-reuse-cream md:px-10 md:py-12">
+                        <div>
                             <p className="text-sm font-bold uppercase tracking-[0.18em] text-reuse-pink">
                                 Comprar · Trocar · Doar
                             </p>
@@ -88,24 +89,43 @@ export default async function Sobre() {
                 </section>
 
                 <section className="bg-reuse-white/60">
-                    <div className="mx-auto grid max-w-7xl gap-8 px-6 py-14 md:px-10 md:py-18 lg:grid-cols-[0.7fr_1.3fr] lg:items-start">
-                        <h2 className="text-3xl font-bold text-reuse-brown">
-                            O que é o ReUse
-                        </h2>
-                        <p className="max-w-3xl text-lg leading-8 text-reuse-brown-light">
-                            O ReUse é uma plataforma para colocar itens usados novamente em circulação. Pessoas podem anunciar, comprar, trocar ou doar produtos, prolongando sua vida útil e se conectando diretamente com quem tem interesse neles.
-                        </p>
+                    <div className="mx-auto grid max-w-7xl gap-8 px-6 py-14 md:px-10 md:py-18 lg:grid-cols-[minmax(0,1fr)_minmax(220px,290px)] lg:items-stretch lg:gap-14">
+                        <div className="flex flex-col justify-center">
+                            <h2 className="text-3xl font-bold text-reuse-brown">O que é o ReUse</h2>
+                            <p className="mt-6 max-w-3xl text-lg leading-8 text-reuse-brown-light">
+                                O ReUse é uma plataforma para colocar itens usados novamente em circulação. Pessoas podem anunciar, comprar, trocar ou doar produtos, prolongando sua vida útil e se conectando diretamente com quem tem interesse neles.
+                            </p>
+                        </div>
+                        <div className="relative mx-auto min-h-[180px] w-full max-w-[290px] lg:min-h-[230px]">
+                            <Image
+                                src="/images/cta/ImpactoColetivo.png"
+                                alt=""
+                                fill
+                                sizes="(max-width: 1024px) 290px, 290px"
+                                className="object-contain"
+                            />
+                        </div>
                     </div>
                 </section>
 
                 <section className="mx-auto w-full max-w-7xl px-6 py-16 md:px-10 md:py-20">
-                    <div className="max-w-2xl">
-                        <p className="text-sm font-bold uppercase tracking-[0.18em] text-reuse-beige">
-                            Passo a passo
-                        </p>
-                        <h2 className="mt-3 text-3xl font-bold text-reuse-brown">
-                            Como funciona
-                        </h2>
+                    <div className="flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
+                        <div className="max-w-2xl">
+                            <p className="text-sm font-bold uppercase tracking-[0.18em] text-reuse-beige">
+                                Passo a passo
+                            </p>
+                            <h2 className="mt-3 text-3xl font-bold text-reuse-brown">
+                                Como funciona
+                            </h2>
+                        </div>
+                        <Image
+                            src="/images/cta/SucessModal.png"
+                            alt=""
+                            width={300}
+                            height={170}
+                            loading="eager"
+                            className="h-auto w-full max-w-[260px]"
+                        />
                     </div>
 
                     <ol className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -128,44 +148,52 @@ export default async function Sobre() {
                     </ol>
                 </section>
 
-                <section className="mx-auto grid w-full max-w-7xl gap-10 px-6 pb-16 md:px-10 md:pb-20 lg:grid-cols-2 lg:items-center">
-                    <div>
-                        <p className="text-sm font-bold uppercase tracking-[0.18em] text-reuse-beige">
-                            Escolhas com continuidade
-                        </p>
-                        <h2 className="mt-3 text-3xl font-bold text-reuse-brown">
-                            Por que reutilizar
-                        </h2>
-                        <p className="mt-5 max-w-xl text-base leading-7 text-reuse-brown-light">
-                            Reutilizar ajuda produtos em bom estado a continuarem úteis e torna mais simples encontrar alternativas antes de comprar algo novo ou descartar o que já existe.
-                        </p>
+                <section className="bg-[#F3E8D2]">
+                    <div className="mx-auto grid w-full max-w-7xl gap-10 px-6 py-16 md:px-10 md:py-20 lg:grid-cols-[minmax(0,1fr)_minmax(260px,0.8fr)] lg:items-stretch lg:gap-16">
+                        <div className="flex flex-col justify-center">
+                            <h2 className="text-3xl font-bold text-reuse-brown">Por que reutilizar?</h2>
+                            <p className="mt-5 max-w-xl text-base leading-7 text-reuse-brown-light">
+                                Reutilizar ajuda produtos em bom estado a continuarem úteis e torna mais simples encontrar alternativas antes de comprar algo novo ou descartar o que já existe.
+                            </p>
+                            <ul className="mt-7 space-y-4">
+                                {BENEFITS.map((benefit) => (
+                                    <li key={benefit} className="flex items-start gap-3 text-reuse-brown">
+                                        <CheckCircle2 aria-hidden="true" size={21} strokeWidth={2} className="mt-0.5 shrink-0 text-reuse-brown" />
+                                        <span className="leading-6">{benefit}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                        <div className="relative min-h-[230px] w-full overflow-hidden rounded-3xl bg-reuse-brown p-6 lg:min-h-[360px]">
+                            <Image
+                                src="/images/cta/HeroBannerCTA.png"
+                                alt=""
+                                fill
+                                sizes="(max-width: 1024px) 100vw, 480px"
+                                className="object-contain p-6"
+                            />
+                        </div>
                     </div>
-
-                    <ul className="space-y-3 rounded-3xl bg-reuse-pink/30 p-6 md:p-8">
-                        {BENEFITS.map((benefit) => (
-                            <li key={benefit} className="flex items-start gap-3 text-reuse-brown">
-                                <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-reuse-brown" />
-                                <span className="leading-6">{benefit}</span>
-                            </li>
-                        ))}
-                    </ul>
                 </section>
 
-                <section className="px-6 pb-16 md:px-10 md:pb-24">
-                    <div className="mx-auto max-w-7xl rounded-[32px] bg-reuse-pink px-6 py-10 text-center md:px-10 md:py-14">
-                        <h2 className="text-3xl font-bold text-reuse-brown">
+                <section className="bg-[#F3E8D2] px-6 py-16 md:px-10 md:py-24">
+                    <div className="mx-auto max-w-7xl rounded-[32px] bg-reuse-brown px-6 py-10 text-center md:px-10 md:py-14">
+                        <h2 className="text-3xl font-bold text-reuse-cream">
                             Tem algo parado que ainda pode ser útil?
                         </h2>
-                        <p className="mx-auto mt-4 max-w-2xl leading-7 text-reuse-brown-light">
+                        <p className="mx-auto mt-4 max-w-2xl leading-7 text-reuse-cream/80">
                             Explore o que já está disponível ou publique um item para que ele encontre um novo caminho.
                         </p>
                         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                            <Button href="/vitrine" variant="secondary">
+                            <Button href="/vitrine">
                                 Explorar a Vitrine
                             </Button>
-                            <Button href="/perfil#publicar-item" variant="outline">
+                            <Link
+                                href="/perfil#publicar-item"
+                                className="inline-flex items-center justify-center rounded-3xl border border-reuse-cream px-5 py-3 text-sm font-medium text-reuse-cream transition hover:bg-reuse-cream hover:text-reuse-brown"
+                            >
                                 Publicar item
-                            </Button>
+                            </Link>
                         </div>
                     </div>
                 </section>

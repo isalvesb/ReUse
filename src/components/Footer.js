@@ -24,7 +24,7 @@ export default function Footer() {
 
                     <ul className="space-y-3 text-sm text-reuse-white">
                         <li>
-                            <Link href="/vitrine?q=vintage">Peças raras</Link>
+                            <Link href="/vitrine?curadoria=pecas-raras">Peças raras</Link>
                         </li>
 
                         <li>
