@@ -59,10 +59,11 @@ a {
   align-items: center;
   gap: 7px;
   transform: translateX(-50%);
-  border: 1px solid rgb(247 239 222 / 35%);
+  border: 1px solid rgb(247 239 222 / 75%);
   border-radius: 9999px;
-  background: rgb(52 42 42 / 82%);
-  padding: 6px 9px;
+  background: rgb(52 42 42 / 94%);
+  padding: 7px 10px;
+  box-shadow: 0 2px 8px rgb(52 42 42 / 45%);
   backdrop-filter: blur(4px);
 }
 
