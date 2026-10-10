@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
 import { sendOrchestrateMessage } from "@/lib/orchestrate";
+import { createAssistantToolDelegationToken } from "@/lib/assistant-tool-auth.mjs";
 
 export async function POST(request) {
     const user = await getCurrentUser();
@@ -21,9 +22,13 @@ export async function POST(request) {
     }
 
     try {
+        const delegationToken = await createAssistantToolDelegationToken({
+            userId: user.id,
+            sessionVersion: user.sessionVersion,
+        });
         const reply = await sendOrchestrateMessage({
             history: [...history, { role: "user", content: text }],
-            userId: user.id,
+            delegationToken,
         });
 
         return NextResponse.json({

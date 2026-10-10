@@ -3,10 +3,10 @@
   "info": {
     "title": "ReUse — ferramentas do assistente",
     "description": "Ações que o assistente virtual pode executar de verdade na plataforma ReUse (pausar/reativar ofertas, listar itens, marcar notificações como lidas).",
-    "version": "1.0.0"
+    "version": "2.0.0"
   },
   "servers": [
-    { "url": "https://pagan-blaspheme-basket.ngrok-free.dev" }
+    { "url": "https://re-use-web-bay.vercel.app" }
   ],
   "security": [
     { "apiKeyAuth": [] }
@@ -16,12 +16,12 @@
       "post": {
         "operationId": "pausarOfertas",
         "summary": "Pausa as ofertas ativas do usuário",
-        "description": "Muda todos os itens ativos do usuário para pausado, tirando-os da vitrine.",
+        "description": "Na primeira chamada, prepara uma confirmação de uso único sem alterar dados. Depois da confirmação explícita do usuário, repita a chamada com o confirmationToken devolvido.",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/UserIdRequest" }
+              "schema": { "$ref": "#/components/schemas/DelegatedToolRequest" }
             }
           }
         },
@@ -41,12 +41,12 @@
       "post": {
         "operationId": "reativarOfertas",
         "summary": "Reativa as ofertas pausadas do usuário",
-        "description": "Muda todos os itens pausados do usuário de volta para ativo, voltando-os pra vitrine.",
+        "description": "Na primeira chamada, prepara uma confirmação de uso único sem alterar dados. Depois da confirmação explícita do usuário, repita a chamada com o confirmationToken devolvido.",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/UserIdRequest" }
+              "schema": { "$ref": "#/components/schemas/DelegatedToolRequest" }
             }
           }
         },
@@ -71,7 +71,7 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/UserIdRequest" }
+              "schema": { "$ref": "#/components/schemas/DelegatedToolRequest" }
             }
           }
         },
@@ -91,12 +91,12 @@
       "post": {
         "operationId": "marcarNotificacoesLidas",
         "summary": "Marca as notificações do usuário como lidas",
-        "description": "Marca todas as notificações não lidas do usuário como lidas.",
+        "description": "Na primeira chamada, prepara uma confirmação de uso único sem alterar dados. Depois da confirmação explícita do usuário, repita a chamada com o confirmationToken devolvido.",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/UserIdRequest" }
+              "schema": { "$ref": "#/components/schemas/DelegatedToolRequest" }
             }
           }
         },
@@ -122,13 +122,18 @@
       }
     },
     "schemas": {
-      "UserIdRequest": {
+      "DelegatedToolRequest": {
         "type": "object",
-        "required": ["userId"],
+        "required": ["delegationToken"],
+        "additionalProperties": false,
         "properties": {
-          "userId": {
+          "delegationToken": {
             "type": "string",
-            "description": "ID do usuário da ReUse logado na conversa."
+            "description": "Token curto e assinado fornecido pelo servidor ReUse no contexto da conversa."
+          },
+          "confirmationToken": {
+            "type": "string",
+            "description": "Token de uso único devolvido pela primeira chamada de uma ação mutável. Não informar em consultas."
           }
         }
       },
@@ -136,6 +141,12 @@
         "type": "object",
         "properties": {
           "message": {
+            "type": "string"
+          },
+          "requiresConfirmation": {
+            "type": "boolean"
+          },
+          "confirmationToken": {
             "type": "string"
           }
         }

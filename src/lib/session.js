@@ -84,7 +84,10 @@ export async function getSession() {
             return null;
         }
 
-        return { userId: payload.userId };
+        return {
+            userId: payload.userId,
+            sessionVersion: payload.sessionVersion,
+        };
     } catch {
         return null;
     }

@@ -7,15 +7,37 @@ const SCRIPT_ID = "watson-assistant-chat-entry";
 
 let scriptInjected = false;
 let chatInstance = null;
-const currentUserId = { value: null };
 
+async function requestDelegationToken() {
+    const response = await fetch("/api/assistant/delegation", {
+        method: "POST",
+        cache: "no-store",
+        headers: { Accept: "application/json" },
+    });
 
-function handlePreSend(event) {
+    if (!response.ok) {
+        throw new Error("Não foi possível validar a sessão do assistente.");
+    }
+
+    const data = await response.json();
+
+    if (typeof data.delegationToken !== "string") {
+        throw new Error("Delegação inválida recebida do servidor.");
+    }
+
+    return data.delegationToken;
+}
+
+async function handlePreSend(event) {
+    const delegationToken = await requestDelegationToken();
+    event.data.context = event.data.context || {};
+    event.data.context.skills = event.data.context.skills || {};
     event.data.context.skills["actions skill"] =
         event.data.context.skills["actions skill"] || {};
     event.data.context.skills["actions skill"].skill_variables =
         event.data.context.skills["actions skill"].skill_variables || {};
-    event.data.context.skills["actions skill"].skill_variables.user_id = currentUserId.value;
+    event.data.context.skills["actions skill"].skill_variables.tool_delegation_token =
+        delegationToken;
 }
 
 function ensureScriptLoaded() {
@@ -30,9 +52,7 @@ function ensureScriptLoaded() {
         region: "https://integrations.au-syd.assistant-builder.watson.appdomain.cloud",
         serviceInstanceID: "ab84fd02-c931-4269-a7f7-7a47ff870115",
         orchestrateUIAgentExtensions: false,
-        
         namespace: "reuse-assistant",
-       
         themeConfig: {
             carbonTheme: "white",
         },
@@ -42,14 +62,12 @@ function ensureScriptLoaded() {
         onLoad: async (instance) => {
             chatInstance = instance;
 
-           
             try {
                 await instance.updateLocale("pt-br");
             } catch (error) {
                 console.error("Não foi possível aplicar o idioma pt-br no web chat:", error);
             }
 
-           
             try {
                 await instance.updateCSSVariables({
                     "cds-background": "#f7efde", // --reuse-cream
@@ -78,21 +96,24 @@ function ensureScriptLoaded() {
         "https://web-chat.global.assistant.watson.appdomain.cloud/versions/" +
         (window.watsonAssistantChatOptions.clientVersion || "latest") +
         "/WatsonAssistantChatEntry.js";
+    script.addEventListener("error", () => {
+        scriptInjected = false;
+        script.remove();
+    }, { once: true });
     document.head.appendChild(script);
 }
 
-export default function OrchestrateWebChat({ userId }) {
-    const previousUserId = useRef(undefined);
+export default function OrchestrateWebChat({ loggedIn }) {
+    const previousLoggedIn = useRef(undefined);
 
     useEffect(() => {
-        if (previousUserId.current === userId) {
+        if (previousLoggedIn.current === loggedIn) {
             return;
         }
 
-        previousUserId.current = userId;
-        currentUserId.value = userId;
+        previousLoggedIn.current = loggedIn;
 
-        if (userId) {
+        if (loggedIn) {
             ensureScriptLoaded();
             return;
         }
@@ -104,7 +125,7 @@ export default function OrchestrateWebChat({ userId }) {
             document.getElementById(SCRIPT_ID)?.remove();
             delete window.watsonAssistantChatOptions;
         }
-    }, [userId]);
+    }, [loggedIn]);
 
     return null;
 }

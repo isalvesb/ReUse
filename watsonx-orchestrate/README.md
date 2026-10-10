@@ -16,6 +16,10 @@ O assistente faz duas coisas:
 - Responde dúvida comum sobre como usar a plataforma: como cadastrar um
   item (venda/troca/doação) e qual a diferença entre esses três tipos.
 
+As ferramentas não recebem `userId`. A identidade vem de um token curto,
+assinado pelo servidor ReUse e vinculado à sessão autenticada. As ações que
+alteram dados usam uma confirmação persistida e de uso único.
+
 ## 1. Criar a conta
 
 Criar conta em https://www.ibm.com/products/watsonx-orchestrate e iniciar
@@ -32,6 +36,10 @@ use o tipo API key com o valor que vai em `ORCHESTRATE_TOOLS_SECRET` no
 Orchestrate manda essa chave sempre no header `x-api-key` (não dá pra
 trocar o nome do header).
 
+Sempre reimporte a versão atual do OpenAPI depois de mudar o contrato das
+ferramentas. A versão 2 usa `delegationToken` e `confirmationToken`; uma
+configuração antiga que ainda envie `userId` será rejeitada pelo servidor.
+
 ## 3. Criar o agente
 
 Criar um novo agente e preencher:
@@ -43,9 +51,10 @@ Criar um novo agente e preencher:
 - **Instruções:**
 
 ```
-Você é o assistente virtual da ReUse. No começo da conversa você recebe o
-ID do usuário logado — use esse ID sempre que for chamar uma ferramenta
-que precise de "userId", sem nunca perguntar isso ao usuário.
+Você é o assistente virtual da ReUse. No começo da conversa você recebe um
+token de delegação curto e assinado. Encaminhe esse valor sem alterações no
+campo "delegationToken" de toda ferramenta. Nunca peça, invente ou envie um
+"userId".
 
 Quando chamar uma ferramenta:
 - Pedido para pausar ofertas/anúncios ativos -> pausar_ofertas
@@ -53,8 +62,13 @@ Quando chamar uma ferramenta:
 - Pedido para ver/listar os itens publicados -> listar_ofertas
 - Pedido para marcar notificações como lidas/limpar notificações -> marcar_notificacoes_lidas
 
-Depois de chamar a ferramenta, responda usando a mensagem que ela
-devolveu, sem inventar informação adicional.
+Para pausar, reativar ou marcar notificações como lidas, a primeira chamada
+não altera dados: ela devolve "requiresConfirmation" e um
+"confirmationToken". Peça confirmação explícita ao usuário e somente depois
+repita a mesma ferramenta com o token devolvido. Não reutilize tokens.
+
+Depois de concluir a ferramenta, responda usando a mensagem que ela devolveu,
+sem inventar informação adicional.
 
 Quando só responder com texto (sem ferramenta):
 - "Como cadastro um item para troca/doação/venda?" -> explique o passo a
@@ -85,6 +99,7 @@ de "Publish" ou "Deploy" na tela do agente.
 ```
 ORCHESTRATE_APIKEY=a-api-key-da-sua-instancia (Settings > API details)
 ORCHESTRATE_CHAT_URL=...
+ORCHESTRATE_AGENT_ID=...
 ORCHESTRATE_TOOLS_SECRET=o-mesmo-valor-usado-na-ferramenta-no-passo-2
 ```
 
@@ -107,3 +122,8 @@ que eu troco o widget customizado pelo embed oficial do Orchestrate.
 - `src/components/AssistantWidget.js` — o chat flutuante, incluído em
   `src/app/layout.js`.
 - `watsonx-orchestrate/reuse-tools-openapi.yaml` — spec das ferramentas.
+
+O web chat oficial carregado por `OrchestrateWebChat.js` usa outra família de
+rotas (`/api/assistant/*`) e o arquivo `assistant/reuse-openapi.json`. Essas
+rotas usam `ASSISTANT_API_KEY`, não `ORCHESTRATE_TOOLS_SECRET`. Os dois
+segredos devem ser distintos e configurados somente no servidor.

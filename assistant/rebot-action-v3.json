@@ -687,6 +687,40 @@
         "type": "standard",
         "steps": [
           {
+            "step": "step_774_prepare",
+            "type": "standard",
+            "output": {
+              "generic": []
+            },
+            "handlers": [],
+            "resolver": {
+              "type": "callout",
+              "callout": {
+                "path": "/api/assistant/pausar-ofertas",
+                "type": "integration_interaction",
+                "method": "POST",
+                "internal": {
+                  "spec_hash_id": "71aba41894b986e0773f4a4eb49b4045acafb5eff913e25690ea7d4504d05f2b",
+                  "match_scenario": 10,
+                  "catalog_item_id": "5cc5e54f-dc7b-44da-b5ac-a14ff4b2e2a2"
+                },
+                "request_mapping": {
+                  "body": [
+                    {
+                      "value": {
+                        "skill_variable": "tool_delegation_token"
+                      },
+                      "parameter": "delegationToken"
+                    }
+                  ]
+                },
+                "result_variable": "step_774_prepare_result_1"
+              }
+            },
+            "variable": "step_774_prepare",
+            "next_step": "step_774"
+          },
+          {
             "step": "step_774",
             "type": "standard",
             "output": {
@@ -820,9 +854,16 @@
                   "body": [
                     {
                       "value": {
-                        "skill_variable": "user_id"
+                        "skill_variable": "tool_delegation_token"
                       },
-                      "parameter": "userId"
+                      "parameter": "delegationToken"
+                    },
+                    {
+                      "value": {
+                        "variable": "step_774_prepare_result_1",
+                        "variable_path": "body.confirmationToken"
+                      },
+                      "parameter": "confirmationToken"
                     }
                   ]
                 },
@@ -923,6 +964,13 @@
         },
         "variables": [
           {
+            "privacy": {
+              "enabled": true
+            },
+            "variable": "step_774_prepare_result_1",
+            "data_type": "any"
+          },
+          {
             "title": "{variable}",
             "privacy": {
               "enabled": false
@@ -1012,9 +1060,9 @@
                   "body": [
                     {
                       "value": {
-                        "skill_variable": "user_id"
+                        "skill_variable": "tool_delegation_token"
                       },
-                      "parameter": "userId"
+                      "parameter": "delegationToken"
                     }
                   ]
                 },
@@ -1102,6 +1150,96 @@
         "type": "standard",
         "steps": [
           {
+            "step": "step_871_prepare",
+            "type": "standard",
+            "output": {
+              "generic": []
+            },
+            "handlers": [],
+            "resolver": {
+              "type": "callout",
+              "callout": {
+                "path": "/api/assistant/marcar-notificacoes-lidas",
+                "type": "integration_interaction",
+                "method": "POST",
+                "internal": {
+                  "spec_hash_id": "5e9001c912772d6a33f5768d4c8a3bed35e6c73264710ee0365ae4d6c0e12b6f",
+                  "match_scenario": 10,
+                  "catalog_item_id": "5cc5e54f-dc7b-44da-b5ac-a14ff4b2e2a2"
+                },
+                "request_mapping": {
+                  "body": [
+                    {
+                      "value": {
+                        "skill_variable": "tool_delegation_token"
+                      },
+                      "parameter": "delegationToken"
+                    }
+                  ]
+                },
+                "result_variable": "step_871_prepare_result_1"
+              }
+            },
+            "variable": "step_871_prepare",
+            "next_step": "step_871_confirm"
+          },
+          {
+            "step": "step_871_confirm",
+            "type": "standard",
+            "output": {
+              "generic": [
+                {
+                  "values": [
+                    {
+                      "text_expression": {
+                        "concat": [
+                          {
+                            "scalar": "Quer mesmo marcar todas as suas notificações como lidas?"
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  "response_type": "text",
+                  "selection_policy": "sequential"
+                },
+                {
+                  "options": [
+                    {
+                      "label": "Sim",
+                      "value": {
+                        "input": {
+                          "text": "Sim"
+                        }
+                      }
+                    },
+                    {
+                      "label": "Não",
+                      "value": {
+                        "input": {
+                          "text": "Não"
+                        }
+                      }
+                    }
+                  ],
+                  "response_type": "option",
+                  "repeat_on_reprompt": true
+                }
+              ]
+            },
+            "handlers": [],
+            "question": {
+              "entity": "sys-yes-no",
+              "max_tries": 3,
+              "response_collection_behavior": "always_ask"
+            },
+            "resolver": {
+              "type": "continue"
+            },
+            "variable": "step_871_confirm",
+            "next_step": "step_871"
+          },
+          {
             "step": "step_871",
             "type": "standard",
             "output": {
@@ -1139,9 +1277,16 @@
                   "body": [
                     {
                       "value": {
-                        "skill_variable": "user_id"
+                        "skill_variable": "tool_delegation_token"
                       },
-                      "parameter": "userId"
+                      "parameter": "delegationToken"
+                    },
+                    {
+                      "value": {
+                        "variable": "step_871_prepare_result_1",
+                        "variable_path": "body.confirmationToken"
+                      },
+                      "parameter": "confirmationToken"
                     }
                   ]
                 },
@@ -1149,6 +1294,16 @@
               }
             },
             "variable": "step_871",
+            "condition": {
+              "eq": [
+                {
+                  "variable": "step_871_confirm"
+                },
+                {
+                  "scalar": "yes"
+                }
+              ]
+            },
             "next_step": "step_879"
           },
           {
@@ -1179,9 +1334,58 @@
             },
             "handlers": [],
             "resolver": {
-              "type": "continue"
+              "type": "end_action"
             },
-            "variable": "step_879"
+            "variable": "step_879",
+            "condition": {
+              "eq": [
+                {
+                  "variable": "step_871_confirm"
+                },
+                {
+                  "scalar": "yes"
+                }
+              ]
+            },
+            "next_step": "step_871_cancel"
+          },
+          {
+            "step": "step_871_cancel",
+            "type": "standard",
+            "output": {
+              "generic": [
+                {
+                  "values": [
+                    {
+                      "text_expression": {
+                        "concat": [
+                          {
+                            "scalar": "Tudo bem, nenhuma notificação foi alterada."
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  "response_type": "text",
+                  "selection_policy": "sequential"
+                }
+              ]
+            },
+            "handlers": [],
+            "resolver": {
+              "type": "end_action"
+            },
+            "variable": "step_871_cancel",
+            "condition": {
+              "eq": [
+                {
+                  "variable": "step_871_confirm"
+                },
+                {
+                  "scalar": "no"
+                }
+              ]
+            }
           }
         ],
         "title": "Marcar notificações como lidas",
@@ -1192,6 +1396,29 @@
           "intent": "action_20535_intent_48779"
         },
         "variables": [
+          {
+            "privacy": {
+              "enabled": true
+            },
+            "variable": "step_871_prepare_result_1",
+            "data_type": "any"
+          },
+          {
+            "title": "Quer mesmo marcar todas as suas notificações como lidas?",
+            "privacy": {
+              "enabled": false
+            },
+            "variable": "step_871_confirm",
+            "data_type": "yes_no"
+          },
+          {
+            "title": "Tudo bem, nenhuma notificação foi alterada.",
+            "privacy": {
+              "enabled": false
+            },
+            "variable": "step_871_cancel",
+            "data_type": "any"
+          },
           {
             "title": "Certo, vou marcar suas notificações como lidas...",
             "privacy": {
@@ -1460,6 +1687,40 @@
         "type": "standard",
         "steps": [
           {
+            "step": "step_654_prepare",
+            "type": "standard",
+            "output": {
+              "generic": []
+            },
+            "handlers": [],
+            "resolver": {
+              "type": "callout",
+              "callout": {
+                "path": "/api/assistant/reativar-ofertas",
+                "type": "integration_interaction",
+                "method": "POST",
+                "internal": {
+                  "spec_hash_id": "7818d86e962c164fd3eb71a889483ec984e21593fa36d0a7e9b8eac1bedcf42a",
+                  "match_scenario": 10,
+                  "catalog_item_id": "5cc5e54f-dc7b-44da-b5ac-a14ff4b2e2a2"
+                },
+                "request_mapping": {
+                  "body": [
+                    {
+                      "value": {
+                        "skill_variable": "tool_delegation_token"
+                      },
+                      "parameter": "delegationToken"
+                    }
+                  ]
+                },
+                "result_variable": "step_654_prepare_result_1"
+              }
+            },
+            "variable": "step_654_prepare",
+            "next_step": "step_654"
+          },
+          {
             "step": "step_654",
             "type": "standard",
             "output": {
@@ -1591,9 +1852,16 @@
                   "body": [
                     {
                       "value": {
-                        "skill_variable": "user_id"
+                        "skill_variable": "tool_delegation_token"
                       },
-                      "parameter": "userId"
+                      "parameter": "delegationToken"
+                    },
+                    {
+                      "value": {
+                        "variable": "step_654_prepare_result_1",
+                        "variable_path": "body.confirmationToken"
+                      },
+                      "parameter": "confirmationToken"
                     }
                   ]
                 },
@@ -1706,6 +1974,13 @@
           "intent": "action_21823_intent_24399"
         },
         "variables": [
+          {
+            "privacy": {
+              "enabled": true
+            },
+            "variable": "step_654_prepare_result_1",
+            "data_type": "any"
+          },
           {
             "title": "Certo! Estou reativando suas ofertas.",
             "privacy": {
@@ -1994,11 +2269,11 @@
     },
     "variables": [
       {
-        "title": "user_id",
+        "title": "tool_delegation_token",
         "privacy": {
-          "enabled": false
+          "enabled": true
         },
-        "variable": "user_id",
+        "variable": "tool_delegation_token",
         "data_type": "string",
         "description": ""
       }

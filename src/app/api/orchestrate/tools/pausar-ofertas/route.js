@@ -1,22 +1,15 @@
-import { NextResponse } from "next/server";
-import { isToolAuthorized, pausarOfertas } from "@/lib/orchestrate-actions";
+import { ASSISTANT_INTENTS } from "@/lib/assistant-intents.mjs";
+import { ASSISTANT_TOOL_SCOPES } from "@/lib/assistant-tool-auth.mjs";
+import { handleAssistantToolRequest } from "@/lib/assistant-tool-handler";
+import { pausarOfertas } from "@/lib/orchestrate-actions";
 
 export async function POST(request) {
-    if (!isToolAuthorized(request)) {
-        return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-    }
-
-    const { userId } = await request.json().catch(() => ({}));
-
-    if (!userId) {
-        return NextResponse.json({ mensagem: "Não consegui identificar o usuário." }, { status: 400 });
-    }
-
-    try {
-        const mensagem = await pausarOfertas(userId);
-        return NextResponse.json({ mensagem });
-    } catch (error) {
-        console.error("Erro ao pausar ofertas:", error);
-        return NextResponse.json({ mensagem: "Algo deu errado ao pausar as ofertas." }, { status: 500 });
-    }
+    return handleAssistantToolRequest(request, {
+        action: pausarOfertas,
+        errorMessage: "Algo deu errado ao pausar as ofertas.",
+        intent: ASSISTANT_INTENTS.PAUSAR,
+        requiredScope: ASSISTANT_TOOL_SCOPES.PAUSAR_OFERTAS,
+        responseKey: "mensagem",
+        secretEnvName: "ORCHESTRATE_TOOLS_SECRET",
+    });
 }

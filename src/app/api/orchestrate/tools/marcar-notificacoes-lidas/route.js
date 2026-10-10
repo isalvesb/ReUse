@@ -1,22 +1,15 @@
-import { NextResponse } from "next/server";
-import { isToolAuthorized, marcarNotificacoesLidas } from "@/lib/orchestrate-actions";
+import { ASSISTANT_INTENTS } from "@/lib/assistant-intents.mjs";
+import { ASSISTANT_TOOL_SCOPES } from "@/lib/assistant-tool-auth.mjs";
+import { handleAssistantToolRequest } from "@/lib/assistant-tool-handler";
+import { marcarNotificacoesLidas } from "@/lib/orchestrate-actions";
 
 export async function POST(request) {
-    if (!isToolAuthorized(request)) {
-        return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-    }
-
-    const { userId } = await request.json().catch(() => ({}));
-
-    if (!userId) {
-        return NextResponse.json({ mensagem: "Não consegui identificar o usuário." }, { status: 400 });
-    }
-
-    try {
-        const mensagem = await marcarNotificacoesLidas(userId);
-        return NextResponse.json({ mensagem });
-    } catch (error) {
-        console.error("Erro ao marcar notificações como lidas:", error);
-        return NextResponse.json({ mensagem: "Algo deu errado ao marcar as notificações." }, { status: 500 });
-    }
+    return handleAssistantToolRequest(request, {
+        action: marcarNotificacoesLidas,
+        errorMessage: "Algo deu errado ao marcar as notificações.",
+        intent: ASSISTANT_INTENTS.MARCAR_NOTIFICACOES_LIDAS,
+        requiredScope: ASSISTANT_TOOL_SCOPES.MARCAR_NOTIFICACOES_LIDAS,
+        responseKey: "mensagem",
+        secretEnvName: "ORCHESTRATE_TOOLS_SECRET",
+    });
 }

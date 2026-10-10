@@ -45,7 +45,7 @@ async function getIamToken() {
 }
 
 
-export async function sendOrchestrateMessage({ history, userId }) {
+export async function sendOrchestrateMessage({ history, delegationToken }) {
     const token = await getIamToken();
     const baseUrl = requireEnv("ORCHESTRATE_CHAT_URL").replace(/\/$/, "");
     const agentId = requireEnv("ORCHESTRATE_AGENT_ID");
@@ -54,7 +54,7 @@ export async function sendOrchestrateMessage({ history, userId }) {
     const messages = [
         {
             role: "system",
-            content: `ID do usuário logado na ReUse: ${userId}. Use esse valor sempre que precisar chamar uma ferramenta que peça userId, sem perguntar isso ao usuário.`,
+            content: `Token de delegação da sessão ReUse: ${delegationToken}. Encaminhe esse valor como delegationToken em toda ferramenta. Nunca peça, altere ou invente userId. Para ações mutáveis, chame a ferramenta primeiro sem confirmationToken, peça confirmação explícita ao usuário e só então repita a chamada com o confirmationToken devolvido.`,
         },
         ...history,
     ];

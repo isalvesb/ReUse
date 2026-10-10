@@ -40,8 +40,8 @@ export async function createPersistentAssistantConfirmationToken({ userId, inten
     return token;
 }
 
-export async function consumePersistentAssistantConfirmation(token, userId) {
-    const intent = await verifyAssistantConfirmationToken(token, userId);
+export async function consumePersistentAssistantConfirmation(token, userId, expectedIntent = null) {
+    const intent = await verifyAssistantConfirmationToken(token, userId, expectedIntent);
     const claims = getTokenClaims(token);
     const now = new Date();
 

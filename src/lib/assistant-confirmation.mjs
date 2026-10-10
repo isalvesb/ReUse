@@ -7,6 +7,7 @@ const AUDIENCE = "assistant-confirmation";
 const MUTATING_INTENTS = new Set([
     ASSISTANT_INTENTS.PAUSAR,
     ASSISTANT_INTENTS.RETOMAR,
+    ASSISTANT_INTENTS.MARCAR_NOTIFICACOES_LIDAS,
 ]);
 
 function getConfirmationKey() {
@@ -36,13 +37,17 @@ export async function createAssistantConfirmationToken({ userId, intent }) {
         .sign(getConfirmationKey());
 }
 
-export async function verifyAssistantConfirmationToken(token, userId) {
+export async function verifyAssistantConfirmationToken(token, userId, expectedIntent = null) {
     const { payload } = await jwtVerify(token, getConfirmationKey(), {
         issuer: ISSUER,
         audience: AUDIENCE,
     });
 
-    if (payload.sub !== userId || !MUTATING_INTENTS.has(payload.intent)) {
+    if (
+        payload.sub !== userId
+        || !MUTATING_INTENTS.has(payload.intent)
+        || (expectedIntent && payload.intent !== expectedIntent)
+    ) {
         throw new Error("Confirmação inválida ou pertencente a outro usuário.");
     }
 

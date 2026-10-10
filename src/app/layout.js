@@ -34,9 +34,16 @@ export default async function RootLayout({ children }) {
         </Suspense>
         {children}
         {showLegacyAssistants && (
-          <AssistantWidget loggedIn={!!user} enabled={Boolean(process.env.ORCHESTRATE_CHAT_URL && process.env.ORCHESTRATE_APIKEY)} />
+          <AssistantWidget
+            loggedIn={!!user}
+            enabled={Boolean(
+              process.env.ORCHESTRATE_CHAT_URL
+              && process.env.ORCHESTRATE_APIKEY
+              && process.env.ORCHESTRATE_AGENT_ID
+            )}
+          />
         )}
-        <OrchestrateWebChat userId={user?.id ?? null} />
+        <OrchestrateWebChat loggedIn={!!user} />
       </body>
     </html>
   );

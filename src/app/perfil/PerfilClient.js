@@ -478,7 +478,11 @@ export default function PerfilClient({ user, items }) {
                 PERFIL
             ========================= */}
 
-                <div className="grid gap-8 lg:grid-cols-[minmax(0,1.65fr)_minmax(320px,0.95fr)] lg:items-stretch lg:gap-10">
+                <div
+                    className={SHOW_LEGACY_ASSISTANTS
+                        ? "grid gap-8 lg:grid-cols-[minmax(0,1.65fr)_minmax(320px,0.95fr)] lg:items-stretch lg:gap-10"
+                        : "grid gap-8"}
+                >
                     {/* ESQUERDA: identificação, biografia, estatísticas e anúncios */}
                     <section className="min-w-0 space-y-8">
                         <div className="flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between xl:gap-4">
@@ -602,9 +606,11 @@ export default function PerfilClient({ user, items }) {
                     </section>
 
                     {/* DIREITA: assistente com destaque, sem empurrá-lo abaixo da Vitrine */}
-                    <aside className="min-w-0 self-stretch [&>section]:mt-0! [&>section]:max-w-none! lg:[&>section]:h-full!">
-                        {SHOW_LEGACY_ASSISTANTS && <ReuseAssistant />}
-                    </aside>
+                    {SHOW_LEGACY_ASSISTANTS && (
+                        <aside className="min-w-0 self-stretch [&>section]:mt-0! [&>section]:max-w-none! lg:[&>section]:h-full!">
+                            <ReuseAssistant />
+                        </aside>
+                    )}
                 </div>
 
                 {/* ==================================================FORMULÁRIO DE PUBLICAR ITEM=================================================*/}

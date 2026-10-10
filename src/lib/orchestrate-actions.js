@@ -1,11 +1,6 @@
 
 import { prisma } from "@/lib/prisma";
 
-export function isToolAuthorized(request) {
-    const secret = request.headers.get("x-api-key");
-    return Boolean(secret) && secret === process.env.ORCHESTRATE_TOOLS_SECRET;
-}
-
 export async function pausarOfertas(userId) {
     const result = await prisma.item.updateMany({
         where: { sellerId: userId, status: "ATIVO" },
