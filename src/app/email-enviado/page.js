@@ -23,15 +23,15 @@ export default async function EmailEnviado({ searchParams }) {
 
                 {/* TÍTULO */}
                 <h1 className="text-2xl font-medium text-reuse-brown">
-                    E-mail enviado!
+                    Confira seu e-mail
                 </h1>
 
                 {/* MENSAGEM */}
                 <p className="mt-4 text-base leading-7 text-reuse-brown">
-                    Enviamos um link de recuperação para {""}
+                    Se existir uma conta cadastrada para {""}
                     <strong className="font-bold">
                         {email}
-                    </strong>
+                    </strong>, enviaremos um link para redefinir a senha.
                 </p>
 
                 <div className="mt-10 flex flex-col items-center gap-5">
@@ -47,10 +47,10 @@ export default async function EmailEnviado({ searchParams }) {
 
                     {/* REENVIAR E-MAIL */}
                     <Button
-                        type="submit"
+                        href="/recuperar-senha"
                         variant="primary"
                         className="h-12 w-87.5 max-w-full rounded-[14px] text-base font-medium text-reuse-brown transition hover:opacity-90">
-                        Reenviar e-mail
+                        Solicitar novo link
                     </Button>
 
                     {/* VOLTAR PARA O LOGIN */}

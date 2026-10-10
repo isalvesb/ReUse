@@ -7,6 +7,7 @@ import {
 } from "@/lib/password-reset.mjs";
 import { isValidEmail, normalizeEmail } from "@/lib/validation.mjs";
 import { consumeRateLimit } from "@/lib/rate-limit";
+import { resolveAppUrl } from "@/lib/app-url.mjs";
 
 export async function POST(request) {
     const body = await request.json().catch(() => null);
@@ -62,7 +63,7 @@ export async function POST(request) {
         }),
     ]);
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+    const appUrl = resolveAppUrl({ requestUrl: request.url });
     const resetLink = `${appUrl}/redefinir-senha/${rawToken}`;
 
     if (process.env.NODE_ENV !== "production") {
@@ -76,9 +77,11 @@ export async function POST(request) {
 
     try {
         const resend = new Resend(process.env.RESEND_API_KEY);
+        const fromEmail = process.env.RESEND_FROM_EMAIL?.trim()
+            || "ReUse <onboarding@resend.dev>";
 
         const { error } = await resend.emails.send({
-            from: "onboarding@resend.dev",
+            from: fromEmail,
             to: [user.email],
             subject: "Redefina sua senha - ReUse!",
             html: `
