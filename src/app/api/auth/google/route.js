@@ -1,6 +1,9 @@
-import { createOAuthState, getAppUrl } from "@/lib/oauth";
+import { createOAuthState, resolveOAuthRequest } from "@/lib/oauth";
 
-export async function GET() {
+const CALLBACK_PATH = "/api/auth/google/callback";
+const START_PATH = "/api/auth/google";
+
+export async function GET(request) {
     const clientId = process.env.GOOGLE_CLIENT_ID;
 
     if (!clientId) {
@@ -10,8 +13,21 @@ export async function GET() {
         );
     }
 
+    let oauthRequest;
+
+    try {
+        oauthRequest = resolveOAuthRequest(request, START_PATH);
+    } catch (error) {
+        console.error("[Google OAuth] Origem inválida:", error.message);
+        return new Response("Origem pública do Google OAuth não configurada.", { status: 500 });
+    }
+
+    if (oauthRequest.redirectUrl) {
+        return Response.redirect(oauthRequest.redirectUrl, 307);
+    }
+
     const state = await createOAuthState();
-    const redirectUri = `${getAppUrl()}/api/auth/google/callback`;
+    const redirectUri = `${oauthRequest.appUrl}${CALLBACK_PATH}`;
 
     const authorizeUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
     authorizeUrl.searchParams.set("client_id", clientId);

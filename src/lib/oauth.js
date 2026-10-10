@@ -2,12 +2,17 @@ import { randomBytes } from "crypto";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { findOrCreateOAuthUserWithDatabase } from "@/lib/oauth-user.mjs";
+import { resolveCanonicalRequest } from "@/lib/app-url.mjs";
 
 const STATE_COOKIE = "oauth_state";
 const STATE_MAX_AGE_SECONDS = 10 * 60; // 10 minutos
 
-export function getAppUrl() {
-    return process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+export function resolveOAuthRequest(request, canonicalPath, options = {}) {
+    return resolveCanonicalRequest({
+        requestUrl: request.url,
+        canonicalPath,
+        ...options,
+    });
 }
 
 export async function createOAuthState() {

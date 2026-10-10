@@ -1,12 +1,29 @@
 import { redirect } from "next/navigation";
-import { consumeOAuthState, findOrCreateOAuthUser, getAppUrl } from "@/lib/oauth";
+import { consumeOAuthState, findOrCreateOAuthUser, resolveOAuthRequest } from "@/lib/oauth";
 import { createSession } from "@/lib/session";
+
+const CALLBACK_PATH = "/api/auth/facebook/callback";
 
 function loginError(message) {
     return redirect(`/login?oauthError=${encodeURIComponent(message)}`);
 }
 
 export async function GET(request) {
+    let oauthRequest;
+
+    try {
+        oauthRequest = resolveOAuthRequest(request, CALLBACK_PATH, {
+            preserveSearch: true,
+        });
+    } catch (error) {
+        console.error("[Facebook OAuth] Origem inválida no callback:", error.message);
+        return new Response("Origem pública do Facebook OAuth não configurada.", { status: 500 });
+    }
+
+    if (oauthRequest.redirectUrl) {
+        return Response.redirect(oauthRequest.redirectUrl, 307);
+    }
+
     const { searchParams } = new URL(request.url);
     const code = searchParams.get("code");
     const state = searchParams.get("state");
@@ -24,7 +41,7 @@ export async function GET(request) {
 
     const clientId = process.env.FACEBOOK_CLIENT_ID;
     const clientSecret = process.env.FACEBOOK_CLIENT_SECRET;
-    const redirectUri = `${getAppUrl()}/api/auth/facebook/callback`;
+    const redirectUri = `${oauthRequest.appUrl}${CALLBACK_PATH}`;
 
     if (!clientId || !clientSecret) {
         loginError("Login com Facebook não configurado.");
