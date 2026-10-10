@@ -38,6 +38,9 @@ const FILTER_TYPE_MAP = {
 
 const initialState = { error: null, success: false };
 
+
+const SHOW_LEGACY_ASSISTANTS = process.env.NEXT_PUBLIC_SHOW_LEGACY_ASSISTANTS === "true";
+
 function PublishFormFields() {
     const [condicao, setCondicao] = useState("");
     const [descricao, setDescricao] = useState("");
@@ -600,7 +603,7 @@ export default function PerfilClient({ user, items }) {
 
                     {/* DIREITA: assistente com destaque, sem empurrá-lo abaixo da Vitrine */}
                     <aside className="min-w-0 self-stretch [&>section]:mt-0! [&>section]:max-w-none! lg:[&>section]:h-full!">
-                        <ReuseAssistant />
+                        {SHOW_LEGACY_ASSISTANTS && <ReuseAssistant />}
                     </aside>
                 </div>
 

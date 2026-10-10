@@ -1,0 +1,145 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ReUse — ferramentas do assistente",
+    "description": "Ações que o assistente virtual pode executar de verdade na plataforma ReUse (pausar/reativar ofertas, listar itens, marcar notificações como lidas).",
+    "version": "1.0.0"
+  },
+  "servers": [
+    { "url": "https://pagan-blaspheme-basket.ngrok-free.dev" }
+  ],
+  "security": [
+    { "apiKeyAuth": [] }
+  ],
+  "paths": {
+    "/api/assistant/pausar-ofertas": {
+      "post": {
+        "operationId": "pausarOfertas",
+        "summary": "Pausa as ofertas ativas do usuário",
+        "description": "Muda todos os itens ativos do usuário para pausado, tirando-os da vitrine.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserIdRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado da ação",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/MessageResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/assistant/reativar-ofertas": {
+      "post": {
+        "operationId": "reativarOfertas",
+        "summary": "Reativa as ofertas pausadas do usuário",
+        "description": "Muda todos os itens pausados do usuário de volta para ativo, voltando-os pra vitrine.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserIdRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado da ação",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/MessageResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/assistant/listar-ofertas": {
+      "post": {
+        "operationId": "listarOfertas",
+        "summary": "Lista os itens do usuário",
+        "description": "Lista os itens publicados pelo usuário, com tipo, preço quando houver e status.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserIdRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Lista dos itens",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/MessageResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/assistant/marcar-notificacoes-lidas": {
+      "post": {
+        "operationId": "marcarNotificacoesLidas",
+        "summary": "Marca as notificações do usuário como lidas",
+        "description": "Marca todas as notificações não lidas do usuário como lidas.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserIdRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado da ação",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/MessageResponse" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
+    },
+    "schemas": {
+      "UserIdRequest": {
+        "type": "object",
+        "required": ["userId"],
+        "properties": {
+          "userId": {
+            "type": "string",
+            "description": "ID do usuário da ReUse logado na conversa."
+          }
+        }
+      },
+      "MessageResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

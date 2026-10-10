@@ -1,0 +1,115 @@
+openapi: 3.0.1
+info:
+  title: ReUse — ferramentas do assistente
+  description: >
+    Ações que o agente da ReUse no watsonx Orchestrate pode executar de
+    verdade na plataforma (pausar/reativar oferta, listar itens, marcar
+    notificação como lida).
+  version: "1.0.0"
+servers:
+  - url: https://re-use-web-bay.vercel.app/api/orchestrate/tools
+security:
+  - toolsApiKey: []
+paths:
+  /pausar-ofertas:
+    post:
+      operationId: pausar_ofertas
+      summary: Pausa ofertas ativas
+      description: >
+        Pausa todas as ofertas/anúncios ativos do usuário, tirando-os da
+        vitrine da ReUse até serem reativados. Use quando o usuário pedir
+        pra pausar, suspender ou esconder os itens que ele anuncia.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserIdRequest"
+      responses:
+        "200":
+          description: Resultado da ação
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MensagemResponse"
+  /reativar-ofertas:
+    post:
+      operationId: reativar_ofertas
+      summary: Reativa ofertas pausadas
+      description: >
+        Reativa as ofertas/anúncios pausados do usuário, voltando-os pra
+        vitrine da ReUse. Use quando o usuário pedir pra reativar ou voltar
+        a anunciar os itens dele.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserIdRequest"
+      responses:
+        "200":
+          description: Resultado da ação
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MensagemResponse"
+  /listar-ofertas:
+    post:
+      operationId: listar_ofertas
+      summary: Lista os itens do usuário
+      description: >
+        Lista os itens publicados pelo usuário na ReUse e o status de cada
+        um (ativo, pausado, etc). Use quando o usuário quiser ver o que ele
+        tem anunciado.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserIdRequest"
+      responses:
+        "200":
+          description: Lista dos itens
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MensagemResponse"
+  /marcar-notificacoes-lidas:
+    post:
+      operationId: marcar_notificacoes_lidas
+      summary: Marca notificações como lidas
+      description: >
+        Marca todas as notificações não lidas do usuário como lidas. Use
+        quando o usuário pedir pra limpar ou marcar as notificações dele.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserIdRequest"
+      responses:
+        "200":
+          description: Resultado da ação
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MensagemResponse"
+components:
+  securitySchemes:
+    toolsApiKey:
+      type: apiKey
+      in: header
+      name: x-api-key
+  schemas:
+    UserIdRequest:
+      type: object
+      required: [userId]
+      properties:
+        userId:
+          type: string
+          description: ID do usuário da ReUse logado na conversa (vem do contexto do sistema, nunca perguntar ao usuário).
+    MensagemResponse:
+      type: object
+      properties:
+        mensagem:
+          type: string

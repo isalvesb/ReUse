@@ -26,14 +26,12 @@ export default function BackButton({ fallback = "/vitrine", className = "", chil
         const trackedCurrent = sessionStorage.getItem(CURRENT_PATH_KEY);
         const previousPath = safeInternalPath(sessionStorage.getItem(PREVIOUS_PATH_KEY), origin);
 
-        // Só usa a origem rastreada quando ela pertence à navegação atual.
-        // Nunca usa history.back(), que poderia retornar a uma página externa.
+      
         if (trackedCurrent === currentPath && previousPath && previousPath !== currentPath) {
             event.preventDefault();
             sessionStorage.removeItem(PREVIOUS_PATH_KEY);
             router.push(previousPath);
         }
-        // Caso contrário, o href nativo garante o fallback, mesmo sem JavaScript.
     }
 
     return (
