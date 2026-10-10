@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useRef } from "react";
 import { Send } from "lucide-react";
 import SpriteImage from "@/components/SpriteImage";
 import { getAvatarSource } from "@/lib/sprite";
@@ -18,6 +21,16 @@ function formatDate(value) {
 }
 
 export default function ChatWindow({ conversation, formAction, pending, error }) {
+    const messagesRef = useRef(null);
+    const lastMessageId = conversation?.messages.at(-1)?.id;
+
+    useEffect(() => {
+        const area = messagesRef.current;
+        if (area) {
+            area.scrollTop = area.scrollHeight;
+        }
+    }, [conversation?.id, lastMessageId]);
+
     if (!conversation) {
         return (
             <section className="flex min-h-[540px] min-w-0 flex-1 items-center justify-center px-8 text-center text-reuse-brown-light">
@@ -32,7 +45,7 @@ export default function ChatWindow({ conversation, formAction, pending, error })
         : conversation.id;
 
     return (
-        <section className="flex min-h-[640px] min-w-0 flex-1 flex-col">
+        <section className="flex h-[640px] min-h-0 min-w-0 flex-1 flex-col">
             <div className="flex min-h-[88px] shrink-0 items-center gap-3 border-b border-reuse-brown/20 px-7 py-3">
                 <div className="h-[60px] w-[60px] shrink-0 overflow-hidden rounded-full">
                     <SpriteImage
@@ -54,7 +67,9 @@ export default function ChatWindow({ conversation, formAction, pending, error })
                 </div>
             </div>
 
-            <div className="relative flex-1 bg-[#F2D5AB]/20 px-5 py-8 md:px-16">
+            <div
+                ref={messagesRef}
+                className="relative min-h-0 flex-1 overflow-y-auto bg-[#F2D5AB]/20 px-5 py-8 md:px-16">
                 {lastMessage && (
                     <p className="mb-7 text-center text-[11px] text-reuse-brown-light">
                         {formatDate(lastMessage.createdAt)}
