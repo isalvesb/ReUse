@@ -20,10 +20,12 @@ O build normal agora gera o client Prisma, mas **não aplica migrations**. Migra
 
 ## Verificações
 
-- Testes de regras e lint no checkout.
-- Build de produção em cópia isolada, sem .env original.
+- 48 testes automatizados de regras aprovados e lint sem erros no checkout.
+- Build de produção em cópia isolada, sem .env original. A cópia evita substituir .next ou interferir em outro servidor de desenvolvimento.
 - PostgreSQL exclusivo: sete migrations e seed fictício aplicados localmente.
-- Interface: cadastro, login, upload de duas fotos, publicação, busca, galeria, pausa e reativação com confirmação, conversa e resposta entre duas contas, notificação.
+- Interface real no navegador local: cadastro, login, upload de duas fotos, publicação, busca, galeria, pausa e reativação com confirmação, conversa e resposta entre duas contas, notificação e marcação de leitura. Duas mensagens foram confirmadas no PostgreSQL exclusivo.
+- HTTP com banco local indisponível: Home e Vitrine responderam com aviso explícito de indisponibilidade. Nenhum dado fictício substituiu a falha.
+- Imagem enviada após o build servida com HTTP 200 tanto pela rota local protegida quanto pelo otimizador de imagem. Isso não valida Supabase Storage ou armazenamento serverless.
 - `npm run demo -- verify`: teste HTTP das ferramentas IBM contra o PostgreSQL local, incluindo isolamento e confirmação de uso único. Isso valida o contrato local das ferramentas, não a instância IBM.
 
 ## Limites

@@ -2,7 +2,9 @@
 
 Não há deploy criado por estas alterações. Este documento separa o que está pronto no código, o que foi validado localmente e o que ainda depende de configuração de produção.
 
-## Estado confirmado do ambiente local
+## Registro histórico de validações locais
+
+Os resultados abaixo são registros anteriores, preservados para histórico. Não foram repetidos com provedores externos em 24/10/2026 e não comprovam o estado atual desses serviços. A revisão atual usou PostgreSQL e demonstração isolados; consulte [diagnóstico, evidências e limites atuais](conclusao-local-2026.md). Push, preview, deploy e alterações remotas continuam proibidos sem nova autorização.
 
 - Supabase Storage configurado com bucket público `reuse-items`; um upload real feito pelo formulário do ReUse apareceu em `reuse-items/items/`.
 - Resend configurado; solicitação, recebimento do e-mail, redefinição de senha e novo login foram validados de ponta a ponta.
@@ -37,7 +39,9 @@ A integração validada usa a chave JWT legada `service_role`, enviada nos heade
 
 O bucket público permite leitura das imagens por URL, mas não torna uploads e exclusões públicos. Essas operações continuam autenticadas no servidor.
 
-## Ordem sugerida
+## Ordem sugerida para uma publicação futura autorizada
+
+Não executar estas etapas remotas durante o desenvolvimento local em sigilo. O build atual gera o client Prisma, mas não executa migrations; conferir histórico/destino e aplicar alterações de banco é uma operação separada.
 
 1. Criar PostgreSQL e aplicar as migrations.
 2. Criar o bucket público do Supabase Storage.
