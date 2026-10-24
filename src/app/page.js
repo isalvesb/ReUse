@@ -9,13 +9,16 @@ import { getCurrentUser, getUnreadNotificationCount } from "@/lib/current-user";
 import { formatItemForCard } from "@/lib/format";
 import { NEARBY_DEMO_ITEMS, demoItemFilter, demoItemOrderEntries } from "@/lib/demo-curations";
 
+import { readCatalog } from "@/lib/catalog-availability.mjs";
+import CatalogUnavailable from "@/components/CatalogUnavailable";
+
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const user = await getCurrentUser();
 
   // Prioriza a seleção demonstrativa por título, anunciante e localização.
-  const nearbyItems = await prisma.item.findMany({
+  const catalog = await readCatalog(() => prisma.item.findMany({
     where: {
       status: "ATIVO",
       OR: NEARBY_DEMO_ITEMS.map(demoItemFilter),
@@ -25,7 +28,8 @@ export default async function Home() {
       category: true,
       seller: { select: { email: true } },
     },
-  });
+  }));
+  const nearbyItems = catalog.items;
 
   const itemOrder = new Map(demoItemOrderEntries(NEARBY_DEMO_ITEMS));
   const selectedItems = nearbyItems
@@ -48,6 +52,7 @@ export default async function Home() {
       <main className="min-h-screen w-full bg-reuse-cream pb-20">
 
         <Hero />
+        {!catalog.available && <div className="mx-auto max-w-7xl px-6"><CatalogUnavailable /></div>}
 
         {/* CATEGORIAS */}
         <section id="categorias" className="mx-auto mt-16 w-full max-w-7xl scroll-mt-28 px-6">
@@ -104,7 +109,7 @@ export default async function Home() {
               </Link>
             ))}
 
-            {products.length === 0 && (
+            {catalog.available && products.length === 0 && (
               <p className="text-sm text-reuse-brown-light">
                 Nenhum item ativo disponível no momento.
               </p>

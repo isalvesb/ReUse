@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useMemo, useState } from "react";
+import { useActionState, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import ChatList from "@/components/ChatList";
 import ChatWindow from "@/components/ChatWindow";
@@ -10,10 +10,17 @@ const initialState = { error: null };
 
 export default function ChatClient({ conversations, initialConversationId }) {
     const router = useRouter();
-    const [selectedConversationId, setSelectedConversationId] = useState(
-        initialConversationId
-    );
+    const [selection, setSelection] = useState(null);
+    const selectedConversationId = selection?.source === initialConversationId
+        ? selection.id : initialConversationId;
     const [state, formAction, pending] = useActionState(sendMessage, initialState);
+
+    useEffect(() => {
+        const refresh = () => { if (!document.hidden && !pending) router.refresh(); };
+        const timer = window.setInterval(refresh, 5000);
+        window.addEventListener("focus", refresh);
+        return () => { window.clearInterval(timer); window.removeEventListener("focus", refresh); };
+    }, [router, pending]);
 
     const selectedConversation = useMemo(
         () => conversations.find(
@@ -31,7 +38,7 @@ export default function ChatClient({ conversations, initialConversationId }) {
             return;
         }
 
-        setSelectedConversationId(conversationId);
+        setSelection({ id: conversationId, source: initialConversationId });
 
         const search = conversationId.startsWith("new:")
             ? `itemId=${encodeURIComponent(conversation.itemId)}`

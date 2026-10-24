@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import SpriteImage from "@/components/SpriteImage";
 
 export default function ProductGallery({
@@ -7,13 +10,14 @@ export default function ProductGallery({
     ribbonLabel,
     ribbonClasses = "",
 }) {
+    const [selectedImage, setSelectedImage] = useState(mainImage);
     return (
         <section className="min-w-0">
 
             {/* IMAGEM PRINCIPAL */}
             <div className="relative aspect-square w-full max-w-[487px] overflow-hidden rounded-xl bg-reuse-white">
                 <SpriteImage
-                    src={mainImage}
+                    src={selectedImage}
                     alt={mainAlt}
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"
@@ -32,9 +36,13 @@ export default function ProductGallery({
             <div className="mt-3 flex gap-2">
 
                 {thumbnails.map((image, index) => (
-                    <div
-                        key={index}
-                        className="relative h-12 w-12 overflow-hidden rounded-md bg-reuse-white"
+                    <button
+                        type="button"
+                        key={image}
+                        aria-label={`Ver foto ${index + 1}`}
+                        aria-pressed={selectedImage === image}
+                        onClick={() => setSelectedImage(image)}
+                        className="relative h-12 w-12 overflow-hidden rounded-md border-2 border-reuse-brown/30 bg-reuse-white aria-pressed:border-reuse-brown"
                     >
                         <SpriteImage
                             src={image}
@@ -43,7 +51,7 @@ export default function ProductGallery({
                             sizes="48px"
                             className="object-contain"
                         />
-                    </div>
+                    </button>
                 ))}
 
             </div>

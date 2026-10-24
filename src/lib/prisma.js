@@ -1,4 +1,7 @@
 import { PrismaClient } from "@prisma/client";
+import { isLocalDemo } from "./local-demo.mjs";
+
+isLocalDemo(); // Recusa banco remoto quando o modo local está ativo.
 
 const globalForPrisma = globalThis;
 

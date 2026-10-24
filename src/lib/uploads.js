@@ -1,4 +1,5 @@
 import { randomUUID } from "crypto";
+import { isLocalDemo } from "./local-demo.mjs";
 import { mkdir, unlink, writeFile } from "fs/promises";
 import path from "path";
 import { hasValidImageSignature } from "@/lib/image-signatures.mjs";
@@ -98,7 +99,7 @@ async function storeImage(file, folder) {
         return uploadToSupabase(file, buffer, extension, supabase, folder);
     }
 
-    if (process.env.NODE_ENV === "production") {
+    if (process.env.NODE_ENV === "production" && !isLocalDemo()) {
         throw new Error("Configure o Supabase Storage antes de publicar imagens em produção.");
     }
 

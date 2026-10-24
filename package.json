@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "prisma migrate deploy && prisma generate",
+    "prebuild": "prisma generate",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -14,7 +14,9 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed",
     "db:seed:categories": "prisma db seed -- --categories-only",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "demo": "node scripts/local-demo.mjs",
+    "db:diagnose": "node scripts/diagnose-db.mjs"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

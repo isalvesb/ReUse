@@ -114,7 +114,7 @@ async function runAllowedIntent({ intent, userId, confirmed, origin, watsonText 
 
     if (intent === ASSISTANT_INTENTS.ORIENTAR_PUBLICACAO) {
         return {
-            response: "Para publicar: selecione “Publicar Novo Item”, adicione até cinco fotos, preencha título, categoria, condição, modalidade e uma descrição com pelo menos 20 caracteres. Depois, revise os dados e pressione “Publicar Item”.",
+            response: "Para publicar: selecione “Publicar Novo Item”, adicione de uma a cinco fotos, preencha título, categoria, condição, modalidade e uma descrição com pelo menos 20 caracteres. Depois, revise os dados e pressione “Publicar Item”.",
             origin,
         };
     }

@@ -113,7 +113,7 @@ export default function OrchestrateWebChat({ loggedIn }) {
 
         previousLoggedIn.current = loggedIn;
 
-        if (loggedIn) {
+        if (loggedIn && process.env.NEXT_PUBLIC_DISABLE_IBM_WEBCHAT !== "true") {
             ensureScriptLoaded();
             return;
         }

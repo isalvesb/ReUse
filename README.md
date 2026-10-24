@@ -247,3 +247,7 @@ Para publicar, é necessário validar URL, segredos de sessão, banco, callbacks
 <div align="center">
   <sub>ReUse Web e ReUse Mobile: a mesma proposta de dar continuidade às histórias dos objetos.</sub>
 </div>
+
+## Conclusão acadêmica local (2026)
+
+Consulte [escopo, execução isolada, diagnóstico e limites](docs/projeto/conclusao-local-2026.md). O build não executa migrations. O runner `npm run demo -- prepare|build|start|verify` exige PostgreSQL local e não usa credenciais externas. A versão de trabalho não foi enviada nem publicada.

@@ -6,6 +6,9 @@ import { getCurrentUser, getUnreadNotificationCount } from "@/lib/current-user";
 import { formatItemForCard } from "@/lib/format";
 import { RARE_PIECES_DEMO_ITEMS, demoItemFilter, demoItemOrderEntries } from "@/lib/demo-curations";
 
+import { readCatalog } from "@/lib/catalog-availability.mjs";
+import CatalogUnavailable from "@/components/CatalogUnavailable";
+
 export const dynamic = "force-dynamic";
 
 const CATEGORY_SLUGS = new Set([
@@ -50,7 +53,7 @@ export default async function Vitrine({ searchParams }) {
             : {}),
     };
 
-    const items = await prisma.item.findMany({
+    const catalog = await readCatalog(() => prisma.item.findMany({
         where,
         include: {
             images: { orderBy: { position: "asc" }, take: 1 },
@@ -58,7 +61,8 @@ export default async function Vitrine({ searchParams }) {
             seller: { select: { email: true } },
         },
         orderBy: { createdAt: "desc" },
-    });
+    }));
+    const items = catalog.items;
 
     const rareOrder = new Map(demoItemOrderEntries(RARE_PIECES_DEMO_ITEMS));
     const orderedItems = isRarePiecesCuration
@@ -137,6 +141,7 @@ export default async function Vitrine({ searchParams }) {
                     </form>
                 </div>
 
+                {!catalog.available && <CatalogUnavailable />}
                 <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-6">
                     {cards.map((product, index) => (
                         <ProfileItemCard
@@ -147,7 +152,7 @@ export default async function Vitrine({ searchParams }) {
                     ))}
                 </div>
 
-                {cards.length === 0 && (
+                {catalog.available && cards.length === 0 && (
                     <p className="text-sm text-reuse-brown-light">
                         Nenhum item disponível na vitrine ainda.
                     </p>
