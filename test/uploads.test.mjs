@@ -40,6 +40,10 @@ test("mantém extensões e tipos de imagem em uma única regra", () => {
 
 test("valida quantidade, tipo e tamanho das fotos do item", () => {
     assert.equal(
+        getItemPhotoValidationError([], { required: true }),
+        "Adicione pelo menos uma foto do item."
+    );
+    assert.equal(
         getItemPhotoValidationError(
             Array.from({ length: ITEM_PHOTO_LIMITS.maxFiles + 1 }, () => image())
         ),

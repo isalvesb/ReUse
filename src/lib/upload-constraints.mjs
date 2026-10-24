@@ -15,7 +15,11 @@ export function getImageExtension(mimeType) {
     return ALLOWED_IMAGE_TYPES[mimeType] ?? null;
 }
 
-export function getItemPhotoValidationError(files) {
+export function getItemPhotoValidationError(files, { required = false } = {}) {
+    if (required && files.length === 0) {
+        return "Adicione pelo menos uma foto do item.";
+    }
+
     if (files.length > ITEM_PHOTO_LIMITS.maxFiles) {
         return `Adicione no máximo ${ITEM_PHOTO_LIMITS.maxFiles} imagens.`;
     }

@@ -137,11 +137,11 @@ function PublishFormFields() {
                 {/* TÍTULO */}
 
                 <h2 className="text-[18px] font-medium text-[#101828]">
-                    Fotos do Item
+                    Fotos do Item <span aria-hidden="true">*</span>
                 </h2>
 
                 <p className="mt-4 max-w-[272px] text-[14px] leading-5 text-[#4A5565]">
-                    Adicione até 5 fotos do seu item. A primeira
+                    Adicione de 1 a 5 fotos do seu item. A primeira
                     será a foto de capa.
                 </p>
 
@@ -155,6 +155,7 @@ function PublishFormFields() {
                     accept="image/jpeg,image/png,image/webp,image/gif"
                     multiple
                     onChange={handlePhotosChange}
+                    aria-required="true"
                     aria-describedby={photoError ? "photo-error" : undefined}
                     className="hidden"
                 />

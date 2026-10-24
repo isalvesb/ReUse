@@ -8,6 +8,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser, getUnreadNotificationCount } from "@/lib/current-user";
 import { CONDITION_LABELS, TYPE_LABELS, formatPrice } from "@/lib/format";
+import { getItemImage } from "@/lib/item-image.mjs";
 
 export const dynamic = "force-dynamic";
 
@@ -65,7 +66,7 @@ export default async function DetalheProduto({ params }) {
 
                 <div className="grid gap-8 lg:grid-cols-[minmax(0,487px)_minmax(0,1fr)] lg:items-stretch lg:gap-12">
                     <ProductGallery
-                        mainImage={product.images[0]?.url ?? "/images/itens/cadeira.png"}
+                        mainImage={getItemImage(product)}
                         mainAlt={product.title}
                         thumbnails={product.images.map((image) => image.url)}
                         ribbonLabel={TYPE_LABELS[product.type] ?? product.type}

@@ -161,7 +161,7 @@ export async function publishItem(_prevState, formData) {
         return { error: `A localização pode ter no máximo ${MAX_LOCATION_LENGTH} caracteres.` };
     }
 
-    const photoValidationError = getItemPhotoValidationError(photos);
+    const photoValidationError = getItemPhotoValidationError(photos, { required: true });
     if (photoValidationError) return { error: photoValidationError };
 
     const type = NEGOTIATION_TYPE_MAP[negotiationType];

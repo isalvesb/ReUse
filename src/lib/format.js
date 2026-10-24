@@ -1,3 +1,5 @@
+import { getItemImage } from "@/lib/item-image.mjs";
+
 export const CONDITION_LABELS = {
     NOVO: "Novo",
     USADO_COMO_NOVO: "Usado • Como novo",
@@ -45,6 +47,6 @@ export function formatItemForCard(item) {
         distance: item.location ?? "Combinar com o anunciante",
         type: TYPE_LABELS[item.type] ?? item.type,
         price: item.type === "VENDA" ? formatPrice(item.price) : null,
-        image: item.images?.[0]?.url ?? "/images/itens/cadeira.png",
+        image: getItemImage(item),
     };
 }
