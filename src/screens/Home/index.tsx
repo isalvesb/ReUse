@@ -451,7 +451,7 @@ export function HomeScreen({
         <Header onProfilePress={onNavigateToProfile} avatarUri={avatarUri} />
         <RevealOnScroll scrollY={scrollY}>
           <View style={styles.searchWrap}>
-            <SearchBar value={query} onChangeText={setQuery} onSubmit={() => { Keyboard.dismiss(); catalogScroll.current?.scrollTo({ y: itemsSectionY, animated: true }); }} />
+            <SearchBar value={query} onChangeText={setQuery} onSubmit={() => { Keyboard.dismiss(); catalogScroll.current?.scrollTo({ y: Math.max(0, itemsSectionY - insets.top - 16), animated: true }); }} />
             {(query || catalogCategory) ? <View><Text style={styles.caption}>{catalogError ? "Consulta indisponível" : `${filteredCatalog.length} anúncio(s) encontrado(s)`}{catalogCategory ? ` · ${catalogCategory}` : ""}</Text><Pressable accessibilityRole="button" onPress={() => { setQuery(""); setCatalogCategory(""); }} style={{paddingVertical:12}}><Text style={{color:"#342A2A",fontWeight:"700"}}>Limpar busca e filtros</Text></Pressable></View> : null}
           </View>
         </RevealOnScroll>
@@ -515,7 +515,7 @@ export function HomeScreen({
               <CategoryCard
                 label="Categoria Roupas"
                 imageSource={require("../../../assets/images/categorias/roupas.jpg")}
-                onPress={() => { setCatalogCategory("Roupas"); Keyboard.dismiss(); catalogScroll.current?.scrollTo({ y: itemsSectionY, animated: true }); }}
+                onPress={() => { setCatalogCategory("Roupas"); Keyboard.dismiss(); catalogScroll.current?.scrollTo({ y: Math.max(0, itemsSectionY - insets.top - 16), animated: true }); }}
               />
             </Animated.View>
 
@@ -528,7 +528,7 @@ export function HomeScreen({
               <CategoryCard
                 label="Categoria Acessórios"
                 imageSource={require("../../../assets/images/categorias/oculos.jpg")}
-                onPress={() => { setCatalogCategory("Acessórios"); Keyboard.dismiss(); catalogScroll.current?.scrollTo({ y: itemsSectionY, animated: true }); }}
+                onPress={() => { setCatalogCategory("Acessórios"); Keyboard.dismiss(); catalogScroll.current?.scrollTo({ y: Math.max(0, itemsSectionY - insets.top - 16), animated: true }); }}
               />
             </Animated.View>
 
@@ -541,7 +541,7 @@ export function HomeScreen({
               <CategoryCard
                 label="Categoria Decoração"
                 imageSource={require("../../../assets/images/categorias/luminaria.jpg")}
-                onPress={() => { setCatalogCategory("Decoração"); Keyboard.dismiss(); catalogScroll.current?.scrollTo({ y: itemsSectionY, animated: true }); }}
+                onPress={() => { setCatalogCategory("Decoração"); Keyboard.dismiss(); catalogScroll.current?.scrollTo({ y: Math.max(0, itemsSectionY - insets.top - 16), animated: true }); }}
               />
             </Animated.View>
 
@@ -554,7 +554,7 @@ export function HomeScreen({
               <CategoryCard
                 label="Categoria Infantil"
                 imageSource={require("../../../assets/images/categorias/infantil.jpg")}
-                onPress={() => { setCatalogCategory("Infantil"); Keyboard.dismiss(); catalogScroll.current?.scrollTo({ y: itemsSectionY, animated: true }); }}
+                onPress={() => { setCatalogCategory("Infantil"); Keyboard.dismiss(); catalogScroll.current?.scrollTo({ y: Math.max(0, itemsSectionY - insets.top - 16), animated: true }); }}
               />
             </Animated.View>
           </View>
