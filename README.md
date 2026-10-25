@@ -13,36 +13,31 @@ Esta é a primeira fase do projeto ReUse, uma plataforma digital voltada à econ
 
 ---
 
-## 📱 Funcionalidades
+## 📱 Situação verificada em 25/10/2026
 
-### ✅ Já implementado
-- Tela de splash animada
-- Tela de login com autenticação local
-- Tela de criação de conta
-- Fluxo de recuperação de senha
-- Home com seções de destaque, categorias e itens
-- Navegação principal por TabBar
-- Tela de publicação com:
-  - formulário do item
-  - seleção de fotos por câmera ou galeria
-  - salvamento automático de rascunho local
-- Modal de incentivo à primeira publicação
+O aplicativo mobile e o ReUse Web têm arquiteturas independentes. Não há sincronização ou autenticação compartilhada demonstrada entre eles.
 
-### 🚧 Em desenvolvimento
-- Persistência final das publicações
-- Tela “Minha Vitrine” com listagem dos itens publicados
-- Jornada do usuário após a primeira publicação
-- Sistema de conquistas
-- Tela de mensagens/chats
-- Login social com Google e Facebook
- 
----
+- Navegação nativa, busca e categorias da Home, Vitrine e filtros, detalhes e galeria de anúncios.
+- Publicação e edição com integração de código ao Supabase; nesta homologação, executadas somente contra uma API fictícia local.
+- Rascunho textual e perfil persistidos em AsyncStorage, conferidos após recarregar o aplicativo.
+- Conversas demonstrativas com envio temporário por contato, sem comunicação externa. Recompensas são ilustrativas.
+- Firebase e login social existem no código, mas não foram homologados contra provedores reais nesta revisão. O ambiente isolado usa o desvio de autenticação de desenvolvimento já existente.
+- Câmera e galeria têm implementação nativa. A galeria abriu no iOS; seleção completa e upload pela interface ainda não estão homologados. O simulador não oferece captura real de câmera.
+- Notificações em tempo real não estão conectadas na demonstração; a interface informa essa limitação.
+- Não foi encontrado fluxo de favoritos. Não foi acrescentado um requisito novo de favoritos.
 
-## 📌 Status do Projeto
+Consulte o [relatório de homologação](docs/homologacao-20261025.md) para jornadas, evidências, pendências e limites. O contexto inicial acima é histórico; esta seção registra a situação atual.
 
-O ReUse está em desenvolvimento como projeto acadêmico e atualmente já possui a base visual e funcional do aplicativo mobile em React Native com Expo.
+## Verificação local
 
-Nesta versão, os fluxos de acesso, navegação principal, recuperação de senha, publicação com rascunho local e parte da experiência da Home já estão implementados. As próximas etapas concentram-se na persistência completa das publicações, na tela Minha Vitrine, na jornada pós-publicação e no sistema de conquistas.
+```sh
+npm test
+npm run typecheck
+```
+
+Os testes automatizados cobrem busca, condições antigas, preparação da edição, propriedade do anúncio, falhas no envio de fotos e configuração de cenas do iOS. Não substituem a execução nativa.
+
+As [ferramentas de homologação](scripts/homologacao/README.md) iniciam apenas serviços fictícios locais. Não executar builds ou demonstrações com `.env` real sem revisão. Nenhuma publicação remota foi autorizada.
 
 ---
 
