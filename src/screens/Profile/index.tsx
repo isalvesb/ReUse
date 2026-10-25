@@ -44,7 +44,7 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
   const [stats, setStats] = useState({
     trocas: 0,
     itens: 0,
-    avaliacao: 4.8,
+    avaliacao: null as number | null,
   });
 
   async function fetchStats(userEmail: string) {
@@ -61,7 +61,7 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
       setStats({
         trocas: 0,
         itens: itens || 0,
-        avaliacao: 4.8,
+        avaliacao: null as number | null,
       });
     } catch (error) {
       console.error("Erro ao buscar stats:", error);
@@ -69,7 +69,7 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
       setStats({
         trocas: 0,
         itens: 0,
-        avaliacao: 4.8,
+        avaliacao: null as number | null,
       });
     }
   }
@@ -182,6 +182,8 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
       <View style={styles.content}>
         <Pressable
           style={styles.notificationButton}
+          accessibilityRole="button"
+          accessibilityLabel="Abrir notificações"
           onPress={() => navigation.navigate("Notifications")}
           hitSlop={12}
         >
@@ -235,7 +237,7 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
               <View style={styles.statCard3}>
                 <Ionicons name="star-outline" size={16} style={styles.icon} />
                 <Text style={styles.statNumber}>
-                  {stats.avaliacao.toFixed(1)}
+                  {stats.avaliacao?.toFixed(1) ?? "—"}
                 </Text>
                 <Text style={styles.statLabel}>Avaliação</Text>
               </View>

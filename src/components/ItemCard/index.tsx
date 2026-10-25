@@ -83,7 +83,7 @@ export function ItemCard({
         <View style={styles.info}>
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.caption}>
-            {condition} • {details}
+            {condition}{details ? ` • ${details}` : ""}
           </Text>
           <Text style={styles.caption}>{distance}</Text>
           <Text style={styles.caption}>{transaction}</Text>

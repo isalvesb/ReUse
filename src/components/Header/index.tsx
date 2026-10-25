@@ -65,6 +65,8 @@ export default function Header({ onProfilePress, avatarUri }: HeaderProps) {
       <Text style={styles.logoText}>ReUse</Text>
 
       <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Abrir meu perfil"
         onPress={onProfilePress}
         onPressIn={() => animateIcon(0.94, 0.08)}
         onLongPress={() => animateIcon(0.9, 0.14)}

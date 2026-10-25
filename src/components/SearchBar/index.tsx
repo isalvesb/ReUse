@@ -3,7 +3,8 @@ import { Animated, Pressable, TextInput, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import styles from "./styles";
 
-export default function SearchBar() {
+type Props = { value?: string; onChangeText?: (value: string) => void; onSubmit?: () => void };
+export default function SearchBar({ value, onChangeText, onSubmit }: Props) {
   const [search, setSearch] = useState("");
 
   const inputRef = useRef<TextInput>(null);
@@ -50,6 +51,7 @@ export default function SearchBar() {
 
   return (
     <Pressable
+      accessible={false}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       onLongPress={handleLongPress}
@@ -76,8 +78,10 @@ export default function SearchBar() {
             style={styles.input}
             placeholder="Buscar móveis, roupas, eletrônicos..."
             placeholderTextColor="#A0947A"
-            value={search}
-            onChangeText={setSearch}
+            accessibilityLabel="Buscar anúncios"
+            value={value ?? search}
+            onChangeText={(text) => { setSearch(text); onChangeText?.(text); }}
+            onSubmitEditing={onSubmit}
             autoCapitalize="none"
             autoCorrect={false}
             returnKeyType="search"

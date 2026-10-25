@@ -206,6 +206,8 @@ export function ProductScreen({ route }: Props) {
           {isOwner && (
             <TouchableOpacity
               style={styles.editBtn}
+              accessibilityRole="button"
+              accessibilityLabel="Editar meu anúncio"
               activeOpacity={0.85}
               onPress={() =>
                 navigation.navigate("HomeScreen", {
@@ -234,6 +236,9 @@ export function ProductScreen({ route }: Props) {
             {images.map((uri, i) => (
               <TouchableOpacity
                 key={i}
+                accessibilityRole="button"
+                accessibilityLabel={`Ver foto ${i + 1}`}
+                accessibilityState={{selected:i === selectedImage}}
                 onPress={() => setSelectedImage(i)}
                 activeOpacity={0.8}
                 style={[

@@ -99,6 +99,8 @@ export function PublishSuccessModal({
         >
           <TouchableOpacity
             style={styles.closeBtn}
+            accessibilityRole="button"
+            accessibilityLabel="Fechar confirmação de publicação"
             onPress={onClose}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
@@ -114,6 +116,7 @@ export function PublishSuccessModal({
           </View>
 
           <Text style={styles.title}>{getTitle()}</Text>
+          <Text style={styles.subtitle}>Recompensas ilustrativas, sem benefícios reais.</Text>
 
           {levelsToShow.length > 0 && (
             <Text style={styles.subtitle}>

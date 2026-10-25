@@ -33,7 +33,7 @@ export function IncentiveCard({
       <View style={styles.sparkleCircle}>
         <Ionicons name="sparkles" size={24} color="#2C2416" />
      </View>
-      <Text style={styles.incentiveTitle}>Publique agora seu primeiro item</Text>
+      <Text style={styles.incentiveTitle}>{isFirstItem ? "Publique agora seu primeiro item" : "Continue sua jornada sustentável"}</Text>
       <Text style={styles.incentiveBody}>
         {isFirstItem
           ? "Publique seu primeiro item e desbloqueie benefícios incríveis! Veja o que te aguarda:"

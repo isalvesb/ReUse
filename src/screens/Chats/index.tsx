@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   View,
   Text,
@@ -8,15 +8,17 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import styles from "./styles";
 
 const chats = [
   {
     id: "1",
     userName: "Maria Silva",
-    status: "Online",
+    status: "Demonstração local",
     productStatus: "Negociando troca",
     productName: "cadeira de madeira",
     lastMessage: "Ah, sem problemas, vou pensar um pouco mais e te retorno",
@@ -25,7 +27,7 @@ const chats = [
   {
     id: "2",
     userName: "João Pedro",
-    status: "Online",
+    status: "Demonstração local",
     productStatus: "Interessado no item",
     productName: "luminária usada",
     lastMessage: "Ainda está disponível?",
@@ -66,24 +68,38 @@ const messages = [
   },
 ];
 
-export default function Chats() {
+export default function Chats({embedded = false}: {embedded?: boolean}) {
+  const insets = useSafeAreaInsets();
+  const messageList = useRef<FlatList>(null);
   const [selectedChat, setSelectedChat] = useState<any>(null);
   const [message, setMessage] = useState("");
+  const [threadMessages, setThreadMessages] = useState<Record<string, typeof messages>>({});
+  const initialMessages = (id: string) => id === "1" ? messages : [{id:"initial-2",text:"Ainda está disponível?",time:"09:48",fromMe:true}];
+  const sendLocalMessage = () => {
+    const text = message.trim();
+    if (!text || !selectedChat) return;
+    const entry = {id:`local-${Date.now()}`,text,time:new Intl.DateTimeFormat("pt-BR",{hour:"2-digit",minute:"2-digit"}).format(new Date()),fromMe:true};
+    setThreadMessages(current => ({...current,[selectedChat.id]:[...(current[selectedChat.id] || initialMessages(selectedChat.id)),entry]}));
+    setMessage("");
+    Keyboard.dismiss();
+  };
 
   function renderChatList() {
     return (
       <View style={styles.container}>
-        <Text style={styles.pageTitle}>Conversas</Text>
+        <Text style={[styles.pageTitle,{marginTop:insets.top+12}]}>Conversas</Text>
+        <Text style={{color:"#584C4C",paddingHorizontal:24}}>Demonstração local. Mensagens temporárias, sem envio a outro usuário.</Text>
 
         <FlatList
           data={chats}
+          extraData={threadMessages}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
           renderItem={({ item }) => (
             <TouchableOpacity
               style={styles.chatCard}
               activeOpacity={0.8}
-              onPress={() => setSelectedChat(item)}
+              onPress={() => { setSelectedChat(item); setMessage(""); }}
             >
               <View style={styles.avatar}>
                 <Text style={styles.avatarText}>
@@ -94,13 +110,13 @@ export default function Chats() {
               <View style={styles.chatInfo}>
                 <View style={styles.chatHeader}>
                   <Text style={styles.userName}>{item.userName}</Text>
-                  <Text style={styles.chatTime}>{item.time}</Text>
+                  <Text style={styles.chatTime}>{threadMessages[item.id]?.slice(-1)[0]?.time || item.time}</Text>
                 </View>
 
                 <Text style={styles.productStatus}>{item.productStatus}</Text>
                 <Text style={styles.productName}>{item.productName}</Text>
                 <Text style={styles.lastMessage} numberOfLines={1}>
-                  {item.lastMessage}
+                  {threadMessages[item.id]?.slice(-1)[0]?.text || item.lastMessage}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -113,10 +129,10 @@ export default function Chats() {
   function renderChatDetail() {
     return (
       <KeyboardAvoidingView
-        style={styles.container}
+        style={[styles.container,{marginBottom:embedded ? insets.bottom+112 : insets.bottom}]}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <View style={styles.detailHeader}>
+        <View style={[styles.detailHeader,{paddingTop:insets.top+12}]}>
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => setSelectedChat(null)}
@@ -134,7 +150,7 @@ export default function Chats() {
 
             <View>
               <Text style={styles.detailUserName}>{selectedChat.userName}</Text>
-              <Text style={styles.onlineText}>{selectedChat.status}</Text>
+              <Text style={styles.onlineText}>{selectedChat.status} · sem envio externo</Text>
             </View>
           </View>
         </View>
@@ -151,7 +167,9 @@ export default function Chats() {
         </View>
 
         <FlatList
-          data={messages}
+          ref={messageList}
+          onContentSizeChange={() => messageList.current?.scrollToEnd({animated:true})}
+          data={threadMessages[selectedChat.id] || initialMessages(selectedChat.id)}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.messagesContent}
           renderItem={({ item }) => (
@@ -189,9 +207,12 @@ export default function Chats() {
             placeholderTextColor="#8F8A84"
             value={message}
             onChangeText={setMessage}
+            accessibilityLabel="Mensagem demonstrativa"
+            maxLength={1000}
+            onSubmitEditing={sendLocalMessage}
           />
 
-          <TouchableOpacity style={styles.sendButton} activeOpacity={0.8}>
+          <TouchableOpacity style={styles.sendButton} activeOpacity={0.8} onPress={sendLocalMessage} disabled={!message.trim()} accessibilityRole="button" accessibilityLabel="Enviar mensagem demonstrativa" accessibilityState={{disabled:!message.trim()}}>
             <Ionicons name="paper-plane-outline" size={22} color="#342A2A" />
           </TouchableOpacity>
         </View>

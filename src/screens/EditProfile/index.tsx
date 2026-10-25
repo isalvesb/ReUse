@@ -159,7 +159,7 @@ export function EditProfileScreen() {
             style={styles.avatar}
           />
 
-          <Pressable style={styles.cameraButton} onPress={handlePickImage}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Alterar foto do perfil" style={styles.cameraButton} onPress={handlePickImage}>
             <Ionicons name="camera-outline" size={20} color={"#fff"} />
           </Pressable>
         </View>
@@ -223,12 +223,14 @@ export function EditProfileScreen() {
         <View style={styles.actions}>
           <Pressable
             style={styles.cancelButton}
+            accessibilityRole="button"
+            accessibilityLabel="Cancelar edição do perfil"
             onPress={() => navigation.goBack()}
           >
             <Ionicons name="close" size={24} color={"#342A2A"} />
           </Pressable>
 
-          <Pressable style={styles.saveButton} onPress={handleSave}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Salvar perfil" style={styles.saveButton} onPress={handleSave}>
             <Ionicons name="checkmark" size={24} color={"#EBBBEB"} />
           </Pressable>
         </View>

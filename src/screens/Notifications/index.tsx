@@ -11,6 +11,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { supabase } from "../../lib/supabase";
+import { DEV_SKIP_AUTH } from "../../config/devAuth";
 import styles from "./styles";
 
 type NotificationItem = {
@@ -26,6 +27,8 @@ export default function Notifications() {
   const insets = useSafeAreaInsets();
 
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [unavailable, setUnavailable] = useState(DEV_SKIP_AUTH);
+  const [checking, setChecking] = useState(!DEV_SKIP_AUTH);
   const [userId, setUserId] = useState<string | null>(null);
 
   async function fetchNotifications(id: string | null) {
@@ -37,6 +40,8 @@ export default function Notifications() {
       .eq("user_id", id)
       .order("created_at", { ascending: false });
 
+    setChecking(false);
+    setUnavailable(Boolean(error));
     if (!error && data) {
       setNotifications(data);
     }
@@ -44,10 +49,13 @@ export default function Notifications() {
 
   useEffect(() => {
     async function getUser() {
-      const { data } = await supabase.auth.getUser();
-      const id = data.user?.id ?? null;
-
-      setUserId(id);
+      if (DEV_SKIP_AUTH) return;
+      try {
+        const { data, error } = await supabase.auth.getUser();
+        const id = data.user?.id ?? null;
+        setUserId(id); setUnavailable(Boolean(error) || !id);
+        if (!id) setChecking(false);
+      } catch { setUnavailable(true); setChecking(false); }
     }
 
     getUser();
@@ -116,9 +124,9 @@ export default function Notifications() {
                 size={32}
                 color="#342A2A"
               />
-              <Text style={styles.emptyTitle}>Nenhuma notificação</Text>
+              <Text style={styles.emptyTitle}>{checking ? "Carregando notificações" : unavailable ? "Notificações indisponíveis" : "Nenhuma notificação"}</Text>
               <Text style={styles.emptyText}>
-                Suas notificações aparecerão aqui quando houver novidades.
+                {DEV_SKIP_AUTH ? "Demonstração: notificações em tempo real não estão conectadas." : unavailable ? "Não foi possível acessar as notificações nesta sessão." : checking ? "Aguarde a consulta." : "Suas notificações aparecerão aqui quando houver novidades."}
               </Text>
             </View>
           }

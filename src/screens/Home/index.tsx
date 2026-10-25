@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { Animated, Dimensions, ScrollView, View, Text } from "react-native";
+import { Animated, Dimensions, ScrollView, View, Text, Pressable, ActivityIndicator, Keyboard } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Header from "../../components/Header";
@@ -12,7 +12,10 @@ import { IncentiveModal } from "../../components/IncentiveCard";
 import { salvar, buscar } from "../../Services/Storage";
 import { buscarEmailUsuarioAtual } from "../../Services/firebaseAuth";
 import { supabase } from "../../lib/supabase";
+import { conditionLabel } from "../../lib/itemCondition";
 import styles from "./styles";
+import { getItems, Item } from "../../Services/Items";
+import { filterCatalog } from "../../lib/catalog";
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 const SCREEN_HEIGHT = Dimensions.get("window").height;
@@ -172,6 +175,23 @@ export function HomeScreen({
 }: HomeScreenProps) {
   const [showIncentive, setShowIncentive] = useState(false);
   const [avatarUri, setAvatarUri] = useState<string | null>(null);
+  const [catalog, setCatalog] = useState<Item[]>([]);
+  const [catalogError, setCatalogError] = useState("");
+  const [catalogLoading, setCatalogLoading] = useState(true);
+  const [catalogAttempt, setCatalogAttempt] = useState(0);
+  const [query, setQuery] = useState("");
+  const [catalogCategory, setCatalogCategory] = useState("");
+  const catalogScroll = useRef<ScrollView>(null);
+  const filteredCatalog = filterCatalog(catalog, query, catalogCategory);
+  useFocusEffect(useCallback(() => {
+    let active = true;
+    setCatalogLoading(true); setCatalogError("");
+    getItems().then(items => { if (active) setCatalog(items); })
+      .catch(() => { if (active) setCatalogError("Não foi possível consultar os anúncios. Tente novamente."); })
+      .finally(() => { if (active) setCatalogLoading(false); });
+    return () => { active = false; };
+  }, [catalogAttempt]));
+
 
   useFocusEffect(
     useCallback(() => {
@@ -412,6 +432,7 @@ export function HomeScreen({
   return (
     <>
       <AnimatedScrollView
+        ref={catalogScroll}
         style={styles.screen}
         contentContainerStyle={[
           styles.container,
@@ -430,7 +451,8 @@ export function HomeScreen({
         <Header onProfilePress={onNavigateToProfile} avatarUri={avatarUri} />
         <RevealOnScroll scrollY={scrollY}>
           <View style={styles.searchWrap}>
-            <SearchBar />
+            <SearchBar value={query} onChangeText={setQuery} onSubmit={() => { Keyboard.dismiss(); catalogScroll.current?.scrollTo({ y: itemsSectionY, animated: true }); }} />
+            {(query || catalogCategory) ? <View><Text style={styles.caption}>{catalogError ? "Consulta indisponível" : `${filteredCatalog.length} anúncio(s) encontrado(s)`}{catalogCategory ? ` · ${catalogCategory}` : ""}</Text><Pressable accessibilityRole="button" onPress={() => { setQuery(""); setCatalogCategory(""); }} style={{paddingVertical:12}}><Text style={{color:"#342A2A",fontWeight:"700"}}>Limpar busca e filtros</Text></Pressable></View> : null}
           </View>
         </RevealOnScroll>
 
@@ -491,7 +513,9 @@ export function HomeScreen({
               ]}
             >
               <CategoryCard
+                label="Categoria Roupas"
                 imageSource={require("../../../assets/images/categorias/roupas.jpg")}
+                onPress={() => { setCatalogCategory("Roupas"); Keyboard.dismiss(); catalogScroll.current?.scrollTo({ y: itemsSectionY, animated: true }); }}
               />
             </Animated.View>
 
@@ -502,7 +526,9 @@ export function HomeScreen({
               ]}
             >
               <CategoryCard
+                label="Categoria Acessórios"
                 imageSource={require("../../../assets/images/categorias/oculos.jpg")}
+                onPress={() => { setCatalogCategory("Acessórios"); Keyboard.dismiss(); catalogScroll.current?.scrollTo({ y: itemsSectionY, animated: true }); }}
               />
             </Animated.View>
 
@@ -513,7 +539,9 @@ export function HomeScreen({
               ]}
             >
               <CategoryCard
+                label="Categoria Decoração"
                 imageSource={require("../../../assets/images/categorias/luminaria.jpg")}
+                onPress={() => { setCatalogCategory("Decoração"); Keyboard.dismiss(); catalogScroll.current?.scrollTo({ y: itemsSectionY, animated: true }); }}
               />
             </Animated.View>
 
@@ -524,7 +552,9 @@ export function HomeScreen({
               ]}
             >
               <CategoryCard
+                label="Categoria Infantil"
                 imageSource={require("../../../assets/images/categorias/infantil.jpg")}
+                onPress={() => { setCatalogCategory("Infantil"); Keyboard.dismiss(); catalogScroll.current?.scrollTo({ y: itemsSectionY, animated: true }); }}
               />
             </Animated.View>
           </View>
@@ -537,54 +567,27 @@ export function HomeScreen({
           }}
         >
           <RevealOnScroll scrollY={scrollY} offset={120}>
-            <Text style={styles.sectionTitle}>Perto de você</Text>
+            <Text style={styles.sectionTitle}>Anúncios da comunidade</Text>
           </RevealOnScroll>
 
           <RevealOnScroll scrollY={scrollY} delay={40} offset={120}>
-            <Text style={styles.caption}>Itens disponíveis na sua região</Text>
+            <Text style={styles.caption}>Localização informada pelos anunciantes</Text>
           </RevealOnScroll>
 
           <View style={styles.itemList}>
-            <Animated.View style={getItemAnimatedStyle(itemAnim1)}>
-              <ItemCard
-                title="Cadeira de madeira"
-                condition="Usado"
-                details="Bom estado"
-                distance="1 km de você"
-                transaction="Doação"
-                imageSource={require("../../../assets/images/itens/cadeira.jpg")}
-              />
-            </Animated.View>
-
-            <Animated.View style={getItemAnimatedStyle(itemAnim2)}>
-              <ItemCard
-                title="Jaqueta de couro"
-                condition="Usado"
-                details="Tam 40"
-                distance="1,4 km de você"
-                transaction="Troca"
-                imageSource={require("../../../assets/images/itens/jaqueta.jpg")}
-              />
-            </Animated.View>
-
-            <Animated.View style={getItemAnimatedStyle(itemAnim3)}>
-              <ItemCard
-                title="Teclado gamer"
-                condition="Usado"
-                details="Bom estado"
-                distance="2 km de você"
-                transaction="Venda"
-                imageSource={require("../../../assets/images/itens/teclado.jpg")}
-              />
-            </Animated.View>
+            {catalogLoading ? <ActivityIndicator accessibilityLabel="Carregando anúncios" color="#342A2A" /> : catalogError ? <View><Text accessibilityRole="alert">{catalogError}</Text><Pressable accessibilityRole="button" onPress={() => setCatalogAttempt(value => value + 1)} style={{padding:14}}><Text>Tentar novamente</Text></Pressable></View> : filteredCatalog.length === 0 ? <Text>Nenhum anúncio encontrado para esta busca.</Text> : filteredCatalog.slice(0, 6).map((item, index) => (
+              <Animated.View key={item.id} style={getItemAnimatedStyle([itemAnim1,itemAnim2,itemAnim3][Math.min(index,2)])}>
+                <ItemCard title={item.title} condition={conditionLabel(item.item_condition)} details={item.size || ""} distance={item.location || "Localização não informada"} transaction={item.item_type === "doacao" ? "Doação" : item.item_type === "troca" ? "Troca" : "Venda"} imageSource={item.images?.[0] ? {uri:item.images[0]} : require("../../../assets/images/icon.png")} onPress={() => onNavigateToProduct?.(item.id)} />
+              </Animated.View>
+            ))}
           </View>
         </View>
 
         <RevealOnScroll scrollY={scrollY}>
           <CtaCard
             title="Impacto coletivo"
-            highlightText="+ 1.240 itens"
-            subtitle="ganharam um novo destino este mês. Tem algo parado em casa? Transforme em oportunidade."
+            highlightText="Cada item conta"
+            subtitle="Dê um novo destino ao que está parado em casa. Transforme em oportunidade."
             imageSource={require("../../../assets/images/cta/ImpactoColetivo.png")}
             buttonTitle="Publicar item"
             onPress={() => onNavigateToPublish?.()}

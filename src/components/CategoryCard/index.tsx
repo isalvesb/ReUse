@@ -9,10 +9,11 @@ import styles from "./styles";
 
 type CategoryCardProps = {
   imageSource: ImageSourcePropType;
+  label: string;
   onPress?: () => void;
 };
 
-export function CategoryCard({ imageSource, onPress }: CategoryCardProps) {
+export function CategoryCard({ imageSource, label, onPress }: CategoryCardProps) {
   const scale = useRef(new Animated.Value(1)).current;
   const overlayOpacity = useRef(new Animated.Value(0)).current;
 
@@ -46,6 +47,8 @@ export function CategoryCard({ imageSource, onPress }: CategoryCardProps) {
 
   return (
     <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
       onPress={onPress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}

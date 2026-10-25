@@ -13,6 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { buscarEmailUsuarioAtual } from "../../Services/firebaseAuth";
 import { buscar } from "../../Services/Storage";
 import { getItemsByUser, Item } from "../../Services/Items";
+import { conditionLabel } from "../../lib/itemCondition";
 import styles from "./styles";
 
 type ItemType = "Venda" | "Troca" | "Doação";
@@ -115,6 +116,8 @@ export function ShowcaseScreen() {
   const [user, setUser] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [items, setItems] = useState<Item[]>([]);
+  const [loadError, setLoadError] = useState("");
+  const [attempt, setAttempt] = useState(0);
   const [filter, setFilter] = useState<FilterOption>("Todos");
 
   const filterOptions: FilterOption[] = [
@@ -144,6 +147,7 @@ export function ShowcaseScreen() {
       let isActive = true;
 
       const carregar = async () => {
+        if (isActive) { setIsLoading(true); setLoadError(""); }
         try {
           const email = buscarEmailUsuarioAtual();
 
@@ -167,7 +171,7 @@ export function ShowcaseScreen() {
               email,
               location: parsed.location ?? "Localização não informada",
               avatarUri: parsed.avatarUri ?? null,
-              avaliacao: parsed.avaliacao ?? "4.8",
+              avaliacao: parsed.avaliacao ?? "—",
             });
           } else {
             setUser({
@@ -175,7 +179,7 @@ export function ShowcaseScreen() {
               email,
               location: "Localização não informada",
               avatarUri: null,
-              avaliacao: "4.8",
+              avaliacao: "—",
             });
           }
 
@@ -185,7 +189,7 @@ export function ShowcaseScreen() {
             setItems(userItems);
           }
         } catch (err) {
-          console.error("Erro ao carregar vitrine:", err);
+          if (isActive) setLoadError("Não foi possível carregar sua Vitrine. Tente novamente.");
         } finally {
           if (isActive) {
             setIsLoading(false);
@@ -198,7 +202,7 @@ export function ShowcaseScreen() {
       return () => {
         isActive = false;
       };
-    }, []),
+    }, [attempt]),
   );
 
   if (isLoading) {
@@ -232,22 +236,22 @@ export function ShowcaseScreen() {
         </View>
         <View style={styles.ratingBadge}>
           <Ionicons name="star" size={14} color="#F5C842" />
-          <Text style={styles.ratingText}>{user?.avaliacao ?? "4.8"}</Text>
+          <Text style={styles.ratingText}>{user?.avaliacao ?? "—"}</Text>
         </View>
       </View>
 
       {/* Contadores — fecham o bloco escuro com borderRadius embaixo */}
       <View style={styles.countersRow}>
         <View style={[styles.counterCard, styles.counterCardDoacao]}>
-          <Text style={styles.counterValue}>{counts.Doações}</Text>
+          <Text style={styles.counterValue}>{loadError ? "—" : counts.Doações}</Text>
           <Text style={styles.counterLabel}>Doações</Text>
         </View>
         <View style={[styles.counterCard, styles.counterCardTroca]}>
-          <Text style={styles.counterValue}>{counts.Trocas}</Text>
+          <Text style={styles.counterValue}>{loadError ? "—" : counts.Trocas}</Text>
           <Text style={styles.counterLabel}>Trocas</Text>
         </View>
         <View style={[styles.counterCard, styles.counterCardVenda]}>
-          <Text style={styles.counterValue}>{counts.Vendas}</Text>
+          <Text style={styles.counterValue}>{loadError ? "—" : counts.Vendas}</Text>
           <Text style={styles.counterLabel}>Vendas</Text>
         </View>
       </View>
@@ -291,19 +295,21 @@ export function ShowcaseScreen() {
 
         {/* Contagem total */}
         <Text style={styles.itemCount}>
-          {filtered.length} {filtered.length === 1 ? "item" : "itens"}
+          {loadError ? "Quantidade indisponível" : `${filtered.length} ${filtered.length === 1 ? "item" : "itens"}`}
         </Text>
 
         {/* Grade */}
         <View style={styles.grid}>
-          {filtered.length > 0 ? (
+          {loadError ? (
+            <View style={styles.emptyState}><Text accessibilityRole="alert" style={styles.emptyStateText}>{loadError}</Text><TouchableOpacity accessibilityRole="button" onPress={() => setAttempt(value => value + 1)}><Text>Tentar novamente</Text></TouchableOpacity></View>
+          ) : filtered.length > 0 ? (
             filtered.map((item) => (
               <View key={item.id} style={styles.gridCell}>
                 <ItemCard
                   item={{
                     id: item.id,
                     title: item.title,
-                    condition: item.item_condition || "Bom estado",
+                    condition: conditionLabel(item.item_condition),
                     size: item.size ?? undefined,
                     distance: item.city
                       ? `${item.neighborhood ? `${item.neighborhood}, ` : ""}${item.city}`

@@ -100,6 +100,7 @@ function MainScreen({ route }: any) {
       case "publicar":
         return (
           <PublishScreen
+            key={publishParams?.mode === "edit" ? `edit-${publishParams.itemId}` : "new"}
             navigation={navigation}
             route={{ params: publishParams }}
           />
@@ -109,7 +110,7 @@ function MainScreen({ route }: any) {
         return <ShowcaseScreen />;
 
       case "chats":
-        return <Chats />;
+        return <Chats embedded />;
 
       case "home":
       default:

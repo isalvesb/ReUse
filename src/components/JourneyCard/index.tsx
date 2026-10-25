@@ -23,6 +23,7 @@ export function JourneyCard({ userItemCount }: { userItemCount: number }) {
       <View style={styles.journeyHeader}>
         <View style={{ flex: 1 }}>
           <Text style={styles.journeyTitle}>Sua Jornada Sustentável</Text>
+          <Text style={styles.journeySubtitle}>Recompensas ilustrativas, sem concessão de benefícios reais.</Text>
           <Text style={styles.journeySubtitle}>
             {getSubtitle(userItemCount)}
           </Text>
