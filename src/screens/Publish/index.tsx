@@ -22,10 +22,10 @@ import { JourneyCard } from "../../components/JourneyCard";
 import { PublishSuccessModal } from "../../components/SucessModal";
 import { CepInput } from "../../components/CepInput";
 import { CepResponse } from "../../Services/Cep";
-import { createItem, updateItem, uploadItemImages } from "../../Services/Items";
+import { createItem, updateItem, uploadItemImages, getItemById } from "../../Services/Items";
 import { buscarEmailUsuarioAtual } from "../../Services/firebaseAuth";
 import { supabase } from "../../lib/supabase";
-import { buscarToken } from "../../Services/Auth";
+import { prepareItemForEditing } from "../../lib/itemEditing";
 import styles from "./styles";
 
 type Condition =
@@ -134,7 +134,10 @@ export function PublishScreen({ navigation, route }: Props) {
   const [location, setLocation] = useState("");
 
   const [uploading, setUploading] = useState(false);
-  const [loadingItem] = useState(false);
+  const [loadingItem, setLoadingItem] = useState(isEditMode);
+  const [editError, setEditError] = useState("");
+  const [editRetry, setEditRetry] = useState(0);
+  const [loadedEditId, setLoadedEditId] = useState<number | null>(null);
 
   const salvarCampoRascunho = (key: string, value: string) => {
     if (!isEditMode) {
@@ -211,6 +214,29 @@ export function PublishScreen({ navigation, route }: Props) {
     restaurarRascunho();
   }, []);
 
+  useEffect(() => {
+    if (!isEditMode) return;
+    let active = true;
+    setLoadingItem(true); setEditError(""); setLoadedEditId(null);
+    const load = async () => {
+      try {
+        if (!editItemId) throw new Error("Anúncio não identificado.");
+        const item = prepareItemForEditing(await getItemById(editItemId), buscarEmailUsuarioAtual());
+        if (!active) return;
+        setTitle(item.title); setCategory(item.category); setCondition(item.condition);
+        setDescription(item.description); setItemType(item.item_type); setPrice(item.price || "");
+        setPhotos((item.images || []).map(uri => ({uri})));
+        setCep(item.cep || ""); setStreet(item.street || ""); setNeighborhood(item.neighborhood || "");
+        setCity(item.city || ""); setState(item.state || ""); setLocation(item.location || "");
+        setLoadedEditId(item.id);
+      } catch (error) {
+        if (active) setEditError(error instanceof Error ? error.message : "Não foi possível carregar o anúncio.");
+      } finally { if (active) setLoadingItem(false); }
+    };
+    load();
+    return () => { active = false; };
+  }, [isEditMode, editItemId, editRetry]);
+
   const salvarTitulo = (v: string) => {
     setTitle(v);
     salvarCampoRascunho("draft_title", v);
@@ -265,7 +291,7 @@ export function PublishScreen({ navigation, route }: Props) {
     setCep(v);
     salvarCampoRascunho("draft_cep", v);
 
-    if (v.length < 8) {
+    if (v !== cep) {
       limparDadosEndereco();
     }
   };
@@ -415,16 +441,6 @@ export function PublishScreen({ navigation, route }: Props) {
     return true;
   };
 
-  const marcarIncentivoComoVisto = async (userEmail: string) => {
-    await salvar(`incentive_seen:${userEmail}`, "true");
-
-    const emailToken = await buscarToken();
-
-    if (emailToken && emailToken !== userEmail) {
-      await salvar(`incentive_seen:${emailToken}`, "true");
-    }
-  };
-
   const limparFormulario = async () => {
     setPhotos([]);
     setTitle("");
@@ -482,13 +498,15 @@ export function PublishScreen({ navigation, route }: Props) {
         price: itemType === "venda" ? price : null,
       });
 
-      await salvar(`incentive_seen:${userEmail}`, "true");
-      setUserItemCount((prev) => prev + 1);
-
-      await marcarIncentivoComoVisto(userEmail);
-      await limparFormulario();
-
-      setUserItemCount((prev) => prev + 1);
+      // O anúncio já foi persistido. Falhas locais não devem aparentar falha do cadastro.
+      try {
+        await salvar(`incentive_seen:${userEmail}`, "true");
+        await limparFormulario();
+      } catch (localError) {
+        console.error("Anúncio publicado; falha ao atualizar dados locais:", localError);
+        Alert.alert("Anúncio publicado", "O anúncio foi salvo. Não foi possível atualizar todos os dados locais; confira sua Vitrine antes de publicar novamente.");
+        return;
+      }
       setShowSuccessModal(true);
     } catch (error) {
       const errorMsg =
@@ -502,7 +520,7 @@ export function PublishScreen({ navigation, route }: Props) {
 
   const handleSaveEdit = async () => {
     if (!validar()) return;
-    if (!editItemId) return;
+    if (!editItemId || loadedEditId !== editItemId) return;
 
     setUploading(true);
 
@@ -574,6 +592,14 @@ export function PublishScreen({ navigation, route }: Props) {
       setUploading(false);
     }
   };
+
+  if (isEditMode && editError) {
+    return <View style={[styles.screen,{padding:24,paddingTop:insets.top+24}]}>
+      <Text accessibilityRole="alert">{editError}</Text>
+      <TouchableOpacity accessibilityRole="button" onPress={() => setEditRetry(value => value + 1)}><Text>Tentar novamente</Text></TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" onPress={() => navigation.navigate("HomeScreen",{screen:returnTo})}><Text>Voltar à Vitrine</Text></TouchableOpacity>
+    </View>;
+  }
 
   if (loadingItem) {
     return (
@@ -662,6 +688,7 @@ export function PublishScreen({ navigation, route }: Props) {
 
         <TextInput
           style={styles.input}
+          accessibilityLabel="Título do anúncio"
           placeholder="Ex: Cadeira de escritório ergonômica"
           value={title}
           onChangeText={salvarTitulo}
@@ -674,6 +701,7 @@ export function PublishScreen({ navigation, route }: Props) {
 
         <TouchableOpacity
           style={styles.inputDropdown}
+          accessibilityRole="button"
           onPress={() => setShowCategoryModal(true)}
           activeOpacity={0.7}
         >
@@ -731,6 +759,7 @@ export function PublishScreen({ navigation, route }: Props) {
 
         <TouchableOpacity
           style={styles.inputDropdown}
+          accessibilityRole="button"
           onPress={() => setShowTypeModal(true)}
           activeOpacity={0.7}
         >
@@ -776,6 +805,7 @@ export function PublishScreen({ navigation, route }: Props) {
 
         <TextInput
           style={[styles.input, { height: 100, textAlignVertical: "top" }]}
+          accessibilityLabel="Descrição do anúncio"
           placeholder="Descreva o item, suas características"
           value={description}
           onChangeText={salvarDescricao}
@@ -852,10 +882,11 @@ export function PublishScreen({ navigation, route }: Props) {
       >
         <TouchableOpacity
           style={styles.modalOverlay}
+          accessible={false}
           activeOpacity={1}
           onPress={() => setShowCategoryModal(false)}
         >
-          <View style={styles.modalSheet}>
+          <View style={styles.modalSheet} accessibilityViewIsModal>
             <View style={styles.modalHandle} />
 
             <Text style={styles.modalTitle}>Selecione a categoria</Text>
@@ -901,10 +932,11 @@ export function PublishScreen({ navigation, route }: Props) {
       >
         <TouchableOpacity
           style={styles.modalOverlay}
+          accessible={false}
           activeOpacity={1}
           onPress={() => setShowTypeModal(false)}
         >
-          <View style={styles.modalSheet}>
+          <View style={styles.modalSheet} accessibilityViewIsModal>
             <View style={styles.modalHandle} />
 
             <Text style={styles.modalTitle}>Tipo do item</Text>
@@ -912,6 +944,9 @@ export function PublishScreen({ navigation, route }: Props) {
             {TYPE_OPTIONS.map((opt) => (
               <TouchableOpacity
                 key={opt.key}
+                accessibilityRole="button"
+                accessibilityLabel={opt.label}
+                accessibilityState={{selected:itemType === opt.key}}
                 style={[
                   styles.typeModalItem,
                   itemType === opt.key && styles.typeModalItemActive,

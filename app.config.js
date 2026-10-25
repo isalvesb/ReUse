@@ -23,7 +23,8 @@ module.exports = ({ config }) => {
             "Este identificador será usado para login com Facebook."
         }
       ],
-      "expo-tracking-transparency"
+      "expo-tracking-transparency",
+      "./plugins/with-ios-scenes"
     ],
 
     ios: {

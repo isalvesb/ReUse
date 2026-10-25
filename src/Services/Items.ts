@@ -104,6 +104,7 @@ export async function uploadItemImages(
 
     } catch (err) {
       console.error("❌ Erro no upload:", err);
+      throw new Error("Não foi possível enviar todas as fotos. Tente novamente antes de publicar.");
     }
   }
 

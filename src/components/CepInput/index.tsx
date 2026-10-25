@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { View, Text, TextInput, ActivityIndicator } from "react-native";
 import { buscarEnderecoPorCep, CepResponse } from "../../Services/Cep";
 import styles from "./styles";
@@ -20,6 +20,8 @@ function formatCep(value: string) {
 }
 
 export function CepInput({ value = "", onAddressFound, onCepChange }: CepInputProps) {
+  const requestId = useRef(0);
+  useEffect(() => () => { requestId.current += 1; }, []);
   const [cep, setCep] = useState(formatCep(value));
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -29,11 +31,13 @@ export function CepInput({ value = "", onAddressFound, onCepChange }: CepInputPr
   }, [value]);
 
   async function handleCepChange(value: string) {
+    const currentRequest = ++requestId.current;
     const onlyNumbers = value.replace(/\D/g, "").slice(0, 8);
     const formattedCep = formatCep(onlyNumbers);
 
     setCep(formattedCep);
     setErrorMessage("");
+    setLoading(false);
 
     if (onCepChange) {
       onCepChange(onlyNumbers);
@@ -48,11 +52,11 @@ export function CepInput({ value = "", onAddressFound, onCepChange }: CepInputPr
 
       const address = await buscarEnderecoPorCep(onlyNumbers);
 
-      onAddressFound(address);
+      if (requestId.current === currentRequest) onAddressFound(address);
     } catch (error) {
-      setErrorMessage("CEP não encontrado ou inválido.");
+      if (requestId.current === currentRequest) setErrorMessage("CEP não encontrado ou inválido.");
     } finally {
-      setLoading(false);
+      if (requestId.current === currentRequest) setLoading(false);
     }
   }
 
@@ -64,6 +68,7 @@ export function CepInput({ value = "", onAddressFound, onCepChange }: CepInputPr
         <TextInput
           value={cep}
           onChangeText={handleCepChange}
+          accessibilityLabel="CEP do anúncio"
           placeholder="Digite seu CEP"
           placeholderTextColor="#8A7F7F"
           keyboardType="numeric"
