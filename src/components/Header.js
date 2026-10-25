@@ -21,6 +21,27 @@ import Button from "@/components/Button";
 import { signOut } from "@/app/login/actions";
 
 
+function CatalogSearch({ className }) {
+    return (
+        <form action="/vitrine" method="get" className={className} role="search" aria-label="Pesquisar anúncios">
+                    <div className="flex h-10 w-full items-center rounded-2xl bg-reuse-cream px-4">
+                        <input
+                            type="text"
+                            name="q"
+                            maxLength={80}
+                            placeholder="Busque sapato, poltrona, notebook..."
+                            aria-label="Buscar na vitrine"
+                            className="min-w-0 w-full bg-transparent text-sm text-reuse-brown outline-none placeholder:text-xs placeholder:text-reuse-brown-light placeholder:opacity-60"
+                        />
+
+                        <button type="submit" aria-label="Buscar" className="flex min-h-10 min-w-10 items-center justify-center text-reuse-brown">
+                            <Search size={20} strokeWidth={2} />
+                        </button>
+                    </div>
+                </form>
+    );
+}
+
 export default function Header({
     loggedIn = false,
     avatarUrl,
@@ -85,22 +106,7 @@ export default function Header({
                 </Link>
 
                 {/* Busca */}
-                <form action="/vitrine" method="get" className="hidden w-[350px] md:flex">
-                    <div className="flex h-10 w-full items-center rounded-2xl bg-reuse-cream px-4">
-                        <input
-                            type="text"
-                            name="q"
-                            maxLength={80}
-                            placeholder="Busque sapato, poltrona, notebook..."
-                            aria-label="Buscar na vitrine"
-                            className="w-full bg-transparent text-sm text-reuse-brown outline-none placeholder:text-xs placeholder:text-reuse-brown-light placeholder:opacity-60"
-                        />
-
-                        <button type="submit" aria-label="Buscar" className="text-reuse-brown">
-                            <Search size={20} strokeWidth={2} />
-                        </button>
-                    </div>
-                </form>
+                <CatalogSearch className="hidden w-[350px] md:flex" />
 
                 {/* Navegação */}
                 <nav className="hidden items-center gap-7 text-sm text-reuse-white lg:flex">
@@ -322,6 +328,7 @@ export default function Header({
                     Sobre
                 </Link>
             </nav>
+            <CatalogSearch className="mx-auto mt-3 flex w-full max-w-7xl md:hidden" />
         </header >
     );
 }

@@ -85,7 +85,9 @@ export default async function Vitrine({ searchParams }) {
                     <div>
                         <h1 className="text-3xl font-bold text-reuse-brown">Vitrine</h1>
                         <p className="mt-2 text-sm text-reuse-brown-light">
-                            {isRarePiecesCuration
+                            {!catalog.available
+                                ? "A consulta dos anúncios está indisponível."
+                                : isRarePiecesCuration
                                 ? `${cards.length} peça(s) selecionada(s)`
                                 : query
                                 ? `${cards.length} resultado(s) para “${query}”`

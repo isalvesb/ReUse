@@ -251,3 +251,6 @@ Para publicar, é necessário validar URL, segredos de sessão, banco, callbacks
 ## Conclusão acadêmica local (2026)
 
 Consulte [escopo, execução isolada, diagnóstico e limites](docs/projeto/conclusao-local-2026.md). O build não executa migrations. O runner `npm run demo -- prepare|build|start|verify` exige PostgreSQL local e não usa credenciais externas. A versão de trabalho não foi enviada nem publicada.
+
+
+Homologação de 25/10/2026: [percursos reais em desktop/mobile, correções e limitações](docs/projeto/homologacao-20261025.md).

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { startTransition, useEffect, useRef, useState } from "react";
 import { useActionState } from "react";
 import Button from "@/components/Button";
 import ProfileHeader from "@/components/ProfileHeader";
@@ -455,7 +455,13 @@ export default function PerfilClient({ user, items }) {
 
     const publicarRef = useRef(null);
 
-    const [state, formAction, pending] = useActionState(publishItem, initialState);
+    const [state, formAction, pending] = useActionState(async (previous, formData) => {
+        const result = await publishItem(previous, formData);
+        return {
+            ...result,
+            lastPublishedItemId: result.publishedItemId || previous.lastPublishedItemId,
+        };
+    }, initialState);
 
     const filterType = FILTER_TYPE_MAP[activeFilter];
     const filteredItems = filterType
@@ -470,7 +476,7 @@ export default function PerfilClient({ user, items }) {
         });
     }
 
-    const fieldsKey = state.success ? `published-${state.publishedItemId}` : "draft";
+    const fieldsKey = state.lastPublishedItemId || "draft";
 
     return (
         <main className="w-full bg-reuse-cream">
@@ -627,7 +633,12 @@ export default function PerfilClient({ user, items }) {
 
                     <JourneyCard itemCount={items.length} />
 
-                    <form action={formAction}>
+                    <form action={formAction} onSubmit={(event) => {
+                        // O reset automático apagaria o rascunho mesmo quando a ação retorna erro.
+                        event.preventDefault();
+                        const data = new FormData(event.currentTarget);
+                        startTransition(() => formAction(data));
+                    }}>
 
                         <PublishFormFields key={fieldsKey} />
 
