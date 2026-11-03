@@ -50,10 +50,11 @@ function api({ statuses = [200], session = { access_token: "verified-access" }, 
     getSession: async () => ({ data: { session } }),
     refreshSession: async () => { refreshed++; session = refreshError ? null : { access_token: "renewed-access" }; return { error: refreshError, data: { session } }; },
   } };
+  const transport = async (url, init) => { calls.push({ url, init }); const status = statuses.shift() ?? 200; return { status, ok: status === 200, json: async () => ({ data: { name: "Conta A" }, error: { message: "Fictitious error" } }) }; };
   const scope = load("src/lib/profileApi.ts", {
     process: { env: { EXPO_PUBLIC_REUSE_API_URL: "http://127.0.0.1:4330" } },
-    require: () => ({ supabase, signOutLocally: async () => { signedOut++; session = null; } }),
-    fetch: async (url, init) => { calls.push({ url, init }); const status = statuses.shift() ?? 200; return { status, ok: status === 200, json: async () => ({ data: { name: "Conta A" }, error: { message: "Fictitious error" } }) }; },
+    require: name => name === "./fetchWithTimeout" ? { fetchWithTimeout: transport } : ({ supabase, signOutLocally: async () => { signedOut++; session = null; } }),
+    fetch: transport,
   });
   return { scope, calls, refreshed: () => refreshed, signedOut: () => signedOut };
 }

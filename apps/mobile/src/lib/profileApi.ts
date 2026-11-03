@@ -1,3 +1,4 @@
+import { fetchWithTimeout } from "./fetchWithTimeout";
 import { supabase, signOutLocally } from "./supabase";
 export type SharedProfile = {
   id: string; name: string; email: string; location: string | null; bio: string | null;
@@ -19,9 +20,8 @@ function apiBase() {
 async function request(path: string, init: RequestInit = {}, retry = true): Promise<any> {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) throw new ProfileApiError(401, "Entre novamente.");
-  const response = await fetch(`${apiBase()}/api/v1${path}`, { ...init,
+  const response = await fetchWithTimeout(`${apiBase()}/api/v1${path}`, { ...init,
     headers: { "Content-Type": "application/json", ...init.headers, Authorization: `Bearer ${session.access_token}` },
-    signal: AbortSignal.timeout(15000),
   });
   if (response.status === 401 && retry) {
     const { error, data } = await supabase.auth.refreshSession();

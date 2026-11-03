@@ -1,4 +1,5 @@
 import "react-native-url-polyfill/auto";
+import { fetchWithTimeout } from "./fetchWithTimeout";
 import { createClient } from "@supabase/supabase-js";
 import * as SecureStore from "expo-secure-store";
 import { AppState, Platform } from "react-native";
@@ -25,7 +26,7 @@ const sessionKey = "sb-mqvlgrxwuirgjutqltpv-auth-token";
 export const supabase = createClient(url, key, { auth: {
   storage: sessionStorage, storageKey: sessionKey,
   persistSession: true, autoRefreshToken: true, detectSessionInUrl: false,
-}, global: { fetch: (url, init) => fetch(url, { ...init, signal: AbortSignal.timeout(15000) }) } });
+}, global: { fetch: fetchWithTimeout } });
 const localSignOutListeners = new Set<() => void>();
 export function onLocalSignOut(callback: () => void) {
   localSignOutListeners.add(callback);

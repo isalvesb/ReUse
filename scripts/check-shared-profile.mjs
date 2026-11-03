@@ -23,7 +23,7 @@ async function clientFor(account) {
     const { error } = await supabase.auth.signInWithPassword({ email: credentials[`account_${account}_email`], password: credentials[`account_${account}_password`] });
     assert.equal(error, null, 'Login fictício falhou.');
     const scope = { exports: {}, URL, AbortSignal, __DEV__: true, process: { env: { EXPO_PUBLIC_REUSE_API_URL: base } }, fetch,
-        require: () => ({ supabase, signOutLocally: () => supabase.auth.signOut({ scope: 'local' }) }) };
+        require: name => name === "./fetchWithTimeout" ? { fetchWithTimeout: fetch } : ({ supabase, signOutLocally: () => supabase.auth.signOut({ scope: 'local' }) }) };
     vm.runInNewContext(source, scope);
     const client = { supabase, api: scope.exports }; clients.push(client); return client;
 }
