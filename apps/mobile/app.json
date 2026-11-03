@@ -1,0 +1,61 @@
+{
+  "expo": {
+    "name": "ReUse",
+    "slug": "reuse",
+    "scheme": [
+      "com.guicunhasou.reuse",
+      "fb1650966322512425"
+    ],
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/images/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F7EFDE"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.guicunhasou.reuse",
+      "icon": "./assets/images/icon.png",
+      "infoPlist": {
+        "FacebookDisplayName": "ReUse",
+        "SKAdNetworkItems": [
+          {
+            "SKAdNetworkIdentifier": "v9wttpbfk9.skadnetwork"
+          },
+          {
+            "SKAdNetworkIdentifier": "n38lu8286q.skadnetwork"
+          }
+        ]
+      }
+    },
+    "android": {
+      "package": "com.guicunhasou.reuse",
+      "icon": "./assets/images/icon.png",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#F7EFDE"
+      },
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.INTERNET"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/images/icon.png"
+    },
+    "plugins": [
+      "expo-font",
+      "expo-secure-store",
+      "expo-web-browser",
+      "expo-tracking-transparency"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "2cbc39c3-a17a-489f-beaf-4d4a4113d7eb"
+      }
+    }
+  }
+}
