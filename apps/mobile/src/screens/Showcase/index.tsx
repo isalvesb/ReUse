@@ -10,7 +10,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-import { buscarEmailUsuarioAtual } from "../../Services/firebaseAuth";
+import { buscarEmailUsuarioAtual } from "../../Services/authSession";
 import { buscar } from "../../Services/Storage";
 import { getItemsByUser, Item } from "../../Services/Items";
 import { conditionLabel } from "../../lib/itemCondition";

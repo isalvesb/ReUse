@@ -9,6 +9,8 @@ datasource db {
 
 model User {
   id                  String               @id @default(cuid())
+  authSubject         String?              @unique @db.Uuid
+  domainAuthSessions DomainAuthSession[]
   name                String
   email               String               @unique
   passwordHash        String?
@@ -29,6 +31,17 @@ model User {
   assistantConfirmations AssistantConfirmation[]
 
   @@map("users")
+}
+
+model DomainAuthSession {
+  id        String    @id @db.Uuid
+  userId    String
+  createdAt DateTime  @default(now())
+  revokedAt DateTime?
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("domain_auth_sessions")
 }
 
 model Account {

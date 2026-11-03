@@ -2,11 +2,17 @@
   "name": "reuse-lab",
   "version": "0.1.0",
   "private": true,
-  "workspaces": ["apps/web", "apps/mobile"],
+  "workspaces": [
+    "apps/web",
+    "apps/mobile"
+  ],
   "packageManager": "npm@11.8.0",
-  "engines": {"node": ">=22.14.0", "npm": ">=11.0.0"},
+  "engines": {
+    "node": ">=22.14.0",
+    "npm": ">=11.0.0"
+  },
   "scripts": {
-    "dev:web": "npm run dev --workspace=@reuse/web",
+    "dev:web": "npm run dev --workspace=@reuse/web -- --webpack --hostname 127.0.0.1 --port 4330",
     "dev:mobile": "npm run start --workspace=@reuse/mobile",
     "test": "npm run test:web && npm run test:mobile",
     "test:web": "npm run test --workspace=@reuse/web",
@@ -16,6 +22,7 @@
     "generate:web": "npm exec --workspace=@reuse/web -- prisma generate",
     "build:web": "npm run build --workspace=@reuse/web -- --webpack",
     "build:mobile": "npm run bundle --workspace=@reuse/mobile",
-    "check": "npm test && npm run lint:web && npm run typecheck:mobile"
+    "check": "npm test && npm run lint:web && npm run typecheck:mobile",
+    "test:integration": "node scripts/check-shared-profile.mjs"
   }
 }

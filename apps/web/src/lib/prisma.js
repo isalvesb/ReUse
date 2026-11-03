@@ -1,6 +1,8 @@
 import { PrismaClient } from "@prisma/client";
+import { assertLabDatabaseUrl } from "./lab-config.mjs";
 import { isLocalDemo } from "./local-demo.mjs";
 
+assertLabDatabaseUrl(process.env.DATABASE_URL);
 isLocalDemo(); // Recusa banco remoto quando o modo local está ativo.
 
 const globalForPrisma = globalThis;

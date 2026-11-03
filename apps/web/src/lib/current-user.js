@@ -1,3 +1,4 @@
+import { PROFILE_SELECT } from "./profile-domain.mjs";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/session";
 
@@ -8,7 +9,7 @@ export async function getCurrentUser() {
         return null;
     }
 
-    return prisma.user.findUnique({ where: { id: userId } });
+    return prisma.user.findUnique({ where: { id: userId }, select: PROFILE_SELECT });
 }
 
 export async function getUnreadNotificationCount(userId) {

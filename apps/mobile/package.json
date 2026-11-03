@@ -55,5 +55,13 @@
     "react-native-svg-transformer": "^1.5.3",
     "typescript": "~5.9.2"
   },
-  "private": true
+  "private": true,
+  "expo": {
+    "autolinking": {
+      "exclude": [
+        "react-native-fbsdk-next",
+        "expo-tracking-transparency"
+      ]
+    }
+  }
 }

@@ -136,6 +136,8 @@ export default function EditarPerfilClient({ user }) {
                     <button
                         type="button"
                         aria-label={avatarOptionsOpen ? "Ocultar opções de foto do perfil" : "Alterar foto do perfil"}
+                        disabled
+                        title="Alteração de avatar indisponível nesta etapa"
                         aria-expanded={avatarOptionsOpen}
                         aria-controls="avatar-options"
                         onClick={() => setAvatarOptionsOpen((open) => !open)}
@@ -145,6 +147,7 @@ export default function EditarPerfilClient({ user }) {
                     </button>
                 </div>
 
+                <p className="mt-3 text-center text-xs text-reuse-brown">Avatar e localização preservados; edição disponível para nome e biografia.</p>
                 {/* FORMULÁRIO */}
                 <form
                     id="perfil-form"
@@ -152,7 +155,7 @@ export default function EditarPerfilClient({ user }) {
                     aria-busy={pending}
                     className="mt-6 rounded-[14px] border border-[#E5E7EB] bg-reuse-white p-[25px] shadow-[0_1px_2px_rgba(0,0,0,0.1)]">
 
-                    <fieldset id="avatar-options" className={avatarOptionsOpen ? "" : "hidden"}>
+                    <fieldset disabled id="avatar-options" className={avatarOptionsOpen ? "" : "hidden"}>
                         <legend className="text-sm font-medium leading-5 text-[#4A5565]">
                             Imagem do perfil
                         </legend>
@@ -160,7 +163,7 @@ export default function EditarPerfilClient({ user }) {
                             Envie uma foto ou escolha um dos avatares ReUse.
                         </p>
 
-                        <input type="hidden" name="avatarChoice" value={selectedAvatar} />
+
                         <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-6">
                             {DEFAULT_AVATARS.map((source, index) => {
                                 const selected = selectedAvatar === source;
@@ -233,6 +236,7 @@ export default function EditarPerfilClient({ user }) {
                         value={localizacao}
                         onChange={setLocalizacao}
                         maxLength={FIELD_LIMITS.location}
+                        readOnly
                         active
                     />
 

@@ -2,10 +2,10 @@ import { prisma } from "@/lib/prisma";
 import { createRateLimitKey } from "@/lib/rate-limit-key.mjs";
 
 function getRateLimitSecret() {
-    const secret = process.env.SESSION_SECRET;
+    const secret = process.env.RATE_LIMIT_SECRET;
 
     if (!secret || secret.length < 32) {
-        throw new Error("SESSION_SECRET deve ter pelo menos 32 caracteres.");
+        throw new Error("RATE_LIMIT_SECRET deve ter pelo menos 32 caracteres.");
     }
 
     return secret;

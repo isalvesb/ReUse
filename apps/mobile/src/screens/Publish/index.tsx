@@ -23,7 +23,7 @@ import { PublishSuccessModal } from "../../components/SucessModal";
 import { CepInput } from "../../components/CepInput";
 import { CepResponse } from "../../Services/Cep";
 import { createItem, updateItem, uploadItemImages, getItemById } from "../../Services/Items";
-import { buscarEmailUsuarioAtual } from "../../Services/firebaseAuth";
+import { buscarEmailUsuarioAtual } from "../../Services/authSession";
 import { supabase } from "../../lib/supabase";
 import { prepareItemForEditing } from "../../lib/itemEditing";
 import styles from "./styles";

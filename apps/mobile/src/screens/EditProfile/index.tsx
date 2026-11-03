@@ -10,23 +10,11 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import * as ImagePicker from "expo-image-picker";
-
-import { buscar, salvarObjeto } from "../../Services/Storage";
-import { buscarUsuarioAtual } from "../../Services/firebaseAuth";
-import { DEV_SKIP_AUTH } from "../../config/devAuth";
+import { readMyProfile, editMyProfile } from "../../lib/profileApi";
 
 import styles from "./styles";
 
 const defaultAvatar = require("../../../assets/images/profiles/default.png");
-
-type ProfileData = {
-  name: string;
-  email: string;
-  location: string;
-  about: string;
-  avatarUri?: string;
-};
 
 export function EditProfileScreen() {
   const navigation = useNavigation<any>();
@@ -35,103 +23,29 @@ export function EditProfileScreen() {
   const [email, setEmail] = useState("");
   const [location, setLocation] = useState("");
   const [about, setAbout] = useState("");
-  const [avatarUri, setAvatarUri] = useState("");
+  const avatarUri = "";
+  const [saving, setSaving] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    async function loadProfileData() {
-      try {
-        const firebaseUser = buscarUsuarioAtual();
-
-        const currentEmail = DEV_SKIP_AUTH
-          ? "dev@reuse.app"
-          : firebaseUser?.email;
-
-        const currentName = DEV_SKIP_AUTH
-          ? "Usuário Dev"
-          : firebaseUser?.displayName;
-
-        if (!currentEmail) {
-          return;
-        }
-
-        setEmail(currentEmail);
-
-        const savedUser = await buscar(`user:${currentEmail}`);
-
-        if (!savedUser) {
-          setName(currentName || "Usuário ReUse");
-          setLocation("");
-          setAbout("");
-          return;
-        }
-
-        const parsedUser: ProfileData = JSON.parse(savedUser);
-
-        setName(parsedUser.name || currentName || "Usuário ReUse");
-        setLocation(parsedUser.location || "");
-        setAbout(parsedUser.about || "");
-        setAvatarUri(parsedUser.avatarUri || "");
-      } catch (error) {
-        console.error("Erro ao carregar dados do perfil:", error);
-      }
-    }
-
-    loadProfileData();
+    let active = true;
+    readMyProfile().then(profile => {
+      if (!active) return;
+      setName(profile.name); setEmail(profile.email); setLocation(profile.location || ""); setAbout(profile.bio || "");
+      setLoaded(true);
+    }).catch(() => { if (active) setError("Não foi possível carregar o perfil. Verifique a conexão."); });
+    return () => { active = false; };
   }, []);
 
-  async function handlePickImage() {
-    try {
-      const permission =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-      if (!permission.granted) {
-        Alert.alert(
-          "Permissão necessária",
-          "Para alterar a foto de perfil, permita o acesso à galeria.",
-        );
-        return;
-      }
-
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ["images"],
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.8,
-      });
-
-      if (result.canceled) {
-        return;
-      }
-
-      setAvatarUri(result.assets[0].uri);
-    } catch (error) {
-      console.error("Erro ao abrir galeria:", error);
-      Alert.alert("Erro", "Não foi possível abrir a galeria.");
-    }
-  }
-
   async function handleSave() {
-    try {
-      if (!email) {
-        Alert.alert("Erro", "Não foi possível identificar o usuário.");
-        return;
-      }
-
-      const profileData: ProfileData = {
-        name: name.trim() || "Usuário ReUse",
-        email,
-        location: location.trim() || "Localização não informada",
-        about: about.trim(),
-        avatarUri,
-      };
-
-      await salvarObjeto(`user:${email}`, profileData);
-
-      navigation.goBack();
-    } catch (error) {
-      console.error("Erro ao salvar perfil:", error);
-      Alert.alert("Erro", "Não foi possível salvar as alterações.");
-    }
+    if (saving || !loaded) return;
+    setSaving(true); setError("");
+    try { await editMyProfile({ name, bio: about }); navigation.goBack(); }
+    catch (error) {
+      const message = error instanceof Error ? error.message : "Não foi possível salvar as alterações.";
+      setError(message); Alert.alert("Perfil", message);
+    } finally { setSaving(false); }
   }
 
   return (
@@ -159,16 +73,21 @@ export function EditProfileScreen() {
             style={styles.avatar}
           />
 
-          <Pressable accessibilityRole="button" accessibilityLabel="Alterar foto do perfil" style={styles.cameraButton} onPress={handlePickImage}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Alterar foto do perfil" style={styles.cameraButton} disabled accessibilityHint="Alteração de avatar indisponível nesta etapa">
             <Ionicons name="camera-outline" size={20} color={"#fff"} />
           </Pressable>
         </View>
 
+        <Text>Avatar e localização preservados nesta etapa.</Text>
+        {error ? <Text accessibilityRole="alert">{error}</Text> : null}
         <View style={styles.card}>
           <Text style={styles.label}>Nome</Text>
 
           <View style={styles.inputContainer}>
             <TextInput
+              accessibilityLabel="Nome"
+              editable={loaded && !saving}
+              maxLength={100}
               placeholder="Digite seu nome"
               value={name}
               onChangeText={setName}
@@ -200,7 +119,7 @@ export function EditProfileScreen() {
             <TextInput
               placeholder="Digite sua localização"
               value={location}
-              onChangeText={setLocation}
+              editable={false}
               style={styles.input}
               placeholderTextColor={"#C6BDB5"}
             />
@@ -211,6 +130,9 @@ export function EditProfileScreen() {
           <Text style={styles.label}>Sobre mim</Text>
 
           <TextInput
+            accessibilityLabel="Sobre mim"
+            editable={loaded && !saving}
+            maxLength={1000}
             placeholder="Fale um pouco sobre você..."
             value={about}
             onChangeText={setAbout}
@@ -230,7 +152,7 @@ export function EditProfileScreen() {
             <Ionicons name="close" size={24} color={"#342A2A"} />
           </Pressable>
 
-          <Pressable accessibilityRole="button" accessibilityLabel="Salvar perfil" style={styles.saveButton} onPress={handleSave}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Salvar perfil" disabled={saving || !loaded} style={styles.saveButton} onPress={handleSave}>
             <Ionicons name="checkmark" size={24} color={"#EBBBEB"} />
           </Pressable>
         </View>

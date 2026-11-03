@@ -1,55 +1,51 @@
 import "react-native-url-polyfill/auto";
 import { createClient } from "@supabase/supabase-js";
+import * as SecureStore from "expo-secure-store";
+import { AppState, Platform } from "react-native";
+import { createSecureSessionStorage } from "./secureSessionStorage";
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error("Variáveis do Supabase não configuradas no .env");
+const url = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const key = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+if (url !== "https://mqvlgrxwuirgjutqltpv.supabase.co" || !key?.startsWith("sb_publishable_")) {
+  throw new Error("Configure exclusivamente o projeto Supabase novo do laboratório.");
 }
-
-export const supabase = createClient(supabaseUrl, supabaseKey);
-
-export async function fetchStats(userId: string) {
-  try {
-    const { count: trocas, error: trocasError } = await supabase
-      .from("trocas")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", userId);
-
-    const { count: itens, error: itensError } = await supabase
-      .from("itens")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", userId);
-
-    const { data: avaliacoes, error: avaliacoesError } = await supabase
-      .from("avaliacoes")
-      .select("rating")
-      .eq("to_user_id", userId);
-
-    if (trocasError || itensError || avaliacoesError) {
-      console.error("Erro ao buscar stats:", {
-        trocasError,
-        itensError,
-        avaliacoesError,
-      });
-
-      return { trocas: 0, itens: 0, avaliacao: 0 };
-    }
-
-    const media =
-      avaliacoes && avaliacoes.length > 0
-        ? avaliacoes.reduce((acc, item) => acc + item.rating, 0) /
-          avaliacoes.length
-        : 0;
-
-    return {
-      trocas: trocas || 0,
-      itens: itens || 0,
-      avaliacao: Number(media.toFixed(1)),
-    };
-  } catch (error) {
-    console.error("Erro geral:", error);
-    return { trocas: 0, itens: 0, avaliacao: 0 };
+const memory = new Map<string, string>();
+const nativeStorage = createSecureSessionStorage({
+  getItemAsync: k => SecureStore.getItemAsync(k),
+  setItemAsync: (k, v) => SecureStore.setItemAsync(k, v, { keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY }),
+  deleteItemAsync: k => SecureStore.deleteItemAsync(k),
+});
+// Web preview is intentionally in memory; native installations use SecureStore.
+const sessionStorage = Platform.OS === "web" ? {
+  getItem: async (k: string) => memory.get(k) ?? null,
+  setItem: async (k: string, v: string) => { memory.set(k, v); },
+  removeItem: async (k: string) => { memory.delete(k); },
+} : nativeStorage;
+const sessionKey = "sb-mqvlgrxwuirgjutqltpv-auth-token";
+export const supabase = createClient(url, key, { auth: {
+  storage: sessionStorage, storageKey: sessionKey,
+  persistSession: true, autoRefreshToken: true, detectSessionInUrl: false,
+}, global: { fetch: (url, init) => fetch(url, { ...init, signal: AbortSignal.timeout(15000) }) } });
+const localSignOutListeners = new Set<() => void>();
+export function onLocalSignOut(callback: () => void) {
+  localSignOutListeners.add(callback);
+  return () => { localSignOutListeners.delete(callback); };
+}
+export async function signOutLocally() {
+  supabase.auth.stopAutoRefresh();
+  try { await supabase.auth.signOut({ scope: "local" }); }
+  finally {
+    // Also clear durable storage when the provider is unreachable.
+    for (const key of [sessionKey, `${sessionKey}-user`, `${sessionKey}-code-verifier`]) await sessionStorage.removeItem(key);
+    for (const listener of localSignOutListeners) listener();
   }
 }
+if (Platform.OS !== "web") {
+  if (AppState.currentState === "active") supabase.auth.startAutoRefresh();
+  AppState.addEventListener("change", state => {
+    if (state === "active") supabase.auth.startAutoRefresh();
+    else supabase.auth.stopAutoRefresh();
+  });
+}
+// Catalog/statistics have not been integrated in Work 1.3.
+export async function fetchStats(_userId: string) { return { trocas: 0, itens: 0, avaliacao: 0 }; }

@@ -35,3 +35,8 @@ As dependências herdadas incluem avisos de depreciação. Não foram atualizada
 As fontes nativas locais ignoradas permanecem no backup externo. Sua reprodução pelo prebuild e a divergência conhecida entre AppDelegate local e plugin de cenas precisam de validação específica antes de compilar/distribuir aplicativos.
 
 Não foi iniciada integração de backend, dados, contas ou identidade visual. As próximas etapas dependem de autorização própria.
+
+
+## Continuação Work 1.3
+
+As evidências acima descrevem a fundação. A configuração e os limites atuais de autenticação/perfil estão em [contas e perfis compartilhados](contas-e-perfis.md). Não houve publicação remota desta implementação.

@@ -3,15 +3,14 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { destroySession, getCurrentUserId } from "@/lib/session";
+import { destroySession, getCurrentUserId, getSession } from "@/lib/session";
 import {
     deleteStoredItemImage,
     storeItemImage,
-    storeProfileImage,
     UploadValidationError,
 } from "@/lib/uploads";
 import { getItemPhotoValidationError } from "@/lib/upload-constraints.mjs";
-import { FIELD_LIMITS } from "@/lib/validation.mjs";
+import { updateOwnProfile } from "@/lib/profile-domain.mjs";
 
 const MAX_TITLE_LENGTH = 120;
 const MAX_DESCRIPTION_LENGTH = 3000;
@@ -23,91 +22,29 @@ export async function logOut() {
 }
 
 export async function updateProfile(_prevState, formData) {
-    const userId = await getCurrentUserId();
-
-    if (!userId) {
-        redirect("/login");
+    const actor = await getSession();
+    if (!actor) redirect("/login");
+    const avatar = formData.get("avatar");
+    if ((avatar instanceof File && avatar.size > 0) || ![null, "current"].includes(formData.get("avatarChoice"))) {
+        return { error: "Alteração de avatar indisponível nesta etapa." };
     }
-
-    const name = formData.get("name")?.toString().trim();
-    const location = formData.get("location")?.toString().trim();
-    const bio = formData.get("bio")?.toString().trim();
-    const avatarChoice = formData.get("avatarChoice")?.toString() || "current";
-    const avatarFile = formData.get("avatar");
-
-    if (!name) {
-        return { error: "O nome é obrigatório." };
-    }
-
-    if (name.length > FIELD_LIMITS.name) {
-        return { error: `O nome pode ter no máximo ${FIELD_LIMITS.name} caracteres.` };
-    }
-
-    if (location && location.length > FIELD_LIMITS.location) {
-        return { error: `A localização pode ter no máximo ${FIELD_LIMITS.location} caracteres.` };
-    }
-
-    if (bio && bio.length > FIELD_LIMITS.bio) {
-        return { error: `A biografia pode ter no máximo ${FIELD_LIMITS.bio} caracteres.` };
-    }
-
-    let avatarUrl;
-
-    if (avatarFile instanceof File && avatarFile.size > 0) {
-        try {
-            avatarUrl = (await storeProfileImage(avatarFile)).url;
-        } catch (error) {
-            console.error("Falha ao armazenar imagem do perfil", error);
-            return {
-                error: error instanceof UploadValidationError
-                    ? error.message
-                    : "Não foi possível enviar a imagem do perfil.",
-            };
-        }
-    } else if (/^\/images\/pranchas\/prancha8\.png#sprite=[1-6]$/.test(avatarChoice)) {
-        avatarUrl = avatarChoice;
-    }
-
-    await prisma.user.update({
-        where: { id: userId },
-        data: {
-            name,
-            location: location || null,
-            bio: bio || null,
-            ...(avatarUrl ? { avatarUrl } : {}),
-        },
-    });
-
+    try {
+        await updateOwnProfile(prisma, actor, { name: formData.get("name"), bio: formData.get("bio") });
+    } catch (error) { return { error: error.status === 400 ? error.message : "Não foi possível salvar o perfil." }; }
     revalidatePath("/perfil");
     revalidatePath("/perfil/editar");
-
     redirect("/perfil");
 }
 
 export async function updateBio(_prevState, formData) {
-    const userId = await getCurrentUserId();
-
-    if (!userId) {
-        redirect("/login");
-    }
-
-    const bio = formData.get("bio")?.toString().trim() || "";
-
-    if (bio.length > FIELD_LIMITS.bio) {
-        return {
-            success: false,
-            error: `A biografia pode ter no máximo ${FIELD_LIMITS.bio} caracteres.`,
-        };
-    }
-
-    await prisma.user.update({
-        where: { id: userId },
-        data: { bio: bio || null },
-    });
-
-    revalidatePath("/perfil");
-
-    return { success: true, error: null, bio };
+    const actor = await getSession();
+    if (!actor) redirect("/login");
+    try {
+        const profile = await updateOwnProfile(prisma, actor, { bio: formData.get("bio") });
+        revalidatePath("/perfil");
+        revalidatePath("/perfil/editar");
+        return { success: true, error: null, bio: profile.bio ?? "" };
+    } catch (error) { return { success: false, error: error.status === 400 ? error.message : "Não foi possível salvar a descrição." }; }
 }
 
 const NEGOTIATION_TYPE_MAP = {

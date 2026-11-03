@@ -1,40 +1,15 @@
-module.exports = ({ config }) => {
-  const facebookAppId = process.env.EXPO_PUBLIC_FACEBOOK_APP_ID;
-  const facebookClientToken = process.env.EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN;
-
-  return {
-    ...config,
-
-    plugins: [
-      "expo-font",
-      "expo-secure-store",
-      "expo-web-browser",
-      [
-        "react-native-fbsdk-next",
-        {
-          appID: facebookAppId,
-          clientToken: facebookClientToken,
-          displayName: "ReUse",
-          scheme: `fb${facebookAppId}`,
-          advertiserIDCollectionEnabled: false,
-          autoLogAppEventsEnabled: false,
-          isAutoInitEnabled: true,
-          iosUserTrackingPermission:
-            "Este identificador será usado para login com Facebook."
-        }
-      ],
-      "expo-tracking-transparency",
-      "./plugins/with-ios-scenes"
-    ],
-
-    ios: {
-      ...config.ios,
-      infoPlist: {
-        ...config.ios?.infoPlist,
-        FacebookAppID: facebookAppId,
-        FacebookClientToken: facebookClientToken,
-        FacebookDisplayName: "ReUse"
-      }
-    }
-  };
-};
+// Work 1.3 uses email/password only; no legacy provider initializes in the lab.
+module.exports = ({ config }) => ({
+  ...config,
+  scheme: "com.guicunhasou.reuse",
+  plugins: ["expo-font", "expo-secure-store", "expo-web-browser", "./plugins/with-ios-scenes"],
+  ios: {
+    ...config.ios,
+    infoPlist: {
+      ...config.ios?.infoPlist,
+      FacebookAutoInitEnabled: false,
+      FacebookAutoLogAppEventsEnabled: false,
+      FacebookAdvertiserIDCollectionEnabled: false,
+    },
+  },
+});

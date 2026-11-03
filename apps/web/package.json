@@ -11,7 +11,7 @@
     "test": "node --test",
     "check": "npm run lint && npm test && npm run build",
     "postinstall": "prisma generate",
-    "db:migrate": "prisma migrate dev",
+    "db:migrate": "node scripts/migrate-lab.mjs",
     "db:seed": "prisma db seed",
     "db:seed:categories": "prisma db seed -- --categories-only",
     "db:studio": "prisma studio",
@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
+    "@supabase/supabase-js": "2.104.0",
     "bcryptjs": "^3.0.3",
     "dotenv": "^18.0.4",
     "jose": "^6.2.10",

@@ -3,13 +3,8 @@ import { ActivityIndicator, Image, Pressable, Text, View } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import {
-  buscarUsuarioAtual,
-  logoutFirebase,
-} from "../../Services/firebaseAuth";
-import { buscar } from "../../Services/Storage";
-import { DEV_SKIP_AUTH } from "../../config/devAuth";
-import { supabase } from "../../lib/supabase";
+import { logoutCompartilhado } from "../../Services/authSession";
+import { readMyProfile } from "../../lib/profileApi";
 import styles from "./styles";
 
 type UserData = {
@@ -19,13 +14,6 @@ type UserData = {
 };
 
 const defaultProfileImage = require("../../../assets/images/profiles/default.png");
-
-const profileImagesByEmail: Record<string, any> = {
-  "gui@email.com": require("../../../assets/images/profiles/gui.png"),
-  "isa@email.com": require("../../../assets/images/profiles/isa.png"),
-  "kau@email.com": require("../../../assets/images/profiles/kau.png"),
-  "mir@email.com": require("../../../assets/images/profiles/mir.png"),
-};
 
 type ProfileScreenProps = {
   onLogoutComplete?: () => void;
@@ -39,124 +27,38 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [user, setUser] = useState<UserData | null>(null);
   const [about, setAbout] = useState("");
-  const [avatarUri, setAvatarUri] = useState("");
+  const [error, setError] = useState("");
 
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     trocas: 0,
     itens: 0,
     avaliacao: null as number | null,
   });
 
-  async function fetchStats(userEmail: string) {
-    try {
-      const { count: itens, error } = await supabase
-        .from("items")
-        .select("*", { count: "exact", head: true })
-        .eq("user_email", userEmail);
-
-      if (error) {
-        throw error;
-      }
-
-      setStats({
-        trocas: 0,
-        itens: itens || 0,
-        avaliacao: null as number | null,
-      });
-    } catch (error) {
-      console.error("Erro ao buscar stats:", error);
-
-      setStats({
-        trocas: 0,
-        itens: 0,
-        avaliacao: null as number | null,
-      });
-    }
-  }
-
-  useFocusEffect(
-    useCallback(() => {
-      const carregarTudo = async () => {
-        setIsLoadingUser(true);
-        try {
-          const firebaseUser = buscarUsuarioAtual();
-
-          const userId = DEV_SKIP_AUTH ? "dev@reuse.app" : firebaseUser?.uid;
-          const emailAtual = DEV_SKIP_AUTH
-            ? "dev@reuse.app"
-            : firebaseUser?.email;
-          const nomeAtual = DEV_SKIP_AUTH
-            ? "Usuário Dev"
-            : firebaseUser?.displayName;
-
-          if (emailAtual) {
-            await fetchStats(emailAtual);
-          }
-
-          if (!emailAtual) {
-            setUser(null);
-            return;
-          }
-
-          const userData = await buscar(`user:${emailAtual}`);
-
-          if (!userData) {
-            setUser({
-              name: nomeAtual || "Usuário ReUse",
-              email: emailAtual,
-              location: "Localização não informada",
-            });
-
-            setAbout("");
-            setAvatarUri("");
-
-            return;
-          }
-
-          const parsedUser = JSON.parse(userData);
-
-          setUser({
-            name: parsedUser.name || nomeAtual || "Usuário ReUse",
-            email: parsedUser.email || emailAtual,
-            location: parsedUser.location || "Localização não informada",
-          });
-
-          setAbout(parsedUser.about || "");
-          setAvatarUri(parsedUser.avatarUri || "");
-        } catch (error) {
-          console.error("Erro ao carregar dados:", error);
-        } finally {
-          setIsLoadingUser(false);
-        }
-      };
-
-      carregarTudo();
-    }, []),
-  );
-
-  const normalizedEmail = user?.email?.toLowerCase();
-
-  const profileImageSource = avatarUri
-  ? { uri: avatarUri }
-  : normalizedEmail && profileImagesByEmail[normalizedEmail]
-    ? profileImagesByEmail[normalizedEmail]
-    : defaultProfileImage;
-
-  const isLogoutDisabled = DEV_SKIP_AUTH || isLoggingOut;
+  useFocusEffect(useCallback(() => {
+    let active = true;
+    setIsLoadingUser(true);
+    setError("");
+    readMyProfile().then(profile => {
+      if (!active) return;
+      setUser({ name: profile.name, email: profile.email, location: profile.location || "Localização não informada" });
+      setAbout(profile.bio || "");
+    }).catch((error) => { if (active) { setUser(null); setAbout(""); setError(error instanceof Error ? error.message : "Não foi possível carregar o perfil. Verifique a conexão e tente novamente."); } })
+      .finally(() => { if (active) setIsLoadingUser(false); });
+    return () => { active = false; };
+  }, []));
+  const profileImageSource = defaultProfileImage;
+  const isLogoutDisabled = isLoggingOut;
 
   const notificationCount = 0;
 
   const handleLogout = async () => {
-    if (DEV_SKIP_AUTH) {
-      return;
-    }
-
     if (isLoggingOut) return;
 
     try {
       setIsLoggingOut(true);
 
-      await logoutFirebase();
+      await logoutCompartilhado();
 
       onLogoutComplete?.();
     } catch (error) {
@@ -168,6 +70,7 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
 
   return (
     <View style={styles.screen}>
+      {error ? <Text accessibilityRole="alert">{error}</Text> : null}
       {/* NAVBAR */}
       <View style={[styles.navBar, { paddingTop: insets.top + 14 }]}>
         <Pressable

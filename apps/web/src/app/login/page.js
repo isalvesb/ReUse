@@ -70,6 +70,7 @@ export default function Login() {
                         <OAuthErrorBanner />
                     </Suspense>
 
+                    <p className="mb-4 text-sm text-reuse-cream">Laboratório: acesso pelas duas contas de teste. Login social, cadastro e recuperação por e-mail indisponíveis.</p>
                     {/* FORMULÁRIO */}
                     <form action={formAction}>
 
@@ -160,7 +161,7 @@ export default function Login() {
 
                     {/* GOOGLE */}
                     <a
-                        href="/api/auth/google"
+                        aria-disabled="true" title="Login social indisponível nesta etapa"
                         className="flex h-12 w-full items-center justify-center rounded-3xl border border-reuse-pink text-sm font-medium text-reuse-cream transition-all duration-200 hover:scale-105 hover:bg-reuse-brown-light"
                     >
                         <Image
@@ -176,7 +177,7 @@ export default function Login() {
 
                     {/* FACEBOOK */}
                     <a
-                        href="/api/auth/facebook"
+                        aria-disabled="true" title="Login social indisponível nesta etapa"
                         className="mt-4 flex h-12 w-full items-center justify-center rounded-3xl border border-reuse-pink text-sm font-medium text-reuse-cream transition-all duration-200 hover:scale-105 hover:bg-reuse-brown-light"
                     >
                         <Image

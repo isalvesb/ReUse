@@ -1,8 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
-import { verifyPassword } from "@/lib/auth";
+import { authClient } from "@/lib/supabase-auth.mjs";
 import { createSession, destroySession, } from "@/lib/session";
 import {
     isValidEmail,
@@ -35,23 +34,10 @@ export async function signIn(_prevState, formData) {
         return { error: "Muitas tentativas. Aguarde alguns minutos antes de tentar novamente." };
     }
 
-    const user = await prisma.user.findUnique({ where: { email } });
-
-    if (!user) {
-        return { error: "E-mail ou senha inválidos." };
-    }
-
-    if (!user.passwordHash) {
-        return { error: "Esta conta foi criada com Google/Facebook. Entre por um desses botões abaixo." };
-    }
-
-    const valid = await verifyPassword(password, user.passwordHash);
-
-    if (!valid) {
-        return { error: "E-mail ou senha inválidos." };
-    }
-
-    await createSession(user.id);
+    const { data, error } = await authClient().auth.signInWithPassword({ email, password });
+    if (error || !data.session) return { error: "E-mail ou senha inválidos, ou serviço indisponível." };
+    try { await createSession(data.session); }
+    catch { return { error: "Não foi possível iniciar a sessão. Tente novamente." }; }
 
     redirect("/perfil");
 }

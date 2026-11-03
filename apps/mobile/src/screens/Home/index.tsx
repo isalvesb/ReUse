@@ -10,7 +10,7 @@ import { CategoryCard } from "../../components/CategoryCard";
 import { ItemCard } from "../../components/ItemCard";
 import { IncentiveModal } from "../../components/IncentiveCard";
 import { salvar, buscar } from "../../Services/Storage";
-import { buscarEmailUsuarioAtual } from "../../Services/firebaseAuth";
+import { buscarEmailUsuarioAtual } from "../../Services/authSession";
 import { supabase } from "../../lib/supabase";
 import { conditionLabel } from "../../lib/itemCondition";
 import styles from "./styles";

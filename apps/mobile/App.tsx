@@ -19,18 +19,17 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Ionicons } from "@expo/vector-icons";
 import { SplashScreen } from "./src/screens/Splash";
 import { Login } from "./src/screens/Login";
-import { ForgotPass } from "./src/screens/ForgotPass";
-import { ResetEmailSent } from "./src/screens/ResetEmailSent";
-import { CreateAccount } from "./src/screens/CreateAccount";
+import { AuthUnavailable as ForgotPass } from "./src/screens/AuthUnavailable";
+import { AuthUnavailable as ResetEmailSent } from "./src/screens/AuthUnavailable";
+import { AuthUnavailable as CreateAccount } from "./src/screens/AuthUnavailable";
 import { HomeScreen } from "./src/screens/Home";
 import Chats from "./src/screens/Chats";
 import { ShowcaseScreen } from "./src/screens/Showcase";
 import { PublishScreen } from "./src/screens/Publish";
 import TabBar from "./src/components/TabBar";
-import { observarUsuarioLogado } from "./src/Services/firebaseAuth";
+import { observarUsuarioLogado } from "./src/Services/authSession";
 import { ProfileScreen } from "./src/screens/Profile";
 import { ProductScreen } from "./src/screens/Product";
-import { DEV_SKIP_AUTH } from "./src/config/devAuth";
 import Notifications from "./src/screens/Notifications";
 import { EditProfileScreen } from "./src/screens/EditProfile";
 
@@ -142,15 +141,9 @@ function MainScreen({ route }: any) {
 
 function AppNavigator() {
   const [isCheckingSession, setIsCheckingSession] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(DEV_SKIP_AUTH);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    if (DEV_SKIP_AUTH) {
-      setIsAuthenticated(true);
-      setIsCheckingSession(false);
-      return;
-    }
-
     const unsubscribe = observarUsuarioLogado((user) => {
       setIsAuthenticated(!!user);
       setIsCheckingSession(false);

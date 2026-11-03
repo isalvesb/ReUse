@@ -11,3 +11,8 @@ As atribuições dos autores e a topologia dos commits foram preservadas. Exempl
 Não incluir segredos de servidor, chaves `service_role`, tokens administrativos, chaves privadas, dados pessoais de usuários, `.env` reais, certificados, keystores ou configurações locais de assinatura. A exceção histórica não se estende a novos valores.
 
 Os originais e os backups completos permanecem externos ao repositório e não foram reescritos. Não configurar deploy, conectar provedores ou executar operações de banco como consequência desta fundação.
+
+
+## Continuação Work 1.3
+
+As evidências acima descrevem a fundação. A configuração e os limites atuais de autenticação/perfil estão em [contas e perfis compartilhados](contas-e-perfis.md). Não houve publicação remota desta implementação.
