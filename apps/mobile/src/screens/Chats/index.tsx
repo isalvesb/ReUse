@@ -276,7 +276,7 @@ export default function Chats({ embedded = false, route }: any) {
                   {item.preview || "Conversa sem mensagens"}
                 </Text>
                 {item.unreadCount > 0 && (
-                  <Text>{item.unreadCount} não lidas</Text>
+                  <Text>{item.unreadCount} {item.unreadCount === 1 ? "não lida" : "não lidas"}</Text>
                 )}
               </View>
             </TouchableOpacity>

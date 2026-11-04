@@ -103,7 +103,7 @@ export default function Notifications() {
         </Pressable>
       </View>
       <View style={styles.content}>
-        <Text style={styles.screenTitle}>Notificações · {count} não lidas</Text>
+        <Text style={styles.screenTitle}>Notificações · {count} {count === 1 ? "não lida" : "não lidas"}</Text>
         {count > 0 && (
           <Pressable onPress={all} disabled={busy}>
             <Text

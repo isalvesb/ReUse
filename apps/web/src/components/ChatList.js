@@ -47,7 +47,7 @@ export default function ChatList({
                                 <div className="min-w-0 flex-1">
 
                                     <h2 className="text-xl font-bold leading-tight">
-                                        {conversation.name} {conversation.unreadCount > 0 && <span className="text-sm">({conversation.unreadCount} não lidas)</span>}
+                                        {conversation.name} {conversation.unreadCount > 0 && <span className="text-sm">({conversation.unreadCount} {conversation.unreadCount === 1 ? "não lida" : "não lidas"})</span>}
                                     </h2>
                                     <p className="text-sm text-reuse-brown-light">{conversation.itemTitle}</p>
 
