@@ -141,7 +141,14 @@ export function SharedCatalog({
       <Text style={{ color: "#342A2A", fontFamily: "Inter_700Bold" }}>
         Categorias
       </Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={true}
+        contentContainerStyle={{ paddingRight: 20 }}
+        automaticallyAdjustContentInsets={false}
+        contentInsetAdjustmentBehavior="never"
+        contentOffset={{ x: 0, y: 0 }}
+      >
         {chip("Todas as categorias", !category, () => {
           setCategory("");
           setPage(1);
@@ -153,7 +160,7 @@ export function SharedCatalog({
           }),
         )}
       </ScrollView>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      <View style={{ flexDirection: "row", flexWrap: "wrap", rowGap: 8 }}>
         {chip("Todas as modalidades", !type, () => {
           setType("");
           setPage(1);
@@ -164,7 +171,7 @@ export function SharedCatalog({
             setPage(1);
           }),
         )}
-      </ScrollView>
+      </View>
       {curadoria ? <Text>Curadoria: peças raras</Text> : null}
       {category || type || query || curadoria ? (
         <Pressable

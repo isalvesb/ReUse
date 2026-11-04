@@ -129,6 +129,14 @@ export default async function DetalheProduto({ params }) {
               </p>
             </section>
 
+            {isOwnItem && (
+              <a
+                href={`/perfil/anuncios/${product.id}`}
+                className="mt-5 inline-block rounded-xl bg-reuse-pink p-4"
+              >
+                Editar anúncio
+              </a>
+            )}
             {!isOwnItem && (
               <div className="mt-auto pt-5">
                 <SellerCard

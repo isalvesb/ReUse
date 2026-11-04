@@ -1,1003 +1,465 @@
-import { useState, useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
-  TouchableOpacity,
   TextInput,
   ScrollView,
   Image,
-  Alert,
+  Pressable,
   ActivityIndicator,
-  Modal,
-  Platform,
+  Alert,
   ActionSheetIOS,
-  FlatList,
+  Platform,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
-import { Ionicons } from "@expo/vector-icons";
-import { salvar, buscar, remover } from "../../Services/Storage";
-import { IncentiveCard } from "../../components/IncentiveCard";
-import { JourneyCard } from "../../components/JourneyCard";
-import { PublishSuccessModal } from "../../components/SucessModal";
-import { CepInput } from "../../components/CepInput";
-import { CepResponse } from "../../Services/Cep";
-import { createItem, updateItem, uploadItemImages, getItemById } from "../../Services/Items";
-import { buscarEmailUsuarioAtual } from "../../Services/authSession";
+import * as FileSystem from "expo-file-system/legacy";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { supabase } from "../../lib/supabase";
-import { prepareItemForEditing } from "../../lib/itemEditing";
+import { itemRequest, uploadPhoto } from "../../lib/itemWriteApi";
+import {
+  readCategories,
+  Category,
+  TYPE_LABELS,
+  CONDITION_LABELS,
+} from "../../lib/catalogApi";
+import { JourneyCard } from "../../components/JourneyCard";
 import styles from "./styles";
-
-type Condition =
-  | "Novo"
-  | "Usado • Como novo"
-  | "Usado • Bom estado"
-  | "Usado • Estado Regular";
-
-type ItemType = "doacao" | "troca" | "venda";
-
-interface PhotoItem {
+import { publishDraftKey, draftPhotoReference } from "../../lib/publishDraft";
+type Photo = {
   uri: string;
-}
-
-const CATEGORIES = [
-  "Móveis",
-  "Roupas e Acessórios",
-  "Eletrônicos",
-  "Livros e Revistas",
-  "Brinquedos e Jogos",
-  "Esportes e Lazer",
-  "Utensílios Domésticos",
-  "Ferramentas",
-  "Bebês e Crianças",
-  "Arte e Decoração",
-  "Outros",
-];
-
-const TYPE_OPTIONS = [
-  {
-    key: "doacao" as ItemType,
-    label: "Doação",
-    icon: "heart-outline",
-    desc: "Ofereça gratuitamente para quem precisar",
-    badge: "#A8D4B0",
-    badgeText: "#27500A",
-  },
-  {
-    key: "troca" as ItemType,
-    label: "Troca",
-    icon: "swap-horizontal-outline",
-    desc: "Troque por outro item de seu interesse",
-    badge: "#C9A8D4",
-    badgeText: "#3C3489",
-  },
-  {
-    key: "venda" as ItemType,
-    label: "Venda",
-    icon: "pricetag-outline",
-    desc: "Defina um preço e venda seu item",
-    badge: "#F5C842",
-    badgeText: "#412402",
-  },
-];
-
-const DRAFT_KEYS = [
-  "draft_title",
-  "draft_category",
-  "draft_condition",
-  "draft_description",
-  "draft_cep",
-  "draft_street",
-  "draft_neighborhood",
-  "draft_city",
-  "draft_state",
-  "draft_location",
-  "draft_type",
-  "draft_price",
-];
-
-type Props = {
-  navigation: any;
-  route?: {
-    params?: {
-      mode?: "edit";
-      itemId?: number;
-      returnTo?: string;
-    };
-  };
+  type: string;
+  size: number;
+  imageId?: string;
+  uploadId?: string;
 };
-
-export function PublishScreen({ navigation, route }: Props) {
-  const insets = useSafeAreaInsets();
-
-  const isEditMode = route?.params?.mode === "edit";
-  const editItemId = route?.params?.itemId;
-  const returnTo = route?.params?.returnTo ?? "vitrine";
-
-  const [photos, setPhotos] = useState<PhotoItem[]>([]);
-  const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("");
-  const [showCategoryModal, setShowCategoryModal] = useState(false);
-  const [condition, setCondition] = useState<Condition | null>(null);
-  const [description, setDescription] = useState("");
-  const [itemType, setItemType] = useState<ItemType | null>(null);
-  const [price, setPrice] = useState("");
-  const [showTypeModal, setShowTypeModal] = useState(false);
-  const [userItemCount, setUserItemCount] = useState(0);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-
-  const [cep, setCep] = useState("");
-  const [street, setStreet] = useState("");
-  const [neighborhood, setNeighborhood] = useState("");
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
-  const [location, setLocation] = useState("");
-
-  const [uploading, setUploading] = useState(false);
-  const [loadingItem, setLoadingItem] = useState(isEditMode);
-  const [editError, setEditError] = useState("");
-  const [editRetry, setEditRetry] = useState(0);
-  const [loadedEditId, setLoadedEditId] = useState<number | null>(null);
-
-  const salvarCampoRascunho = (key: string, value: string) => {
-    if (!isEditMode) {
-      salvar(key, value);
-    }
-  };
-
-  const fetchUserItemCount = async () => {
-    const userEmail = buscarEmailUsuarioAtual();
-
-    if (!userEmail) return;
-
-    const { count, error } = await supabase
-      .from("items")
-      .select("*", { count: "exact", head: true })
-      .eq("user_email", userEmail);
-
-    if (!error && count !== null) {
-      setUserItemCount(count);
-    }
-  };
-
-  const restaurarRascunho = async () => {
-    if (isEditMode) return;
-
-    const [
-      draftTitle,
-      draftCategory,
-      draftCondition,
-      draftDescription,
-      draftCep,
-      draftStreet,
-      draftNeighborhood,
-      draftCity,
-      draftState,
-      draftLocation,
-      draftType,
-      draftPrice,
-    ] = await Promise.all(DRAFT_KEYS.map((key) => buscar(key)));
-
-    if (draftTitle) setTitle(draftTitle);
-    if (draftCategory) setCategory(draftCategory);
-
-    if (
-      draftCondition === "Novo" ||
-      draftCondition === "Usado • Como novo" ||
-      draftCondition === "Usado • Bom estado" ||
-      draftCondition === "Usado • Estado Regular"
-    ) {
-      setCondition(draftCondition);
-    }
-
-    if (draftDescription) setDescription(draftDescription);
-    if (draftCep) setCep(draftCep);
-    if (draftStreet) setStreet(draftStreet);
-    if (draftNeighborhood) setNeighborhood(draftNeighborhood);
-    if (draftCity) setCity(draftCity);
-    if (draftState) setState(draftState);
-    if (draftLocation) setLocation(draftLocation);
-
-    if (
-      draftType === "doacao" ||
-      draftType === "troca" ||
-      draftType === "venda"
-    ) {
-      setItemType(draftType);
-    }
-
-    if (draftPrice) setPrice(draftPrice);
-  };
-
+type Draft = {
+  title: string;
+  description: string;
+  category: string;
+  type: string;
+  condition: string;
+  price: string;
+  location: string;
+  photos: Photo[];
+  creationKey: string;
+  status: string;
+};
+const blank = (): Draft => ({
+  title: "",
+  description: "",
+  category: "",
+  type: "",
+  condition: "",
+  price: "",
+  location: "",
+  photos: [],
+  creationKey: "",
+  status: "ATIVO",
+});
+export function PublishScreen({ navigation, route }: any) {
+  const insets = useSafeAreaInsets(),
+    id = route?.params?.itemId as string | undefined;
+  const [draft, setDraft] = useState<Draft>(blank),
+    [categories, setCategories] = useState<Category[]>([]),
+    [ready, setReady] = useState(false),
+    [busy, setBusy] = useState(false),
+    [error, setError] = useState(""),
+    [version, setVersion] = useState(""),
+    [count, setCount] = useState(0);
+  const saveQueue = useRef(Promise.resolve());
+  const key = useRef(""),
+    directory = useRef(""),
+    draftRef = useRef(draft);
+  draftRef.current = draft;
   useEffect(() => {
-    fetchUserItemCount();
-    restaurarRascunho();
-  }, []);
-
-  useEffect(() => {
-    if (!isEditMode) return;
     let active = true;
-    setLoadingItem(true); setEditError(""); setLoadedEditId(null);
-    const load = async () => {
-      try {
-        if (!editItemId) throw new Error("Anúncio não identificado.");
-        const item = prepareItemForEditing(await getItemById(editItemId), buscarEmailUsuarioAtual());
-        if (!active) return;
-        setTitle(item.title); setCategory(item.category); setCondition(item.condition);
-        setDescription(item.description); setItemType(item.item_type); setPrice(item.price || "");
-        setPhotos((item.images || []).map(uri => ({uri})));
-        setCep(item.cep || ""); setStreet(item.street || ""); setNeighborhood(item.neighborhood || "");
-        setCity(item.city || ""); setState(item.state || ""); setLocation(item.location || "");
-        setLoadedEditId(item.id);
-      } catch (error) {
-        if (active) setEditError(error instanceof Error ? error.message : "Não foi possível carregar o anúncio.");
-      } finally { if (active) setLoadingItem(false); }
+    supabase.auth
+      .getSession()
+      .then(async (session) => {
+        const subject = session.data.session?.user.id;
+        if (!subject) throw Error("Entre novamente.");
+        key.current = publishDraftKey(subject);
+        directory.current = `${FileSystem.documentDirectory}reuse-drafts/${subject}/`;
+        await FileSystem.makeDirectoryAsync(directory.current, {
+          intermediates: true,
+        });
+        let value = blank();
+        if (id) {
+          const item = await itemRequest(
+            `/me/items?id=${encodeURIComponent(id)}`,
+          );
+          value = {
+            ...value,
+            ...item,
+            category: item.category.slug,
+            photos: item.photos.map((p: any) => ({
+              imageId: p.id,
+              uri: p.preview.startsWith("/")
+                ? process.env.EXPO_PUBLIC_REUSE_API_URL + p.preview
+                : p.preview,
+              type: "image/jpeg",
+              size: 0,
+            })),
+            price: item.price || "",
+            location: item.location || "",
+          };
+          if (active) setVersion(item.updatedAt);
+        } else {
+          const saved = await AsyncStorage.getItem(key.current);
+          if (saved) value = JSON.parse(saved);
+        }
+
+        const cached = await AsyncStorage.getItem("reuse:categories:v1");
+        if (active) {
+          setDraft(value);
+          setReady(true);
+          if (cached) setCategories(JSON.parse(cached));
+        }
+        readCategories()
+          .then((cats) => {
+            if (active) setCategories(cats);
+            return AsyncStorage.setItem(
+              "reuse:categories:v1",
+              JSON.stringify(cats),
+            );
+          })
+          .catch(() => {
+            if (active)
+              setError(
+                "Sem conexão com o catálogo. O rascunho local foi preservado.",
+              );
+          });
+        itemRequest("/me/items")
+          .then((items) => {
+            if (active) setCount(items.length);
+          })
+          .catch(() => {});
+      })
+      .catch(() => {
+        if (active)
+          setError(
+            "Não foi possível carregar o anúncio ou o rascunho. Volte e tente novamente.",
+          );
+      });
+    return () => {
+      active = false;
     };
-    load();
-    return () => { active = false; };
-  }, [isEditMode, editItemId, editRetry]);
-
-  const salvarTitulo = (v: string) => {
-    setTitle(v);
-    salvarCampoRascunho("draft_title", v);
+  }, [id]);
+  const change = (patch: Partial<Draft>) => {
+    const next = { ...draftRef.current, ...patch };
+    draftRef.current = next;
+    setDraft(next);
+    if (!id && key.current)
+      saveQueue.current = saveQueue.current
+        .then(() => AsyncStorage.setItem(key.current, JSON.stringify(next)))
+        .catch(() => {
+          setError("Não foi possível salvar o rascunho neste aparelho.");
+        });
   };
-
-  const salvarCategoria = (v: string) => {
-    setCategory(v);
-    salvarCampoRascunho("draft_category", v);
-  };
-
-  const salvarCondicao = (v: Condition) => {
-    setCondition(v);
-    salvarCampoRascunho("draft_condition", v);
-  };
-
-  const salvarDescricao = (v: string) => {
-    setDescription(v);
-    salvarCampoRascunho("draft_description", v);
-  };
-
-  const salvarTipo = (v: ItemType) => {
-    setItemType(v);
-    salvarCampoRascunho("draft_type", v);
-
-    if (v !== "venda") {
-      setPrice("");
-      salvarCampoRascunho("draft_price", "");
-    }
-  };
-
-  const salvarPreco = (v: string) => {
-    const clean = v.replace(/[^0-9,]/g, "");
-    setPrice(clean);
-    salvarCampoRascunho("draft_price", clean);
-  };
-
-  const limparDadosEndereco = () => {
-    setStreet("");
-    setNeighborhood("");
-    setCity("");
-    setState("");
-    setLocation("");
-
-    salvarCampoRascunho("draft_street", "");
-    salvarCampoRascunho("draft_neighborhood", "");
-    salvarCampoRascunho("draft_city", "");
-    salvarCampoRascunho("draft_state", "");
-    salvarCampoRascunho("draft_location", "");
-  };
-
-  const salvarCep = (v: string) => {
-    setCep(v);
-    salvarCampoRascunho("draft_cep", v);
-
-    if (v !== cep) {
-      limparDadosEndereco();
-    }
-  };
-
-  const handleAddressFound = (address: CepResponse) => {
-    const formattedLocation = address.bairro
-      ? `${address.bairro}, ${address.localidade} - ${address.uf}`
-      : `${address.localidade} - ${address.uf}`;
-
-    setStreet(address.logradouro);
-    setNeighborhood(address.bairro);
-    setCity(address.localidade);
-    setState(address.uf);
-    setLocation(formattedLocation);
-
-    salvarCampoRascunho("draft_street", address.logradouro);
-    salvarCampoRascunho("draft_neighborhood", address.bairro);
-    salvarCampoRascunho("draft_city", address.localidade);
-    salvarCampoRascunho("draft_state", address.uf);
-    salvarCampoRascunho("draft_location", formattedLocation);
-  };
-
-  const limparRascunho = async () => {
-    await Promise.all(DRAFT_KEYS.map((key) => remover(key)));
-    await fetchUserItemCount();
-  };
-
-  const abrirCamera = async () => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-
-    if (status !== "granted") {
-      Alert.alert(
-        "Permissão necessária",
-        "Autorize o acesso à câmera nas configurações.",
-      );
-      return;
-    }
-
+  async function pick(camera = false) {
     try {
-      const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ["images"],
-        quality: 0.8,
-      });
-
-      if (!result.canceled && result.assets.length > 0) {
-        setPhotos((prev) =>
-          [...prev, { uri: result.assets[0].uri }].slice(0, 5),
-        );
+      const permission = camera
+        ? await ImagePicker.requestCameraPermissionsAsync()
+        : await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) {
+        setError("Permita acesso às fotos ou à câmera para adicionar imagens.");
+        return;
       }
-    } catch {
-      Alert.alert("Erro", "Não foi possível abrir a câmera. Tente novamente.");
-    }
-  };
-
-  const abrirGaleria = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (status !== "granted") {
-      Alert.alert(
-        "Permissão necessária",
-        "Autorize o acesso à galeria nas configurações.",
+      const options: ImagePicker.ImagePickerOptions = {
+        mediaTypes: ["images"],
+        preferredAssetRepresentationMode:
+          ImagePicker.UIImagePickerPreferredAssetRepresentationMode.Compatible,
+        quality: 0.85,
+        allowsMultipleSelection: !camera,
+        selectionLimit: 5 - draft.photos.length,
+      };
+      const result = camera
+        ? await ImagePicker.launchCameraAsync(options)
+        : await ImagePicker.launchImageLibraryAsync(options);
+      if (result.canceled) return;
+      const photos = [...draftRef.current.photos];
+      for (const asset of result.assets) {
+        const type = asset.mimeType || "image/jpeg";
+        if (
+          !["image/jpeg", "image/png", "image/webp", "image/gif"].includes(type)
+        )
+          throw Error("Use JPG, PNG, WebP ou GIF.");
+        const size =
+          asset.fileSize || (await (await fetch(asset.uri)).blob()).size;
+        if (size > 5242880) throw Error("Cada foto pode ter no máximo 5 MB.");
+        if (photos.length >= 5) throw Error("Adicione no máximo cinco fotos.");
+        const filename = asset.uri
+          .split("/")
+          .pop()!
+          .replace(/[^a-zA-Z0-9.-]/g, "");
+        const uri = directory.current + Date.now() + "-" + filename;
+        await FileSystem.copyAsync({ from: asset.uri, to: uri });
+        photos.push({ uri, type, size });
+      }
+      if (photos.reduce((n, p) => n + p.size, 0) > 12582912)
+        throw Error("As fotos podem somar até 12 MB.");
+      change({ photos });
+      setError("");
+    } catch (e) {
+      setError(
+        e instanceof Error
+          ? e.message
+          : "Não foi possível abrir a câmera ou selecionar fotos.",
       );
-      return;
     }
-
-    try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ["images"],
-        allowsMultipleSelection: true,
-        selectionLimit: 5 - photos.length,
-        quality: 0.8,
-      });
-
-      if (!result.canceled) {
-        const novasFotos = result.assets.map((a) => ({ uri: a.uri }));
-        setPhotos((prev) => [...prev, ...novasFotos].slice(0, 5));
-      }
-    } catch {
-      Alert.alert("Erro", "Não foi possível acessar a galeria.");
-    }
-  };
-
-  const handleAddPhoto = () => {
-    if (Platform.OS === "ios") {
+  }
+  function choosePhoto() {
+    if (Platform.OS === "ios")
       ActionSheetIOS.showActionSheetWithOptions(
         {
-          options: ["Cancelar", "Câmera", "Galeria"],
+          options: ["Cancelar", "Tirar foto", "Escolher fotos"],
           cancelButtonIndex: 0,
         },
-        (index) => {
-          if (index === 1) abrirCamera();
-          if (index === 2) abrirGaleria();
+        (v) => {
+          if (v) void pick(v === 1);
         },
       );
-    } else {
-      Alert.alert("Adicionar foto", "Escolha uma opção:", [
-        { text: "Câmera", onPress: abrirCamera },
-        { text: "Galeria", onPress: abrirGaleria },
-        { text: "Cancelar", style: "cancel" },
+    else
+      Alert.alert("Adicionar foto", "Escolha a origem", [
+        { text: "Câmera", onPress: () => void pick(true) },
+        { text: "Galeria", onPress: () => void pick(false) },
+        { text: "Cancelar" },
       ]);
-    }
-  };
-
-  const removePhoto = (index: number) => {
-    setPhotos((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const validar = () => {
-    if (!title.trim()) {
-      Alert.alert("Atenção!", "Adicione um título!");
-      return false;
-    }
-
-    if (!category) {
-      Alert.alert("Atenção!", "Selecione uma categoria.");
-      return false;
-    }
-
-    if (!condition) {
-      Alert.alert("Atenção!", "Selecione a condição do item.");
-      return false;
-    }
-
-    if (!itemType) {
-      Alert.alert(
-        "Atenção!",
-        "Selecione o tipo do item (Doação, Troca ou Venda).",
-      );
-      return false;
-    }
-
-    if (itemType === "venda" && !price.trim()) {
-      Alert.alert("Atenção!", "Informe o preço do item.");
-      return false;
-    }
-
-    if (description.trim().length < 20) {
-      Alert.alert("Atenção!", "Descrição mínima de 20 caracteres.");
-      return false;
-    }
-
-    if (!location.trim()) {
-      Alert.alert("Atenção!", "Informe um CEP válido.");
-      return false;
-    }
-
-    return true;
-  };
-
-  const limparFormulario = async () => {
-    setPhotos([]);
-    setTitle("");
-    setCategory("");
-    setCondition(null);
-    setItemType(null);
-    setPrice("");
-    setDescription("");
-    setCep("");
-    setStreet("");
-    setNeighborhood("");
-    setCity("");
-    setState("");
-    setLocation("");
-
-    await limparRascunho();
-  };
-
-  const handlePublish = async () => {
-    if (!validar()) return;
-
-    setUploading(true);
-
-    try {
-      const userEmail = buscarEmailUsuarioAtual();
-
-      if (!userEmail) {
-        Alert.alert("Login necessário");
-        return;
-      }
-
-      let imageUrls: string[] = [];
-
-      if (photos.length > 0) {
-        imageUrls = await uploadItemImages(
-          photos.map((p) => p.uri),
-          userEmail,
-        );
-      }
-
-      await createItem({
-        title: title.trim(),
-        category,
-        item_condition: condition!,
-        description: description.trim(),
-        location: location.trim(),
-        user_email: userEmail,
-        images: imageUrls,
-        cep,
-        street,
-        neighborhood,
-        city,
-        state,
-        item_type: itemType,
-        price: itemType === "venda" ? price : null,
-      });
-
-      // O anúncio já foi persistido. Falhas locais não devem aparentar falha do cadastro.
-      try {
-        await salvar(`incentive_seen:${userEmail}`, "true");
-        await limparFormulario();
-      } catch (localError) {
-        console.error("Anúncio publicado; falha ao atualizar dados locais:", localError);
-        Alert.alert("Anúncio publicado", "O anúncio foi salvo. Não foi possível atualizar todos os dados locais; confira sua Vitrine antes de publicar novamente.");
-        return;
-      }
-      setShowSuccessModal(true);
-    } catch (error) {
-      const errorMsg =
-        error instanceof Error ? error.message : "Erro desconhecido";
-
-      Alert.alert("Erro", `Não foi possível publicar: ${errorMsg}`);
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const handleSaveEdit = async () => {
-    if (!validar()) return;
-    if (!editItemId || loadedEditId !== editItemId) return;
-
-    setUploading(true);
-
-    try {
-      const userEmail = buscarEmailUsuarioAtual();
-
-      if (!userEmail) {
-        Alert.alert("Login necessário");
-        return;
-      }
-
-      const fotosNovas = photos.filter((p) => !p.uri.startsWith("http"));
-      const fotosExistentes = photos
-        .filter((p) => p.uri.startsWith("http"))
-        .map((p) => p.uri);
-
-      let novasUrls: string[] = [];
-
-      if (fotosNovas.length > 0) {
-        novasUrls = await uploadItemImages(
-          fotosNovas.map((p) => p.uri),
-          userEmail,
-        );
-      }
-
-      await updateItem(editItemId, {
-        title: title.trim(),
-        category,
-        item_condition: condition!,
-        description: description.trim(),
-        location: location.trim(),
-        images: [...fotosExistentes, ...novasUrls],
-        cep,
-        street,
-        neighborhood,
-        city,
-        state,
-        item_type: itemType,
-        price: itemType === "venda" ? price : null,
-      });
-
-      Alert.alert("Salvo!", "Item atualizado com sucesso.", [
-        {
-          text: "OK",
-          onPress: () =>
-            navigation.navigate("HomeScreen", {
-              screen: returnTo,
-            }),
-        },
-      ]);
-    } catch (error) {
-      const errorMsg =
-        error instanceof Error ? error.message : "Erro desconhecido";
-
-      if (errorMsg.includes("RLS") || errorMsg.includes("row-level security")) {
-        Alert.alert(
-          "Erro de Segurança",
-          "O banco de dados está bloqueando a publicação. Contate o suporte.",
-        );
-      } else if (errorMsg.includes("authentication")) {
-        Alert.alert(
-          "Erro de Autenticação",
-          "Você precisa estar logado para publicar um item.",
-        );
-      } else {
-        Alert.alert("Erro", `Não foi possível publicar: ${errorMsg}`);
-      }
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  if (isEditMode && editError) {
-    return <View style={[styles.screen,{padding:24,paddingTop:insets.top+24}]}>
-      <Text accessibilityRole="alert">{editError}</Text>
-      <TouchableOpacity accessibilityRole="button" onPress={() => setEditRetry(value => value + 1)}><Text>Tentar novamente</Text></TouchableOpacity>
-      <TouchableOpacity accessibilityRole="button" onPress={() => navigation.navigate("HomeScreen",{screen:returnTo})}><Text>Voltar à Vitrine</Text></TouchableOpacity>
-    </View>;
   }
-
-  if (loadingItem) {
-    return (
-      <View
+  async function save() {
+    if (busy || !ready) return;
+    setBusy(true);
+    setError("");
+    try {
+      if (
+        !draft.title.trim() ||
+        draft.description.trim().length < 20 ||
+        !draft.category ||
+        !draft.type ||
+        !draft.condition ||
+        !draft.photos.length
+      )
+        throw Error(
+          "Preencha os campos e adicione pelo menos uma foto. Descrição mínima: 20 caracteres.",
+        );
+      if (!id && !draft.creationKey) {
+        const created = await itemRequest("/me/items", "POST");
+        change({ creationKey: created.creationKey });
+      }
+      const photos = [...draft.photos];
+      for (let i = 0; i < photos.length; i++) {
+        if (!photos[i].imageId && !photos[i].uploadId) {
+          photos[i] = { ...photos[i], uploadId: await uploadPhoto(photos[i]) };
+          change({ photos: [...photos] });
+        }
+      }
+      const body = {
+        title: draft.title,
+        description: draft.description,
+        category: draft.category,
+        type: draft.type,
+        condition: draft.condition,
+        price: draft.type === "VENDA" ? draft.price.replace(",", ".") : null,
+        location: draft.location,
+        status: draft.status,
+        photos: photos.map(draftPhotoReference),
+        ...(id
+          ? { updatedAt: version }
+          : { creationKey: draftRef.current.creationKey }),
+      };
+      const item = await itemRequest(
+        id ? `/items/${id}` : "/items",
+        id ? "PATCH" : "POST",
+        body,
+      );
+      if (!id) {
+        await saveQueue.current;
+        await AsyncStorage.removeItem(key.current);
+        const empty = blank();
+        draftRef.current = empty;
+        setDraft(empty);
+      }
+      navigation.navigate("Product", { itemId: item.id });
+    } catch (e) {
+      setError(
+        e instanceof Error && !/network|fetch|abort/i.test(e.message)
+          ? e.message
+          : "Falha de conexão. Os dados e fotos do rascunho foram preservados. Tente novamente.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+  const field = (
+    label: string,
+    name: keyof Draft,
+    max: number,
+    multiline = false,
+  ) => (
+    <View style={{ marginVertical: 10 }}>
+      <Text style={styles.label}>{label}</Text>
+      <TextInput
+        accessibilityLabel={label}
         style={[
-          styles.screen,
-          {
-            justifyContent: "center",
-            alignItems: "center",
-          },
+          styles.input,
+          multiline ? { minHeight: 110 } : { minHeight: 48 },
         ]}
-      >
-        <ActivityIndicator size="large" color="#342A2A" />
+        maxLength={max}
+        value={String(draft[name])}
+        editable={!busy}
+        multiline={multiline}
+        onChangeText={(v) => change({ [name]: v })}
+      />
+    </View>
+  );
+  const choices = (
+    label: string,
+    name: keyof Draft,
+    options: Record<string, string>,
+  ) => (
+    <View style={{ gap: 8, marginVertical: 12 }}>
+      <Text style={styles.label}>{label}</Text>
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+        {Object.entries(options).map(([v, text]) => (
+          <Pressable
+            key={v}
+            accessibilityRole="button"
+            accessibilityState={{ selected: draft[name] === v }}
+            disabled={busy}
+            onPress={() => change({ [name]: v })}
+            style={{
+              padding: 12,
+              minHeight: 44,
+              borderWidth: 1,
+              borderColor: "#342A2A",
+              borderRadius: 18,
+              backgroundColor: draft[name] === v ? "#EBBBEB" : "#F7EFDE",
+            }}
+          >
+            <Text>{text}</Text>
+          </Pressable>
+        ))}
+      </View>
+    </View>
+  );
+  if (!ready)
+    return (
+      <View style={{ padding: 30, paddingTop: insets.top + 30 }}>
+        {error ? <Text role="alert">{error}</Text> : <ActivityIndicator />}
       </View>
     );
-  }
-
   return (
     <ScrollView
-      style={styles.screen}
-      contentContainerStyle={{ paddingBottom: 140 }}
+      keyboardShouldPersistTaps="handled"
+      style={{ backgroundColor: "#F7EFDE" }}
+      contentContainerStyle={{
+        padding: 20,
+        paddingTop: insets.top + 20,
+        paddingBottom: Math.max(insets.bottom, 12) + 140,
+      }}
     >
-      <View style={[styles.navBar, { paddingTop: insets.top + 14 }]}>
-        <Text style={styles.navTitle}>
-          {isEditMode ? "Editar Item" : "Publicar Item"}
-        </Text>
-      </View>
-
-      {!isEditMode && <JourneyCard userItemCount={userItemCount} />}
-
-      {!isEditMode && (
-        <IncentiveCard
-          userItemCount={userItemCount}
-          onPublish={() => navigation?.goBack()}
-        />
-      )}
-
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Fotos do Item</Text>
-        <Text style={styles.cardSubtitle}>
-          Adicione até 5 fotos do seu item. A primeira será a foto de capa.
-        </Text>
-
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={{ marginTop: 12 }}
-        >
-          {photos.map((p, i) => (
-            <View key={i} style={styles.photoThumb}>
-              <Image source={{ uri: p.uri }} style={styles.thumbImg} />
-
-              {i === 0 && (
-                <View style={styles.coverBadge}>
-                  <Text style={styles.coverBadgeText}>Capa</Text>
-                </View>
-              )}
-
-              <TouchableOpacity
-                style={styles.removeBtn}
-                onPress={() => removePhoto(i)}
-              >
-                <Text style={{ color: "#fff", fontSize: 12 }}>✕</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-
-          {photos.length < 5 && (
-            <TouchableOpacity
-              style={styles.addPhotoBtn}
-              onPress={handleAddPhoto}
-            >
-              <Ionicons name="camera-outline" size={28} color="#888780" />
-              <Text style={styles.addPhotoText}>Adicionar</Text>
-            </TouchableOpacity>
-          )}
-        </ScrollView>
-      </View>
-
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Detalhes do Item</Text>
-
-        <Text style={styles.label}>
-          Título <Text style={styles.required}>*</Text>
-        </Text>
-
-        <TextInput
-          style={styles.input}
-          accessibilityLabel="Título do anúncio"
-          placeholder="Ex: Cadeira de escritório ergonômica"
-          value={title}
-          onChangeText={salvarTitulo}
-          placeholderTextColor="#aaa"
-        />
-
-        <Text style={styles.label}>
-          Categoria <Text style={styles.required}>*</Text>
-        </Text>
-
-        <TouchableOpacity
-          style={styles.inputDropdown}
-          accessibilityRole="button"
-          onPress={() => setShowCategoryModal(true)}
-          activeOpacity={0.7}
-        >
-          <Text
-            style={[styles.inputDropdownField, !category && { color: "#aaa" }]}
-          >
-            {category || "Selecione..."}
-          </Text>
-
-          <Ionicons name="chevron-down" size={16} color="#888780" />
-        </TouchableOpacity>
-
-        <Text style={styles.label}>
-          Condição <Text style={styles.required}>*</Text>
-        </Text>
-
-        <View style={styles.conditionGrid}>
-          {(
-            [
-              "Novo",
-              "Usado • Como novo",
-              "Usado • Bom estado",
-              "Usado • Estado Regular",
-            ] as Condition[]
-          ).map((c) => (
-            <TouchableOpacity
-              key={c}
-              style={[
-                styles.conditionBtn,
-                condition === c && styles.conditionBtnActive,
-              ]}
-              onPress={() => salvarCondicao(c)}
-            >
-              <Text
-                style={[
-                  styles.conditionText,
-                  condition === c && styles.conditionTextActive,
-                ]}
-              >
-                {c === "Novo"
-                  ? "Novo"
-                  : c === "Usado • Como novo"
-                    ? "Usado -\nComo Novo"
-                    : c === "Usado • Bom estado"
-                      ? "Usado -\nBom Estado"
-                      : "Usado - Estado\nRegular"}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        <Text style={styles.label}>
-          Tipo <Text style={styles.required}>*</Text>
-        </Text>
-
-        <TouchableOpacity
-          style={styles.inputDropdown}
-          accessibilityRole="button"
-          onPress={() => setShowTypeModal(true)}
-          activeOpacity={0.7}
-        >
-          <Text
-            style={[styles.inputDropdownField, !itemType && { color: "#aaa" }]}
-          >
-            {itemType === "doacao"
-              ? "Doação"
-              : itemType === "troca"
-                ? "Troca"
-                : itemType === "venda"
-                  ? "Venda"
-                  : "Selecione..."}
-          </Text>
-
-          <Ionicons name="chevron-down" size={16} color="#888780" />
-        </TouchableOpacity>
-
-        {itemType === "venda" && (
-          <>
-            <Text style={styles.label}>
-              Preço <Text style={styles.required}>*</Text>
-            </Text>
-
-            <View style={styles.inputRow}>
-              <Text style={styles.pricePrefix}>R$</Text>
-
-              <TextInput
-                style={styles.priceInput}
-                placeholder="0,00"
-                value={price}
-                onChangeText={salvarPreco}
-                keyboardType="decimal-pad"
-                placeholderTextColor="#aaa"
-              />
-            </View>
-          </>
-        )}
-
-        <Text style={styles.label}>
-          Descrição <Text style={styles.required}>*</Text>
-        </Text>
-
-        <TextInput
-          style={[styles.input, { height: 100, textAlignVertical: "top" }]}
-          accessibilityLabel="Descrição do anúncio"
-          placeholder="Descreva o item, suas características"
-          value={description}
-          onChangeText={salvarDescricao}
-          multiline
-          placeholderTextColor="#aaa"
-        />
-
-        <Text style={styles.charCount}>
-          Mínimo 20 caracteres ({description.length}/20)
-        </Text>
-
-        <Text style={styles.label}>
-          Localização <Text style={styles.required}>*</Text>
-        </Text>
-
-        <CepInput
-          value={cep}
-          onCepChange={salvarCep}
-          onAddressFound={handleAddressFound}
-        />
-
-        {location ? (
-          <View style={[styles.inputRow, { marginTop: 12 }]}>
-            <Ionicons
-              name="location-outline"
-              size={16}
-              color="#888780"
-              style={{ marginRight: 8 }}
-            />
-
-            <Text style={styles.inputRowField}>{location}</Text>
-          </View>
-        ) : (
-          <Text style={styles.charCount}>
-            Digite um CEP válido para preencher a localização aproximada.
-          </Text>
-        )}
-      </View>
-
-      <View style={styles.tipBox}>
-        <Text style={styles.tip}>
-          <Text style={styles.tipBold}>Dica:</Text> Itens com fotos claras e
-          descrições detalhadas têm até 3x mais chances de serem doados
-          rapidamente!
-        </Text>
-      </View>
-
-      <TouchableOpacity
-        style={styles.publishBtn}
-        onPress={isEditMode ? handleSaveEdit : handlePublish}
-        disabled={uploading}
-      >
-        {uploading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.publishBtnText}>
-            {isEditMode ? "Salvar Alterações" : "Publicar Item"}
-          </Text>
-        )}
-      </TouchableOpacity>
-
-      {!isEditMode && (
-        <Text style={styles.terms}>
-          Ao publicar, você concorda com nossos{" "}
-          <Text style={styles.termsLink}>Termos de Uso</Text>
-        </Text>
-      )}
-
-      <Modal
-        visible={showCategoryModal}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowCategoryModal(false)}
-      >
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          accessible={false}
-          activeOpacity={1}
-          onPress={() => setShowCategoryModal(false)}
-        >
-          <View style={styles.modalSheet} accessibilityViewIsModal>
-            <View style={styles.modalHandle} />
-
-            <Text style={styles.modalTitle}>Selecione a categoria</Text>
-
-            <FlatList
-              data={CATEGORIES}
-              keyExtractor={(item) => item}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={[
-                    styles.modalItem,
-                    category === item && styles.modalItemActive,
-                  ]}
-                  onPress={() => {
-                    salvarCategoria(item);
-                    setShowCategoryModal(false);
-                  }}
-                >
-                  <Text
-                    style={[
-                      styles.modalItemText,
-                      category === item && styles.modalItemTextActive,
-                    ]}
-                  >
-                    {item}
-                  </Text>
-
-                  {category === item && (
-                    <Ionicons name="checkmark" size={16} color="#4A6741" />
-                  )}
-                </TouchableOpacity>
-              )}
-            />
-          </View>
-        </TouchableOpacity>
-      </Modal>
-
-      <Modal
-        visible={showTypeModal}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowTypeModal(false)}
-      >
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          accessible={false}
-          activeOpacity={1}
-          onPress={() => setShowTypeModal(false)}
-        >
-          <View style={styles.modalSheet} accessibilityViewIsModal>
-            <View style={styles.modalHandle} />
-
-            <Text style={styles.modalTitle}>Tipo do item</Text>
-
-            {TYPE_OPTIONS.map((opt) => (
-              <TouchableOpacity
-                key={opt.key}
-                accessibilityRole="button"
-                accessibilityLabel={opt.label}
-                accessibilityState={{selected:itemType === opt.key}}
-                style={[
-                  styles.typeModalItem,
-                  itemType === opt.key && styles.typeModalItemActive,
-                ]}
-                onPress={() => {
-                  salvarTipo(opt.key);
-                  setShowTypeModal(false);
-                }}
-              >
-                <View
-                  style={[
-                    styles.typeModalBadge,
-                    { backgroundColor: opt.badge },
-                  ]}
-                >
-                  <Ionicons
-                    name={opt.icon as any}
-                    size={22}
-                    color={opt.badgeText}
-                  />
-                </View>
-
-                <View style={{ flex: 1 }}>
-                  <Text
-                    style={[
-                      styles.typeModalLabel,
-                      itemType === opt.key && styles.typeModalLabelActive,
-                    ]}
-                  >
-                    {opt.label}
-                  </Text>
-
-                  <Text style={styles.typeModalDesc}>{opt.desc}</Text>
-                </View>
-
-                {itemType === opt.key && (
-                  <Ionicons name="checkmark" size={18} color="#4A6741" />
-                )}
-              </TouchableOpacity>
-            ))}
-          </View>
-        </TouchableOpacity>
-      </Modal>
-
-      <PublishSuccessModal
-        visible={showSuccessModal}
-        userItemCount={userItemCount}
-        onClose={() => {
-          setShowSuccessModal(false);
+      <JourneyCard userItemCount={count} />
+      <Text
+        style={{
+          fontFamily: "Syne_800ExtraBold",
+          fontSize: 26,
+          color: "#342A2A",
+          marginVertical: 20,
         }}
-      />
+      >
+        {id ? "Editar anúncio" : "Publicar item"}
+      </Text>
+      <Text>De 1 a 5 fotos · até 5 MB cada e 12 MB no total</Text>
+      <View
+        style={{
+          flexDirection: "row",
+          flexWrap: "wrap",
+          gap: 12,
+          marginVertical: 15,
+        }}
+      >
+        {draft.photos.map((p, i) => (
+          <View key={p.uri}>
+            <Image
+              source={{ uri: p.uri }}
+              style={{ width: 90, height: 90, borderRadius: 12 }}
+            />
+            <Pressable
+              accessibilityRole="button"
+              disabled={busy}
+              onPress={() =>
+                change({ photos: draft.photos.filter((_, j) => j !== i) })
+              }
+              style={{ padding: 10 }}
+            >
+              <Text>Remover foto {i + 1}</Text>
+            </Pressable>
+          </View>
+        ))}
+      </View>
+      {draft.photos.length < 5 && (
+        <Pressable
+          accessibilityRole="button"
+          disabled={busy}
+          onPress={choosePhoto}
+          style={{ padding: 16, borderWidth: 1, borderRadius: 14 }}
+        >
+          <Text>Adicionar foto</Text>
+        </Pressable>
+      )}
+      {field("Título", "title", 120)}
+      {choices(
+        "Categoria",
+        "category",
+        Object.fromEntries(categories.map((c) => [c.slug, c.name])),
+      )}
+      {choices("Condição", "condition", CONDITION_LABELS)}
+      {choices("Modalidade", "type", TYPE_LABELS)}
+      {draft.type === "VENDA" && field("Preço", "price", 12)}
+      {field("Descrição", "description", 3000, true)}
+      {field("Localização pública (opcional)", "location", 160)}
+      {id &&
+        choices(
+          "Estado",
+          "status",
+          ["ATIVO", "INATIVO"].includes(draft.status)
+            ? { ATIVO: "Ativo", INATIVO: "Pausado" }
+            : { [draft.status]: draft.status },
+        )}
+      {error && (
+        <Text
+          accessibilityRole="alert"
+          style={{ color: "#9B1C1C", marginVertical: 15 }}
+        >
+          {error}
+        </Text>
+      )}
+      {!id && (
+        <Text>
+          Rascunho privado salvo neste aparelho. Fotos locais só serão
+          compartilhadas após a publicação.
+        </Text>
+      )}
+      <Pressable
+        accessibilityRole="button"
+        disabled={busy}
+        onPress={() => void save()}
+        style={{
+          padding: 20,
+          backgroundColor: "#EBBBEB",
+          borderRadius: 18,
+          marginVertical: 20,
+        }}
+      >
+        <Text>
+          {busy
+            ? "Enviando e salvando..."
+            : id
+              ? "Salvar anúncio"
+              : "Publicar anúncio"}
+        </Text>
+      </Pressable>
     </ScrollView>
   );
 }

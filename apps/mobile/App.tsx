@@ -23,6 +23,7 @@ import { Login } from "./src/screens/Login";
 import { AuthUnavailable as ForgotPass } from "./src/screens/AuthUnavailable";
 import { AuthUnavailable as ResetEmailSent } from "./src/screens/AuthUnavailable";
 import { AuthUnavailable as CreateAccount } from "./src/screens/AuthUnavailable";
+import { PublishScreen } from "./src/screens/Publish";
 import { HomeScreen } from "./src/screens/Home";
 import Chats from "./src/screens/Chats";
 import { ShowcaseScreen } from "./src/screens/Showcase";
@@ -46,7 +47,7 @@ type RootStackParamList = {
         screen?: TabName;
         params?: {
           mode?: "edit";
-          itemId?: number;
+          itemId?: string;
           returnTo?: TabName;
         };
       }
@@ -65,7 +66,6 @@ type RootStackParamList = {
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
-
 
 function MainScreen({ route }: any) {
   const [activeTab, setActiveTab] = useState<TabName>("home");
@@ -98,11 +98,11 @@ function MainScreen({ route }: any) {
     switch (activeTab) {
       case "publicar":
         return (
-          <View style={{ flex: 1, backgroundColor: "#F7EFDE", padding: 28, justifyContent: "center" }}>
-            <Text style={{ color: "#342A2A", fontSize: 18 }}>
-              A publicação e a edição de anúncios ainda não estão disponíveis no catálogo compartilhado.
-            </Text>
-          </View>
+          <PublishScreen
+            key={publishParams?.itemId || "new"}
+            navigation={navigation}
+            route={{ params: publishParams }}
+          />
         );
 
       case "vitrine":

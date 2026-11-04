@@ -9,3 +9,22 @@ export async function GET(_request, { params }) {
     return apiError(error);
   }
 }
+
+import { apiActor } from "@/lib/profile-api";
+import { readSmallJson } from "@/lib/item-http";
+import { saveItem } from "@/lib/item-write-domain.mjs";
+export async function PATCH(request, { params }) {
+  try {
+    const { actor } = await apiActor(request);
+    return apiResponse(
+      await saveItem(
+        prisma,
+        actor,
+        await readSmallJson(request),
+        (await params).id,
+      ),
+    );
+  } catch (e) {
+    return apiError(e);
+  }
+}

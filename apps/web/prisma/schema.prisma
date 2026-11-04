@@ -25,6 +25,7 @@ model User {
   buyerConversations  Conversation[]       @relation("BuyerConversations")
   sellerConversations Conversation[]       @relation("SellerConversations")
   items               Item[]               @relation("SellerItems")
+  itemUploads         ItemUpload[]
   sentMessages        Message[]            @relation("SentMessages")
   notifications       Notification[]
   passwordResetTokens PasswordResetToken[]
@@ -102,6 +103,8 @@ model Category {
 }
 
 model Item {
+  creationKey String? @unique
+  creationHash String?
   id            String         @id @default(cuid())
   title         String
   description   String
@@ -126,6 +129,8 @@ model Item {
 }
 
 model ItemImage {
+  uploadId String? @unique @db.Uuid
+  upload   ItemUpload? @relation(fields: [uploadId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "item_image_upload")
   id       String @id @default(cuid())
   url      String
   position Int    @default(0)
@@ -198,4 +203,20 @@ enum ItemStatus {
   RESERVADO
   CONCLUIDO
   INATIVO
+}
+
+model ItemUpload {
+  id String @id @db.Uuid
+  ownerId String
+  owner User @relation(fields: [ownerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  image ItemImage?
+  stagingKey String @unique
+  storageKey String? @unique
+  mime String
+  size Int
+  status String @default("PENDING")
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  @@index([ownerId, status, expiresAt])
+  @@map("item_uploads")
 }

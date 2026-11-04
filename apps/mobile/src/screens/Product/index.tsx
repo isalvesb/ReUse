@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import {
   readItem,
   CatalogItem,
@@ -19,42 +19,53 @@ import {
   priceLabel,
 } from "../../lib/catalogApi";
 import styles from "./styles";
+import { readMyProfile } from "../../lib/profileApi";
 type Props = { route?: { params?: { itemId: string; returnTo?: string } } };
 export function ProductScreen({ route }: Props) {
   const navigation = useNavigation<any>(),
     insets = useSafeAreaInsets();
+  const [owner, setOwner] = useState(false);
   const [item, setItem] = useState<CatalogItem | null>(null),
     [error, setError] = useState(""),
     [loading, setLoading] = useState(true),
     [attempt, setAttempt] = useState(0),
     [photo, setPhoto] = useState(0);
-  useEffect(() => {
-    const controller = new AbortController();
-    let active = true;
-    setLoading(true);
-    setItem(null);
-    setError("");
-    setPhoto(0);
-    readItem(route?.params?.itemId || "", controller.signal)
-      .then((value) => {
-        if (active) setItem(value);
-      })
-      .catch((error) => {
-        if (active)
-          setError(
-            error instanceof CatalogError && error.status === 404
-              ? "Anúncio não disponível."
-              : "Não foi possível carregar o anúncio. Verifique a conexão.",
-          );
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-    return () => {
-      active = false;
-      controller.abort();
-    };
-  }, [route?.params?.itemId, attempt]);
+  useFocusEffect(
+    useCallback(() => {
+      const controller = new AbortController();
+      let active = true;
+      setLoading(true);
+      setItem(null);
+      setError("");
+      setPhoto(0);
+      readItem(route?.params?.itemId || "", controller.signal)
+        .then((value) => {
+          if (active) {
+            setItem(value);
+            readMyProfile()
+              .then((p) => {
+                if (active) setOwner(p.id === value.seller?.id);
+              })
+              .catch(() => {});
+          }
+        })
+        .catch((error) => {
+          if (active)
+            setError(
+              error instanceof CatalogError && error.status === 404
+                ? "Anúncio não disponível."
+                : "Não foi possível carregar o anúncio. Verifique a conexão.",
+            );
+        })
+        .finally(() => {
+          if (active) setLoading(false);
+        });
+      return () => {
+        active = false;
+        controller.abort();
+      };
+    }, [route?.params?.itemId, attempt]),
+  );
   return (
     <View style={styles.screen}>
       <View style={[styles.navBar, { paddingTop: insets.top + 14 }]}>
@@ -133,9 +144,21 @@ export function ProductScreen({ route }: Props) {
             <View style={styles.ownerCard}>
               <Text style={styles.ownerName}>{item.seller?.name}</Text>
               <Text>{item.seller?.activeItemsCount} itens publicados</Text>
-              <Text>
-                Conversa, publicação e edição compartilhadas pendentes.
-              </Text>
+              {owner && (
+                <Pressable
+                  accessibilityRole="button"
+                  style={{ padding: 16 }}
+                  onPress={() =>
+                    navigation.navigate("HomeScreen", {
+                      screen: "publicar",
+                      params: { mode: "edit", itemId: item.id },
+                    })
+                  }
+                >
+                  <Text>Editar anúncio</Text>
+                </Pressable>
+              )}
+              <Text>Conversa compartilhada pendente.</Text>
             </View>
           </ScrollView>
         )

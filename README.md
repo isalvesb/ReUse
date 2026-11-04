@@ -1,6 +1,6 @@
 # ReUse Lab
 
-Laboratório privado que reúne ReUse Web e ReUse Mobile em npm workspaces. A fundação preserva os históricos dos dois projetos. A Work 1.3 integrou identidade e perfil: Supabase Auth, PostgreSQL novo e backend Next.js/Prisma; a Work 1.4 verificou sua execução nativa iOS. A Work 1.5 compartilha a leitura do catálogo, categorias, busca, filtros e detalhes. Expo/React Native e a identidade visual são preservados. Publicação/edição Mobile, upload e chat compartilhado permanecem pendentes.
+Laboratório privado que reúne ReUse Web e ReUse Mobile em npm workspaces. A fundação preserva os históricos dos dois projetos. A Work 1.3 integrou identidade e perfil: Supabase Auth, PostgreSQL novo e backend Next.js/Prisma; a Work 1.4 verificou sua execução nativa iOS. A Work 1.5 compartilha a leitura do catálogo, categorias, busca, filtros e detalhes. Expo/React Native e a identidade visual são preservados. A Work 1.6 integra publicação/edição e imagens em Storage privado. Chat compartilhado permanece pendente.
 
 ```text
 apps/web/       Next.js e Prisma
@@ -51,3 +51,5 @@ Não há deploy, integração Vercel ou publicação automática. A aplicação 
 Consulte [origem e sanitização](docs/origem-e-historico.md), [política de conteúdo](docs/seguranca.md) e [validação e limites](docs/validacao.md).
 
 Para conferir o catálogo com o backend local e os fixtures já criados, execute `node scripts/check-catalog.mjs`. Para regressão Auth sem editar perfis, execute `node scripts/check-profile-regression.mjs` com `REUSE_TEST_CREDENTIALS_FILE` apontando para o arquivo privado local. O teste de integração da Work 1.3 edita biografias fictícias; não é necessário para a regressão de leitura da Work 1.5. A carga fictícia é explícita e separada, com bloqueio de destino, conforme a documentação do catálogo.
+
+A [Work 1.6](docs/publicacao-e-imagens.md) descreve os contratos de escrita, configuração de Storage exclusivamente no servidor, migration aditiva, rascunhos, limpeza e limites de homologação. `node scripts/check-item-writes.mjs` usa as duas contas fictícias e cria anúncios adicionais; exige `REUSE_TEST_CREDENTIALS_FILE` e backend local. Não execute contra ambientes históricos.

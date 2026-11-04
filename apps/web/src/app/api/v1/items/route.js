@@ -14,3 +14,17 @@ export async function GET(request) {
     return apiError(error);
   }
 }
+
+import { apiActor } from "@/lib/profile-api";
+import { readSmallJson } from "@/lib/item-http";
+import { saveItem } from "@/lib/item-write-domain.mjs";
+export async function POST(request) {
+  try {
+    const { actor } = await apiActor(request);
+    return apiResponse(
+      await saveItem(prisma, actor, await readSmallJson(request)),
+    );
+  } catch (e) {
+    return apiError(e);
+  }
+}
