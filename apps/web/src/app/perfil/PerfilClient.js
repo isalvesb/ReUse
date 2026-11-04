@@ -16,6 +16,7 @@ import {
   ITEM_PHOTO_LIMITS,
 } from "@/lib/upload-constraints.mjs";
 import SharedItemForm from "./SharedItemForm";
+import { itemStatistics } from "@/lib/item-statistics.mjs";
 
 import { ChevronDown, MapPin } from "lucide-react";
 
@@ -39,6 +40,7 @@ const SHOW_LEGACY_ASSISTANTS =
   process.env.NEXT_PUBLIC_SHOW_LEGACY_ASSISTANTS === "true";
 
 export default function PerfilClient({ user, items }) {
+  const statistics = itemStatistics(items);
   const [activeFilter, setActiveFilter] = useState("todos");
   const [showAllItems, setShowAllItems] = useState(false);
 
@@ -86,14 +88,8 @@ export default function PerfilClient({ user, items }) {
               </div>
               <div className="w-full shrink-0 xl:w-[274px]">
                 <ProfileInfo
-                  tradesCount={
-                    items.filter((item) => item.negotiationType === "TROCA")
-                      .length
-                  }
-                  salesCount={
-                    items.filter((item) => item.negotiationType === "VENDA")
-                      .length
-                  }
+                  tradesCount={statistics.tradeItems}
+                  salesCount={statistics.saleItems}
                   rating={user.rating}
                   showBio={false}
                 />

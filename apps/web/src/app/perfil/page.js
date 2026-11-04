@@ -26,6 +26,7 @@ export default async function Perfil() {
     const cards = items.map((item) => ({
         ...formatItemForCard(item),
         negotiationType: item.type,
+        status: item.status,
     }));
 
     const unreadCount = await getUnreadNotificationCount(user.id);

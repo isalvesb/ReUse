@@ -2,12 +2,22 @@ import { Text } from "../../design/Text";
 import { notifications } from "../../lib/chatApi";
 import { useActivePolling } from "../../lib/useActivePolling";
 import React, { useCallback, useState } from "react";
-import { ActivityIndicator, Image, Pressable, View } from "react-native";
+import {
+  ActivityIndicator,
+  AppState,
+  Image,
+  Pressable,
+  View,
+} from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { logoutCompartilhado } from "../../Services/authSession";
-import { readMyProfile } from "../../lib/profileApi";
+import {
+  readMyProfile,
+  readMyItemStatistics,
+  ItemStatistics,
+} from "../../lib/profileApi";
 import styles from "./styles";
 
 type UserData = {
@@ -32,31 +42,77 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
   const [about, setAbout] = useState("");
   const [error, setError] = useState("");
 
-  const [stats] = useState({
-    trocas: 0,
-    itens: 0,
-    avaliacao: null as number | null,
-  });
+  const [stats, setStats] = useState<ItemStatistics | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [statsError, setStatsError] = useState("");
+  const [statsAttempt, setStatsAttempt] = useState(0);
 
-  useFocusEffect(useCallback(() => {
-    let active = true;
-    setIsLoadingUser(true);
-    setError("");
-    readMyProfile().then(profile => {
-      if (!active) return;
-      setUser({ name: profile.name, email: profile.email, location: profile.location || "Localização não informada" });
-      setAbout(profile.bio || "");
-    }).catch((error) => { if (active) { setUser(null); setAbout(""); setError(error instanceof Error ? error.message : "Não foi possível carregar o perfil. Verifique a conexão e tente novamente."); } })
-      .finally(() => { if (active) setIsLoadingUser(false); });
-    return () => { active = false; };
-  }, []));
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+      let statsRequest = 0;
+      const loadStats = async () => {
+        const request = ++statsRequest;
+        setStats(null);
+        setStatsLoading(true);
+        setStatsError("");
+        try {
+          const next = await readMyItemStatistics();
+          if (active && request === statsRequest) setStats(next);
+        } catch {
+          if (active && request === statsRequest)
+            setStatsError("Estatísticas indisponíveis. Tente novamente.");
+        } finally {
+          if (active && request === statsRequest) setStatsLoading(false);
+        }
+      };
+      void loadStats();
+      const appState = AppState.addEventListener("change", (state) => {
+        if (state === "active") void loadStats();
+      });
+      setIsLoadingUser(true);
+      setError("");
+      readMyProfile()
+        .then((profile) => {
+          if (!active) return;
+          setUser({
+            name: profile.name,
+            email: profile.email,
+            location: profile.location || "Localização não informada",
+          });
+          setAbout(profile.bio || "");
+        })
+        .catch((error) => {
+          if (active) {
+            setUser(null);
+            setAbout("");
+            setError(
+              error instanceof Error
+                ? error.message
+                : "Não foi possível carregar o perfil. Verifique a conexão e tente novamente.",
+            );
+          }
+        })
+        .finally(() => {
+          if (active) setIsLoadingUser(false);
+        });
+      return () => {
+        active = false;
+        statsRequest++;
+        appState.remove();
+      };
+    }, [statsAttempt]),
+  );
   const profileImageSource = defaultProfileImage;
   const isLogoutDisabled = isLoggingOut;
 
   const [notificationCount, setNotificationCount] = useState(0);
   useActivePolling(async () => {
-    try { setNotificationCount((await notifications()).unreadCount); }
-    catch { /* Keep last count while offline. */ }
+    try {
+      setNotificationCount((await notifications()).unreadCount);
+    } catch {
+      /* Keep last count while offline. */
+    }
   }, 10000);
 
   const handleLogout = async () => {
@@ -133,25 +189,55 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
             {/* STATS */}
             <View style={styles.statsContainer}>
               <View style={styles.statCard}>
-                <Ionicons name="gift-outline" size={16} style={styles.icon} />
-                <Text style={styles.statNumber}>{stats.trocas}</Text>
-                <Text style={styles.statLabel}>Trocas</Text>
+                <Ionicons name="cube-outline" size={16} style={styles.icon} />
+                <Text style={styles.statNumber}>
+                  {statsLoading ? "…" : (stats?.totalItems ?? "—")}
+                </Text>
+                <Text style={styles.statLabel}>Anúncios</Text>
               </View>
 
               <View style={styles.statCard2}>
-                <Ionicons name="cube-outline" size={16} style={styles.icon} />
-                <Text style={styles.statNumber}>{stats.itens}</Text>
-                <Text style={styles.statLabel}>Itens</Text>
+                <Ionicons
+                  name="checkmark-circle-outline"
+                  size={16}
+                  style={styles.icon}
+                />
+                <Text style={styles.statNumber}>
+                  {statsLoading ? "…" : (stats?.activeItems ?? "—")}
+                </Text>
+                <Text style={styles.statLabel}>Ativos</Text>
               </View>
 
               <View style={styles.statCard3}>
-                <Ionicons name="star-outline" size={16} style={styles.icon} />
+                <Ionicons
+                  name="pause-circle-outline"
+                  size={16}
+                  style={styles.icon}
+                />
                 <Text style={styles.statNumber}>
-                  {stats.avaliacao?.toFixed(1) ?? "—"}
+                  {statsLoading ? "…" : (stats?.pausedItems ?? "—")}
                 </Text>
-                <Text style={styles.statLabel}>Avaliação</Text>
+                <Text style={styles.statLabel}>Pausados</Text>
               </View>
             </View>
+            {statsLoading ? (
+              <Text accessibilityLiveRegion="polite">
+                Carregando estatísticas...
+              </Text>
+            ) : null}
+            {statsError ? (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Tentar novamente as estatísticas"
+                onPress={() => setStatsAttempt((value) => value + 1)}
+                style={{ padding: 12 }}
+              >
+                <Text accessibilityRole="alert">{statsError}</Text>
+              </Pressable>
+            ) : null}
+            {stats?.totalItems === 0 ? (
+              <Text>Você ainda não publicou anúncios.</Text>
+            ) : null}
 
             {/* SOBRE */}
             <View style={styles.aboutCard}>

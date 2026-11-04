@@ -44,13 +44,13 @@ test("gravações concorrentes são ordenadas e uma nova sessão substitui a ant
   assert.equal(await storage.getItem("s"), "B".repeat(5000));
   assert.equal(disk.values.size, 14);
 });
-function api({ statuses = [200], session = { access_token: "verified-access" }, refreshError = false } = {}) {
+function api({ statuses = [200], session = { access_token: "verified-access" }, refreshError = false, payload = { name: "Conta A" } } = {}) {
   const calls = []; let refreshed = 0, signedOut = 0;
   const supabase = { auth: {
     getSession: async () => ({ data: { session } }),
     refreshSession: async () => { refreshed++; session = refreshError ? null : { access_token: "renewed-access" }; return { error: refreshError, data: { session } }; },
   } };
-  const transport = async (url, init) => { calls.push({ url, init }); const status = statuses.shift() ?? 200; return { status, ok: status === 200, json: async () => ({ data: { name: "Conta A" }, error: { message: "Fictitious error" } }) }; };
+  const transport = async (url, init) => { calls.push({ url, init }); const status = statuses.shift() ?? 200; return { status, ok: status === 200, json: async () => ({ data: payload, error: { message: "Fictitious error" } }) }; };
   const scope = load("src/lib/profileApi.ts", {
     process: { env: { EXPO_PUBLIC_REUSE_API_URL: "http://127.0.0.1:4330" } },
     require: name => name === "./fetchWithTimeout" ? { fetchWithTimeout: transport } : ({ supabase, signOutLocally: async () => { signedOut++; session = null; } }),
@@ -74,4 +74,15 @@ test("sem sessão não faz HTTP; indisponibilidade não apaga sessão; logout te
   const missing = api({ session: null }); await assert.rejects(missing.scope.readMyProfile(), e => e.status === 401); assert.equal(missing.calls.length, 0);
   const unavailable = api({ statuses: [503] }); await assert.rejects(unavailable.scope.readMyProfile(), e => e.status === 503); assert.equal(unavailable.signedOut(), 0);
   const logout = api({ statuses: [503] }); await assert.rejects(logout.scope.endSharedSession()); assert.equal(logout.signedOut(), 1);
+});
+
+const itemStats = {totalItems:3,activeItems:2,pausedItems:1,donationItems:1,tradeItems:1,saleItems:1};
+test("estatísticas usam identidade Bearer sem aceitar identificadores de terceiros", async()=>{
+ const a=api({payload:itemStats});assert.equal((await a.scope.readMyItemStatistics()).totalItems,3);
+ assert.equal(a.calls[0].url,"http://127.0.0.1:4330/api/v1/me/stats");assert.equal(a.calls[0].init.headers.Authorization,"Bearer verified-access");assert.equal(a.calls[0].init.body,undefined);
+ const renewed=api({statuses:[401,200],payload:itemStats});assert.equal((await renewed.scope.readMyItemStatistics()).totalItems,3);assert.equal(renewed.refreshed(),1);
+});
+test("estatísticas indisponíveis ou incompletas não viram zeros; vazio legítimo continua válido",async()=>{
+ for(const setup of [{statuses:[503]}, {payload:{}}, {payload:{...itemStats,activeItems:-1}}])await assert.rejects(api(setup).scope.readMyItemStatistics(),e=>e.status===503);
+ const zero=Object.fromEntries(Object.keys(itemStats).map(k=>[k,0]));assert.equal((await api({payload:zero}).scope.readMyItemStatistics()).totalItems,0);
 });

@@ -1,4 +1,5 @@
 import { FIELD_LIMITS } from "./validation.mjs";
+import { itemStatistics } from "./item-statistics.mjs";
 
 export class IntegrationError extends Error {
     constructor(status, code, message) { super(message); this.status = status; this.code = code; }
@@ -62,6 +63,17 @@ export async function readOwnProfile(db, actor) {
     const user = await db.user.findUnique({ where: { id: actor.userId }, select: PROFILE_SELECT });
     if (!user) throw new IntegrationError(401, "UNAUTHENTICATED", "Entre novamente.");
     return profileDto(user);
+}
+export async function readOwnItemStatistics(db, actor) {
+  if (!actor?.userId)
+    throw new IntegrationError(401, "UNAUTHENTICATED", "Entre novamente.");
+  return itemStatistics(
+    await db.item.groupBy({
+      by: ["type", "status"],
+      where: { sellerId: actor.userId },
+      _count: { _all: true },
+    }),
+  );
 }
 export async function updateOwnProfile(db, actor, input) {
     const data = validateProfilePatch(input);

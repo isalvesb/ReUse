@@ -33,6 +33,34 @@ async function request(path: string, init: RequestInit = {}, retry = true): Prom
   return result.data;
 }
 export function readMyProfile(): Promise<SharedProfile> { return request("/me"); }
+export type ItemStatistics = {
+  totalItems: number;
+  activeItems: number;
+  pausedItems: number;
+  donationItems: number;
+  tradeItems: number;
+  saleItems: number;
+};
+export async function readMyItemStatistics(): Promise<ItemStatistics> {
+  const data = await request("/me/stats");
+  const fields = [
+    "totalItems",
+    "activeItems",
+    "pausedItems",
+    "donationItems",
+    "tradeItems",
+    "saleItems",
+  ];
+  if (
+    !data ||
+    fields.some((key) => !Number.isSafeInteger(data[key]) || data[key] < 0)
+  )
+    throw new ProfileApiError(
+      503,
+      "Estatísticas indisponíveis. Tente novamente.",
+    );
+  return data;
+}
 export function editMyProfile(input: Pick<SharedProfile, "name" | "bio">): Promise<SharedProfile> {
   return request("/me", { method: "PATCH", body: JSON.stringify(input) });
 }
