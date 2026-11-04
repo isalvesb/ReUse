@@ -7,6 +7,7 @@ import {
   AppState,
   Image,
   Pressable,
+  ScrollView,
   View,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
@@ -133,7 +134,6 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
 
   return (
     <View style={styles.screen}>
-      {error ? <Text accessibilityRole="alert">{error}</Text> : null}
       {/* NAVBAR */}
       <View style={[styles.navBar, { paddingTop: insets.top + 14 }]}>
         <Pressable
@@ -145,7 +145,14 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
         </Pressable>
       </View>
 
-      <View style={styles.content}>
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        style={{ flex: 1 }}
+        contentContainerStyle={[
+          styles.content,
+          { paddingBottom: Math.max(insets.bottom, 20) },
+        ]}
+      >
         <Pressable
           style={styles.notificationButton}
           accessibilityRole="button"
@@ -163,6 +170,11 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
             </View>
           )}
         </Pressable>
+        {error ? (
+          <Text accessibilityRole="alert" style={styles.statusMessage}>
+            {error}
+          </Text>
+        ) : null}
         {isLoadingUser ? (
           <View style={styles.loadingContent}>
             <ActivityIndicator size="large" color="#342A2A" />
@@ -230,7 +242,7 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
                 accessibilityRole="button"
                 accessibilityLabel="Tentar novamente as estatísticas"
                 onPress={() => setStatsAttempt((value) => value + 1)}
-                style={{ padding: 12 }}
+                style={styles.statsRetry}
               >
                 <Text accessibilityRole="alert">{statsError}</Text>
               </Pressable>
@@ -266,7 +278,7 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
             </Pressable>
           </>
         )}
-      </View>
+      </ScrollView>
     </View>
   );
 }

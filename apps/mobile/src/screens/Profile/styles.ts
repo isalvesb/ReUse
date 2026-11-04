@@ -33,10 +33,20 @@ export default StyleSheet.create({
   },
 
   content: {
-    flex: 1,
+    flexGrow: 1,
     alignItems: "center",
     padding: 20,
     position: "relative",
+  },
+  statsRetry: {
+    padding: space.md,
+    minHeight: tokens.size.touch,
+    maxWidth: "100%",
+  },
+  statusMessage: {
+    paddingTop: space.sm,
+    textAlign: "center",
+    alignSelf: "stretch",
   },
 
   avatarContainer: {

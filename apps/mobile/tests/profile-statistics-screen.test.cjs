@@ -30,6 +30,7 @@ function screen() {
       Image: "Image",
       Pressable: "Pressable",
       View: "View",
+      ScrollView: "ScrollView",
       AppState: {
         addEventListener: (_, f) => {
           appChange = f;

@@ -13,7 +13,7 @@ O total pode ser maior que ativos + pausados quando houver registros `RESERVADO`
 
 No Mobile, os cartões locais “Trocas / Itens / Avaliação” foram substituídos por **Anúncios / Ativos / Pausados**, mantendo os mesmos componentes e estilos. Não foi inventada reputação. O campo legado de avaliação permanece no domínio/Web sem uma nova implementação; não é apresentado como estatística funcional no Mobile.
 
-O Mobile lê as contagens ao abrir/retomar o perfil e ao voltar do segundo plano. Não há promessa de atualização instantânea enquanto a tela continua aberta. Retornar ao perfil após publicação/edição consulta o banco novamente. Uma nova tentativa manual repete a leitura. Durante carregamento aparecem reticências; em erro aparecem traços e mensagem de indisponibilidade com nova tentativa, nunca zeros substitutos. Zero é exibido apenas após resposta válida para uma conta realmente sem anúncios. Respostas tardias de uma tela/conta anterior são ignoradas.
+O Mobile lê as contagens ao abrir/retomar o perfil e ao voltar do segundo plano. Não há promessa de atualização instantânea enquanto a tela continua aberta. Retornar ao perfil após publicação/edição consulta o banco novamente. Uma nova tentativa manual repete a leitura. Durante carregamento aparecem reticências; em erro aparecem traços e mensagem de indisponibilidade com nova tentativa, nunca zeros substitutos. Zero é exibido apenas após resposta válida para uma conta realmente sem anúncios. Respostas tardias de uma tela/conta anterior são ignoradas. O conteúdo do perfil permite rolagem para acomodar avisos e manter os controles acessíveis; mensagens de falha ficam dentro da área de conteúdo, abaixo do cabeçalho seguro.
 
 ## Verificação reproduzível
 
