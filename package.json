@@ -23,6 +23,8 @@
     "build:web": "npm run build --workspace=@reuse/web -- --webpack",
     "build:mobile": "npm run bundle --workspace=@reuse/mobile",
     "check": "npm test && npm run lint:web && npm run typecheck:mobile",
-    "test:integration": "node scripts/check-shared-profile.mjs"
+    "test:integration": "node scripts/check-shared-profile.mjs",
+    "design:tokens": "node scripts/design-tokens.mjs",
+    "design:check": "node scripts/design-tokens.mjs --check"
   }
 }

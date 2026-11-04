@@ -1,13 +1,7 @@
 @import "tailwindcss";
 
-:root {
-  --reuse-brown: #342a2a;
-  --reuse-brown-light: #584c4c;
-  --reuse-cream: #f7efde;
-  --reuse-pink: #ebbbeb;
-  --reuse-beige: #756a54;
-  --reuse-white: #ffffff;
-}
+@import "./design-tokens.css";
+
 
 /* Tailwind CSS v4 directive; suppress false positives from generic CSS linters. */
 /* stylelint-disable-next-line at-rule-no-unknown */
@@ -88,4 +82,15 @@ a {
   outline: 2px solid var(--reuse-cream);
   outline-offset: 3px;
   box-shadow: 0 0 0 2px var(--reuse-brown);
+}
+
+/* Shared control roles; platform-specific markup remains intact. */
+:where(input[type="text"], input[type="email"], input[type="password"], input[type="search"], input[type="number"], select) {
+  min-height: var(--ds-size-control);
+}
+textarea { line-height: 1.5; }
+button:disabled, [aria-disabled="true"] { cursor: not-allowed; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
