@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser, getUnreadNotificationCount } from "@/lib/current-user";
 import { formatItemForCard } from "@/lib/format";
-import { NEARBY_DEMO_ITEMS, demoItemFilter, demoItemOrderEntries } from "@/lib/demo-curations";
+import { listCatalog, catalogQuery } from "@/lib/catalog-domain.mjs";
 
 import { readCatalog } from "@/lib/catalog-availability.mjs";
 import CatalogUnavailable from "@/components/CatalogUnavailable";
@@ -17,45 +17,43 @@ export const dynamic = "force-dynamic";
 export default async function Home() {
   const user = await getCurrentUser();
 
-  // Prioriza a seleção demonstrativa por título, anunciante e localização.
-  const catalog = await readCatalog(() => prisma.item.findMany({
-    where: {
-      status: "ATIVO",
-      OR: NEARBY_DEMO_ITEMS.map(demoItemFilter),
-    },
-    include: {
-      images: { orderBy: { position: "asc" }, take: 1 },
-      category: true,
-      seller: { select: { email: true } },
-    },
-  }));
-  const nearbyItems = catalog.items;
-
-  const itemOrder = new Map(demoItemOrderEntries(NEARBY_DEMO_ITEMS));
-  const selectedItems = nearbyItems
-    .sort((left, right) => {
-      const leftKey = `${left.seller?.email}:${left.title}`;
-      const rightKey = `${right.seller?.email}:${right.title}`;
-      return itemOrder.get(leftKey) - itemOrder.get(rightKey);
-    })
-    .slice(0, 6);
-
-  // Exibe apenas a curadoria demonstrativa de Bela Vista e Liberdade.
-  const products = selectedItems.map(formatItemForCard);
+  const catalog = await readCatalog(
+    async () =>
+      (
+        await listCatalog(
+          prisma,
+          catalogQuery(new URLSearchParams({ pageSize: "6" })),
+        )
+      ).items,
+  );
+  const products = catalog.items.map((item) =>
+    formatItemForCard({ ...item, images: item.images.map((url) => ({ url })) }),
+  );
 
   const unreadCount = user ? await getUnreadNotificationCount(user.id) : 0;
 
   return (
     <>
-      <Header loggedIn={!!user} avatarUrl={user?.avatarUrl} avatarKey={user?.id} unreadCount={unreadCount} />
+      <Header
+        loggedIn={!!user}
+        avatarUrl={user?.avatarUrl}
+        avatarKey={user?.id}
+        unreadCount={unreadCount}
+      />
 
       <main className="min-h-screen w-full bg-reuse-cream pb-20">
-
         <Hero />
-        {!catalog.available && <div className="mx-auto max-w-7xl px-6"><CatalogUnavailable /></div>}
+        {!catalog.available && (
+          <div className="mx-auto max-w-7xl px-6">
+            <CatalogUnavailable />
+          </div>
+        )}
 
         {/* CATEGORIAS */}
-        <section id="categorias" className="mx-auto mt-16 w-full max-w-7xl scroll-mt-28 px-6">
+        <section
+          id="categorias"
+          className="mx-auto mt-16 w-full max-w-7xl scroll-mt-28 px-6"
+        >
           <h2 className="text-2xl font-bold text-reuse-brown">
             Descubra por categorias
           </h2>
@@ -90,13 +88,11 @@ export default async function Home() {
 
         {/* PRODUTOS */}
         <section className="mx-auto mt-16 w-full max-w-7xl px-6">
-
           <h2 className="text-2xl font-bold text-reuse-brown">
-            Produtos perto de você
+            Anúncios da comunidade
           </h2>
 
           <div className="mt-8 grid gap-x-16 gap-y-8 md:grid-cols-2">
-
             {products.map((product) => (
               <Link key={product.id} href={`/produto/${product.id}`}>
                 <ProductCard
@@ -114,7 +110,6 @@ export default async function Home() {
                 Nenhum item ativo disponível no momento.
               </p>
             )}
-
           </div>
 
           <div className="mt-10 flex justify-center">
@@ -125,9 +120,7 @@ export default async function Home() {
               Ver mais
             </Link>
           </div>
-
         </section>
-
       </main>
 
       <Footer />

@@ -7,6 +7,7 @@ import {
   Inter_700Bold,
 } from "@expo-google-fonts/inter";
 import {
+  Text,
   ActivityIndicator,
   Animated,
   Easing,
@@ -25,7 +26,6 @@ import { AuthUnavailable as CreateAccount } from "./src/screens/AuthUnavailable"
 import { HomeScreen } from "./src/screens/Home";
 import Chats from "./src/screens/Chats";
 import { ShowcaseScreen } from "./src/screens/Showcase";
-import { PublishScreen } from "./src/screens/Publish";
 import TabBar from "./src/components/TabBar";
 import { observarUsuarioLogado } from "./src/Services/authSession";
 import { ProfileScreen } from "./src/screens/Profile";
@@ -57,7 +57,7 @@ type RootStackParamList = {
   Notifications: undefined;
 
   Product: {
-    itemId: number;
+    itemId: string;
     returnTo?: TabName;
   };
 
@@ -98,11 +98,11 @@ function MainScreen({ route }: any) {
     switch (activeTab) {
       case "publicar":
         return (
-          <PublishScreen
-            key={publishParams?.mode === "edit" ? `edit-${publishParams.itemId}` : "new"}
-            navigation={navigation}
-            route={{ params: publishParams }}
-          />
+          <View style={{ flex: 1, backgroundColor: "#F7EFDE", padding: 28, justifyContent: "center" }}>
+            <Text style={{ color: "#342A2A", fontSize: 18 }}>
+              A publicação e a edição de anúncios ainda não estão disponíveis no catálogo compartilhado.
+            </Text>
+          </View>
         );
 
       case "vitrine":
