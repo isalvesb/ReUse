@@ -24,6 +24,7 @@ export default function ChatWindow({
   error,
   historyCursor,
   initialClientKey,
+  onComposingChange,
 }) {
   const messagesRef = useRef(null);
   const [clientKey, setClientKey] = useState(initialClientKey);
@@ -210,6 +211,7 @@ export default function ChatWindow({
           value={draft}
           onChange={(e) => {
             setDraft(e.target.value);
+            onComposingChange(Boolean(e.target.value));
             setClientKey(crypto.randomUUID());
           }}
           maxLength={1000}
