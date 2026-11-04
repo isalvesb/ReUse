@@ -131,38 +131,68 @@ export async function photoUrl(key) {
   if (error) throw Error("Foto indisponível.");
   return data.signedUrl;
 }
+export function expiredPhotoWhere(actor = null, now = new Date()) {
+  return {
+    ...(actor ? { ownerId: actor.userId } : {}),
+    expiresAt: { lt: now },
+    status: { not: "ATTACHED" },
+    image: { is: null },
+  };
+}
+export async function inspectPhotoCleanup(db, actor = null, now = new Date()) {
+  const where = expiredPhotoWhere(actor, now);
+  const [expiredCandidates, rows] = await Promise.all([
+    db.itemUpload.count({ where }),
+    db.itemUpload.findMany({
+      where,
+      orderBy: [{ expiresAt: "asc" }, { id: "asc" }],
+      take: 50,
+    }),
+  ]);
+  return { expiredCandidates, rows };
+}
 export async function cleanupPhotos(db, actor = null, store = storageClient()) {
-  const rows = await db.itemUpload.findMany({
-    where: {
-      ...(actor ? { ownerId: actor.userId } : {}),
-      expiresAt: { lt: new Date() },
-      status: { not: "ATTACHED" },
-    },
-    take: 50,
-  });
-  let removed = 0;
+  const { rows } = await inspectPhotoCleanup(db, actor);
+  const result = { removed: 0, skipped: 0, failed: 0 };
   for (const row of rows) {
-    const claimed = await db.itemUpload.updateMany({
-      where: { id: row.id, status: row.status, expiresAt: { lt: new Date() } },
-      data: { status: "CLEANING" },
-    });
-    if (!claimed.count) continue;
-    if (await db.itemImage.count({ where: { uploadId: row.id } })) {
-      await db.itemUpload.update({
-        where: { id: row.id },
-        data: { status: "ATTACHED" },
-      });
-      continue;
-    }
-    const { error } = await store.remove([
-      row.stagingKey,
-      row.storageKey ||
-        `verified/${row.ownerId}/${row.id}.${getImageExtension(row.mime)}`,
-    ]);
-    if (!error) {
-      await db.itemUpload.delete({ where: { id: row.id } });
-      removed++;
+    try {
+      // Keep the row lock until removal and commit. Concurrent workers must not
+      // both reclaim CLEANING; expired uploads cannot be acquired by publishing.
+      const outcome = await db.$transaction(
+        async (tx) => {
+          const claimed = await tx.itemUpload.updateMany({
+            where: {
+              ...expiredPhotoWhere(actor),
+              id: row.id,
+              status: row.status,
+            },
+            data: { status: "CLEANING" },
+          });
+          if (!claimed.count) return "skipped";
+          if (await tx.itemImage.count({ where: { uploadId: row.id } })) {
+            await tx.itemUpload.update({
+              where: { id: row.id },
+              data: { status: "ATTACHED" },
+            });
+            return "skipped";
+          }
+          const { error } = await store.remove([
+            row.stagingKey,
+            row.storageKey ||
+              `verified/${row.ownerId}/${row.id}.${getImageExtension(row.mime)}`,
+          ]);
+          if (error) return "failed";
+          await tx.itemUpload.delete({ where: { id: row.id } });
+          return "removed";
+        },
+        { maxWait: 5000, timeout: 15000 },
+      );
+      result[outcome]++;
+    } catch {
+      // A failed transaction or transport error leaves the record for retry.
+      // Do not log Storage responses, signed URLs or connection credentials.
+      result.failed++;
     }
   }
-  return { removed };
+  return result;
 }
