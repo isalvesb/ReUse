@@ -62,7 +62,7 @@ type RootStackParamList = {
     returnTo?: TabName;
   };
 
-  Chats: { recipientEmail?: string } | undefined;
+  Chats: { conversationId?: string } | undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

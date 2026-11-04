@@ -1,3 +1,4 @@
+import { startConversation } from "../../lib/chatApi";
 import React, { useCallback, useState } from "react";
 import {
   View,
@@ -20,7 +21,14 @@ import {
 } from "../../lib/catalogApi";
 import styles from "./styles";
 import { readMyProfile } from "../../lib/profileApi";
-type Props = { route?: { params?: { itemId: string; returnTo?: string } } };
+type Props = {
+  route?: {
+    params?: {
+      itemId: string;
+      returnTo?: string;
+    };
+  };
+};
 export function ProductScreen({ route }: Props) {
   const navigation = useNavigation<any>(),
     insets = useSafeAreaInsets();
@@ -158,7 +166,26 @@ export function ProductScreen({ route }: Props) {
                   <Text>Editar anúncio</Text>
                 </Pressable>
               )}
-              <Text>Conversa compartilhada pendente.</Text>
+              {!owner && (
+                <Pressable
+                  style={{ padding: 16 }}
+                  accessibilityRole="button"
+                  onPress={async () => {
+                    try {
+                      const conversation = await startConversation(item.id);
+                      navigation.navigate("Chats", {
+                        conversationId: conversation.id,
+                      });
+                    } catch {
+                      setError(
+                        "Não foi possível iniciar a conversa. Verifique a conexão.",
+                      );
+                    }
+                  }}
+                >
+                  <Text>Falar com anunciante</Text>
+                </Pressable>
+              )}
             </View>
           </ScrollView>
         )

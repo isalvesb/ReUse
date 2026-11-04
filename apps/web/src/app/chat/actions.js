@@ -1,113 +1,72 @@
 "use server";
-
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/session";
 import { consumeRateLimit } from "@/lib/rate-limit";
-
-const MAX_MESSAGE_LENGTH = 1000;
-
+import {
+  startConversation,
+  sendChatMessage,
+  listMessages,
+  markConversationRead,
+  chatQuery,
+  messageInput,
+} from "@/lib/chat-domain.mjs";
+import { IntegrationError } from "@/lib/profile-domain.mjs";
+async function actor() {
+  const userId = await getCurrentUserId();
+  if (!userId) redirect("/login");
+  return { userId };
+}
 export async function sendMessage(_previousState, formData) {
-    const userId = await getCurrentUserId();
-
-    if (!userId) {
-        redirect("/login");
-    }
-
-    const content = formData.get("message")?.toString().trim() || "";
-    const conversationId = formData.get("conversationId")?.toString() || "";
-    const itemId = formData.get("itemId")?.toString() || "";
-    const requestConversationId = conversationId || (itemId ? `new:${itemId}` : "");
-
-    const fail = (error) => ({
-        error,
-        conversationId: requestConversationId,
+  const user = await actor();
+  const requested = String(formData.get("conversationId") || ""),
+    itemId = String(formData.get("itemId") || "");
+  let conversationId = requested,
+    sent;
+  try {
+    messageInput({
+      content: formData.get("message"),
+      clientKey: formData.get("clientKey"),
     });
-
-    if (!content || content.length > MAX_MESSAGE_LENGTH) {
-        return fail(
-            `A mensagem deve ter entre 1 e ${MAX_MESSAGE_LENGTH} caracteres.`
-        );
-    }
-
-    const rateLimit = await consumeRateLimit({
-        scope: "mensagens",
-        identifier: userId,
-        limit: 30,
-        windowMs: 60 * 1000,
-    });
-
-    if (!rateLimit.allowed) {
-        return fail("Muitas mensagens em pouco tempo. Aguarde um momento.");
-    }
-
-    let conversation;
-
-    if (conversationId) {
-        conversation = await prisma.conversation.findFirst({
-            where: {
-                id: conversationId,
-                OR: [
-                    { buyerId: userId },
-                    { sellerId: userId },
-                ],
-            },
-        });
-    } else if (itemId) {
-        const item = await prisma.item.findFirst({
-            where: {
-                id: itemId,
-                status: "ATIVO",
-                NOT: { sellerId: userId },
-            },
-            select: { id: true, sellerId: true },
-        });
-
-        if (item) {
-            conversation = await prisma.conversation.upsert({
-                where: {
-                    itemId_buyerId: {
-                        itemId: item.id,
-                        buyerId: userId,
-                    },
-                },
-                update: {},
-                create: {
-                    itemId: item.id,
-                    buyerId: userId,
-                    sellerId: item.sellerId,
-                },
-            });
-        }
-    }
-
-    if (!conversation) {
-        return fail("Esta conversa não está disponível.");
-    }
-
-    const recipientId = conversation.buyerId === userId
-        ? conversation.sellerId
-        : conversation.buyerId;
-
-    await prisma.$transaction([
-        prisma.message.create({
-            data: {
-                conversationId: conversation.id,
-                senderId: userId,
-                content,
-            },
-        }),
-        prisma.notification.create({
-            data: {
-                userId: recipientId,
-                itemId: conversation.itemId,
-                message: "Você recebeu uma nova mensagem sobre um item.",
-            },
-        }),
-    ]);
-
-    revalidatePath("/chat");
-    revalidatePath("/notificacoes");
-    redirect(`/chat?conversationId=${conversation.id}`);
+    if (!conversationId)
+      conversationId = (
+        await startConversation(prisma, user, { itemId }, consumeRateLimit)
+      ).id;
+    sent = await sendChatMessage(
+      prisma,
+      user,
+      conversationId,
+      {
+        content: formData.get("message"),
+        clientKey: formData.get("clientKey"),
+      },
+      consumeRateLimit,
+    );
+  } catch (e) {
+    return {
+      error:
+        e instanceof IntegrationError
+          ? e.message
+          : "Não foi possível enviar. Tente novamente.",
+      conversationId: requested || `new:${itemId}`,
+    };
+  }
+  revalidatePath("/chat");
+  revalidatePath("/notificacoes");
+  return { sent: sent.id, conversationId };
+}
+export async function olderMessages(id, cursor) {
+  return listMessages(
+    prisma,
+    await actor(),
+    id,
+    chatQuery(new URLSearchParams(cursor ? { cursor } : {})),
+  );
+}
+export async function readConversation(id, messageId) {
+  await markConversationRead(prisma, await actor(), id, {
+    throughMessageId: messageId,
+  });
+  revalidatePath("/notificacoes");
 }

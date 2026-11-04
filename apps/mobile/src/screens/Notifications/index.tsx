@@ -1,153 +1,182 @@
-import { useEffect, useState } from "react";
+import { useState, useRef } from "react";
 import {
   View,
   FlatList,
   Text,
-  Image,
-  ImageStyle,
   Pressable,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { supabase } from "../../lib/supabase";
-import { DEV_SKIP_AUTH } from "../../config/devAuth";
+import {
+  notifications,
+  readNotification,
+  readAllNotifications,
+  Notice,
+} from "../../lib/chatApi";
+import { useActivePolling } from "../../lib/useActivePolling";
 import styles from "./styles";
-
-type NotificationItem = {
-  id: string | number;
-  title: string;
-  message: string;
-  created_at: string;
-  avatar_url?: string | null;
-};
-
 export default function Notifications() {
-  const navigation = useNavigation<any>();
-  const insets = useSafeAreaInsets();
-
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
-  const [unavailable, setUnavailable] = useState(DEV_SKIP_AUTH);
-  const [checking, setChecking] = useState(!DEV_SKIP_AUTH);
-  const [userId, setUserId] = useState<string | null>(null);
-
-  async function fetchNotifications(id: string | null) {
-    if (!id) return;
-
-    const { data, error } = await supabase
-      .from("notifications")
-      .select("*")
-      .eq("user_id", id)
-      .order("created_at", { ascending: false });
-
-    setChecking(false);
-    setUnavailable(Boolean(error));
-    if (!error && data) {
-      setNotifications(data);
+  const navigation = useNavigation<any>(),
+    insets = useSafeAreaInsets();
+  const [rows, setRows] = useState<Notice[]>([]),
+    [count, setCount] = useState(0),
+    [cursor, setCursor] = useState<string | null>(null),
+    [loading, setLoading] = useState(true),
+    [error, setError] = useState(""),
+    [busy, setBusy] = useState(false);
+  const loaded = useRef(false);
+  async function refresh() {
+    try {
+      const result = await notifications();
+      setRows((old) => [
+        ...result.items,
+        ...old.filter((n) => !result.items.some((x) => x.id === n.id)),
+      ]);
+      if (!loaded.current) {
+        setCursor(result.nextCursor);
+        loaded.current = true;
+      }
+      setCount(result.unreadCount);
+      setError("");
+    } catch {
+      setError(
+        "Não foi possível atualizar as notificações. Verifique a conexão ou entre novamente.",
+      );
+    } finally {
+      setLoading(false);
     }
   }
-
-  useEffect(() => {
-    async function getUser() {
-      if (DEV_SKIP_AUTH) return;
-      try {
-        const { data, error } = await supabase.auth.getUser();
-        const id = data.user?.id ?? null;
-        setUserId(id); setUnavailable(Boolean(error) || !id);
-        if (!id) setChecking(false);
-      } catch { setUnavailable(true); setChecking(false); }
+  useActivePolling(refresh, 10000);
+  async function open(n: Notice) {
+    setBusy(true);
+    try {
+      await readNotification(n.id);
+      if (n.conversationId)
+        navigation.navigate("Chats", { conversationId: n.conversationId });
+      else if (n.itemId) navigation.navigate("Product", { itemId: n.itemId });
+      await refresh();
+    } catch {
+      setError("Não foi possível abrir a notificação. Tente novamente.");
+    } finally {
+      setBusy(false);
     }
-
-    getUser();
-  }, []);
-
-  useEffect(() => {
-    if (!userId) return;
-
-    fetchNotifications(userId);
-
-    const channel = supabase
-      .channel("notifications-channel")
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "notifications",
-          filter: `user_id=eq.${userId}`,
-        },
-        (payload) => {
-          setNotifications((prev) => [
-            payload.new as NotificationItem,
-            ...prev,
-          ]);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [userId]);
-
-  function getTimeAgo(date: string) {
-    const diff = (Date.now() - new Date(date).getTime()) / 1000;
-
-    if (diff < 60) return "agora";
-    if (diff < 3600) return `há ${Math.floor(diff / 60)}m`;
-    if (diff < 86400) return `há ${Math.floor(diff / 3600)}h`;
-
-    return `há ${Math.floor(diff / 86400)}d`;
   }
-
+  async function all() {
+    setBusy(true);
+    try {
+      await readAllNotifications();
+      setRows((old) => old.map((n) => ({ ...n, read: true })));
+      await refresh();
+    } catch {
+      setError("Não foi possível confirmar a leitura.");
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function more() {
+    if (!cursor) return;
+    setBusy(true);
+    try {
+      const result = await notifications(cursor);
+      setRows((old) => [
+        ...new Map([...old, ...result.items].map((n) => [n.id, n])).values(),
+      ]);
+      setCursor(result.nextCursor);
+      setCount(result.unreadCount);
+    } catch {
+      setError("Não foi possível carregar a página.");
+    } finally {
+      setBusy(false);
+    }
+  }
   return (
     <View style={styles.container}>
       <View style={[styles.navBar, { paddingTop: insets.top + 14 }]}>
-        <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={20} color="#FFFFFF" />
+        <Pressable
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="arrow-back" size={20} color="#fff" />
           <Text style={styles.backText}>Voltar</Text>
         </Pressable>
       </View>
-
       <View style={styles.content}>
-        <Text style={styles.screenTitle}>Notificações</Text>
-
+        <Text style={styles.screenTitle}>Notificações · {count} não lidas</Text>
+        {count > 0 && (
+          <Pressable onPress={all} disabled={busy}>
+            <Text
+              style={{ paddingBottom: 16, textDecorationLine: "underline" }}
+            >
+              Marcar todas como lidas
+            </Text>
+          </Pressable>
+        )}
+        {loading ? <ActivityIndicator color="#342A2A" /> : null}
+        {error ? (
+          <Pressable onPress={refresh}>
+            <Text accessibilityRole="alert">{error} Tentar novamente.</Text>
+          </Pressable>
+        ) : null}
         <FlatList
-          data={notifications}
-          keyExtractor={(item) => String(item.id)}
-          showsVerticalScrollIndicator={false}
+          data={rows}
+          keyExtractor={(n) => n.id}
           contentContainerStyle={styles.listContent}
           ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Ionicons
-                name="notifications-outline"
-                size={32}
-                color="#342A2A"
-              />
-              <Text style={styles.emptyTitle}>{checking ? "Carregando notificações" : unavailable ? "Notificações indisponíveis" : "Nenhuma notificação"}</Text>
-              <Text style={styles.emptyText}>
-                {DEV_SKIP_AUTH ? "Demonstração: notificações em tempo real não estão conectadas." : unavailable ? "Não foi possível acessar as notificações nesta sessão." : checking ? "Aguarde a consulta." : "Suas notificações aparecerão aqui quando houver novidades."}
-              </Text>
-            </View>
+            !loading && !error ? (
+              <View style={styles.emptyContainer}>
+                <Ionicons
+                  name="notifications-outline"
+                  size={32}
+                  color="#342A2A"
+                />
+                <Text style={styles.emptyTitle}>Nenhuma notificação</Text>
+                <Text style={styles.emptyText}>
+                  Suas notificações internas aparecerão aqui.
+                </Text>
+              </View>
+            ) : null
+          }
+          ListFooterComponent={
+            cursor ? (
+              <Pressable onPress={more} disabled={busy}>
+                <Text style={{ padding: 16 }}>Mais notificações</Text>
+              </Pressable>
+            ) : null
           }
           renderItem={({ item }) => (
-            <View style={styles.card}>
-              <Image
-                source={{
-                  uri: item.avatar_url || "https://i.pravatar.cc/100",
-                }}
-                style={styles.avatar as ImageStyle}
+            <Pressable
+              style={[
+                styles.card,
+                !item.read
+                  ? { borderColor: "#cdb1d3", backgroundColor: "#ead5ed" }
+                  : {},
+              ]}
+              onPress={() => open(item)}
+              disabled={busy}
+              accessibilityRole="button"
+              accessibilityLabel={`${item.read ? "Lida" : "Não lida"}: ${item.message}`}
+            >
+              <Ionicons
+                name="notifications-outline"
+                size={26}
+                color="#342A2A"
+                style={{ marginRight: 12 }}
               />
-
               <View style={styles.cardContent}>
-                <View style={styles.cardHeader}>
-                  <Text style={styles.title}>{item.title}</Text>
-                  <Text style={styles.time}>{getTimeAgo(item.created_at)}</Text>
-                </View>
-
+                <Text style={styles.title}>
+                  {item.read ? "Lida" : "Não lida"}
+                </Text>
                 <Text style={styles.message}>{item.message}</Text>
+                <Text style={styles.time}>
+                  {new Date(item.createdAt).toLocaleString("pt-BR")}
+                </Text>
+                {item.conversationId ? (
+                  <Text style={styles.message}>Abrir conversa</Text>
+                ) : null}
               </View>
-            </View>
+            </Pressable>
           )}
         />
       </View>

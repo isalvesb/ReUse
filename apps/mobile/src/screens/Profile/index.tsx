@@ -1,3 +1,5 @@
+import { notifications } from "../../lib/chatApi";
+import { useActivePolling } from "../../lib/useActivePolling";
 import React, { useCallback, useState } from "react";
 import { ActivityIndicator, Image, Pressable, Text, View } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
@@ -50,7 +52,11 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
   const profileImageSource = defaultProfileImage;
   const isLogoutDisabled = isLoggingOut;
 
-  const notificationCount = 0;
+  const [notificationCount, setNotificationCount] = useState(0);
+  useActivePolling(async () => {
+    try { setNotificationCount((await notifications()).unreadCount); }
+    catch { /* Keep last count while offline. */ }
+  }, 10000);
 
   const handleLogout = async () => {
     if (isLoggingOut) return;

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import SpriteImage from "@/components/SpriteImage";
 import { getAvatarSource } from "@/lib/sprite";
 
@@ -5,6 +6,7 @@ export default function ChatList({
     conversations,
     selectedConversation,
     onSelectConversation,
+    nextCursor,
 }) {
     return (
         <aside className="w-full shrink-0 border-b border-reuse-brown/20 bg-[#F9EEDC] px-5 py-6 lg:w-[390px] lg:border-b-0 lg:border-r lg:px-8 lg:pt-[54px]">
@@ -45,8 +47,9 @@ export default function ChatList({
                                 <div className="min-w-0 flex-1">
 
                                     <h2 className="text-xl font-bold leading-tight">
-                                        {conversation.name}
+                                        {conversation.name} {conversation.unreadCount > 0 && <span className="text-sm">({conversation.unreadCount} não lidas)</span>}
                                     </h2>
+                                    <p className="text-sm text-reuse-brown-light">{conversation.itemTitle}</p>
 
                                     <div className="mt-2">
                                         <p className="line-clamp-2 text-sm leading-[18px]">
@@ -59,6 +62,7 @@ export default function ChatList({
                         );
                     })}
 
+                    {nextCursor && <Link href={`/chat?cursor=${encodeURIComponent(nextCursor)}`} className="block p-3 underline">Mais conversas</Link>}
                     {conversations.length === 0 && (
                         <p className="rounded-2xl bg-reuse-white/70 p-5 text-sm text-reuse-brown-light">
                             Você ainda não tem conversas. Abra um item da vitrine para falar com o anunciante.

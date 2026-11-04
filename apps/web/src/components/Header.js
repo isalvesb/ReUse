@@ -1,4 +1,5 @@
 "use client";
+import UnreadCount from "./UnreadCount";
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
@@ -154,11 +155,7 @@ export default function Header({
                         >
                             <Bell size={22} strokeWidth={1.8} />
 
-                            {unreadCount > 0 && (
-                                <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-reuse-pink text-[9px] font-bold text-reuse-brown">
-                                    {unreadCount > 9 ? "9+" : unreadCount}
-                                </span>
-                            )}
+                            <UnreadCount initial={unreadCount}/>
                         </Link>
 
                         {/* Sacola */}
@@ -262,13 +259,7 @@ export default function Header({
                                             <Bell size={18} />
                                             <span>Notificações</span>
 
-                                            {unreadCount > 0 && (
-                                                <span className="ml-auto rounded-full bg-reuse-pink px-2 py-0.5 text-[10px] font-bold text-reuse-brown">
-                                                    {unreadCount > 9
-                                                        ? "9+"
-                                                        : unreadCount}
-                                                </span>
-                                            )}
+                                            <UnreadCount initial={unreadCount} menu/>
                                         </Link>
                                     </div>
 
