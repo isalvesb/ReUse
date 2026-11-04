@@ -49,10 +49,19 @@ export async function provisionActor(db, identity, now = new Date()) {
                 ? identity.name.trim().slice(0, FIELD_LIMITS.name) : "Conta de teste" },
         select: PROFILE_SELECT,
     });
-    const session = await db.domainAuthSession.upsert({
-        where: { id: identity.sessionId }, update: {},
-        create: { id: identity.sessionId, userId: user.id, createdAt: now },
-    });
+    let session;
+    try {
+        session = await db.domainAuthSession.upsert({
+            where: { id: identity.sessionId }, update: {},
+            create: { id: identity.sessionId, userId: user.id, createdAt: now },
+        });
+    } catch (error) {
+        // Concurrent first requests may race on Prisma's empty-update upsert.
+        // Read the winner without changing its owner, age or revocation.
+        if (error?.code !== "P2002") throw error;
+        session = await db.domainAuthSession.findUnique({ where: { id: identity.sessionId } });
+        if (!session) throw error;
+    }
     if (session.userId !== user.id || session.revokedAt || now - session.createdAt >= DOMAIN_SESSION_MAX_AGE_MS) {
         throw new IntegrationError(401, "SESSION_ENDED", "Sessão encerrada. Entre novamente.");
     }

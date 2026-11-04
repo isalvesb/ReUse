@@ -18,6 +18,7 @@ import {
   readMyProfile,
   readMyItemStatistics,
   ItemStatistics,
+  ProfileApiError,
 } from "../../lib/profileApi";
 import styles from "./styles";
 
@@ -88,7 +89,7 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
             setUser(null);
             setAbout("");
             setError(
-              error instanceof Error
+              error instanceof ProfileApiError
                 ? error.message
                 : "Não foi possível carregar o perfil. Verifique a conexão e tente novamente.",
             );

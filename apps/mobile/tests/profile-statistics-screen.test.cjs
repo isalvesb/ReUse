@@ -3,7 +3,7 @@ const test = require("node:test"),
   ts = require("typescript"),
   fs = require("node:fs"),
   vm = require("node:vm");
-function screen() {
+function screen({ profileFailure } = {}) {
   let state = [],
     cursor = 0,
     effect,
@@ -55,11 +55,15 @@ function screen() {
     "../../lib/chatApi": {},
     "../../Services/authSession": {},
     "../../lib/profileApi": {
-      readMyProfile: async () => ({
-        name: "Conta fictícia",
-        email: "teste@example.com",
-        bio: "Bio",
-      }),
+      ProfileApiError: class extends Error {},
+      readMyProfile: async () => {
+        if (profileFailure) throw profileFailure;
+        return {
+          name: "Conta fictícia",
+          email: "teste@example.com",
+          bio: "Bio",
+        };
+      },
       readMyItemStatistics: () =>
         new Promise((resolve, reject) => pending.push({ resolve, reject })),
     },
@@ -103,6 +107,18 @@ function screen() {
   };
 }
 const tick = () => new Promise((r) => setImmediate(r));
+test("falha de transporte do perfil mostra orientação em português junto à nova tentativa", async () => {
+  const s = screen({ profileFailure: new TypeError("Network request failed") });
+  s.render();
+  s.focus();
+  s.pending[0].reject(new TypeError("Network request failed"));
+  await tick();
+  const text = s.texts(s.render());
+  assert.ok(text.includes("Não foi possível carregar o perfil. Verifique a conexão e tente novamente."));
+  assert.ok(text.includes("Estatísticas indisponíveis. Tente novamente."));
+  assert.ok(!text.includes("Network request failed"));
+  assert.equal(text.filter(t => t === "—").length, 3);
+});
 test("perfil ignora resposta tardia da conta anterior e mostra indisponibilidade sem zeros falsos", async () => {
   const s = screen();
   s.render();

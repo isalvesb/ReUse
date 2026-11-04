@@ -88,8 +88,17 @@ try {
     });
     assert.ok(!error, "Login de teste indisponível.");
     tokens[account] = login.session.access_token;
-    profiles[account] = await data(account, "/me");
+    const initial = await Promise.all([
+      data(account, "/me"),
+      data(account, "/me/stats"),
+      data(account, "/me"),
+      data(account, "/me/stats"),
+    ]);
+    profiles[account] = initial[0];
+    assert.deepEqual(initial[0], initial[2]);
+    assert.deepEqual(initial[1], initial[3]);
   }
+  checks.push("Primeiras leituras concorrentes de perfil e estatísticas sem falha de criação da sessão");
   assert.notEqual(profiles.a.id, profiles.b.id);
   const beforeImages = await imageSnapshot(),
     beforeStorage = await storageSnapshot([profiles.a.id, profiles.b.id]);

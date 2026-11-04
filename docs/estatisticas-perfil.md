@@ -26,3 +26,9 @@ REUSE_TEST_CREDENTIALS_FILE=/caminho/privado/contas-ficticias.json node --env-fi
 Por padrão, compara A/B com SQL independente, recusa seleção de outro titular, simula a limpeza e confere inventário de imagens sem remoção. `--exercise-status` é opção explícita para pausar e reativar um anúncio fictício próprio existente, sem upload; só usar com autorização para esse teste. O estado original é restaurado inclusive na saída de erro, quando a conexão permite, e eventual falha de restauração é informada. O `updatedAt` do anúncio avança como numa edição normal. Não usar contas, banco ou objetos históricos.
 
 Publicação nova e vazio legítimo são cobertos em testes isolados. A verificação real usa as duas contas já existentes e uma mudança reversível de estado; não cria anúncios ou imagens.
+
+## Fechamento nativo
+
+Na conferência iOS, o primeiro acesso simultâneo ao perfil e às estatísticas revelou uma disputa no `upsert` da sessão de domínio. Somente o conflito de unicidade `P2002` é recuperado por leitura da sessão vencedora. Titular, expiração e revogação são novamente validados pelas mesmas regras; nenhuma sessão é reativada e outros erros continuam como falhas. O script reproduz leituras iniciais concorrentes com as duas contas. Não foi alterado schema, prazo de sessão nem provedor.
+
+Falhas de transporte do perfil recebem orientação em português, sem exibir a mensagem técnica nativa. O aviso respeita o espaço ocupado pelo sino de notificações. A nova tentativa das estatísticas também recarrega o perfil, permitindo recuperar a tela sem sair da sessão.

@@ -32,6 +32,7 @@ function database() {
             update: async ({ where, data }) => { updates++; const user = users.get(where.id); Object.assign(user, data); return user; },
         },
         domainAuthSession: {
+            findUnique: async ({ where }) => sessions.get(where.id) ?? null,
             upsert: async ({ where, create }) => { if (!sessions.has(where.id)) sessions.set(where.id, { ...create, revokedAt: null }); return sessions.get(where.id); },
             updateMany: async ({ where, data }) => { const session = sessions.get(where.id); if (session?.userId === where.userId && !session.revokedAt) Object.assign(session, data); },
         },
@@ -57,6 +58,42 @@ test("provisionamento é idempotente e usa o subject, sem substituir o perfil po
     const again = await provisionActor(db, { ...identity, name: "Metadata diferente" }, now);
     assert.equal(again.userId, actor.userId); assert.equal(again.profile.name, "Nome persistido");
     assert.equal(db.users.size, 1); assert.equal(db.sessions.size, 1);
+});
+test("requisições iniciais concorrentes reutilizam a sessão vencedora sem duplicar", async () => {
+    const db = database();
+    db.domainAuthSession.upsert = async ({ where, create }) => {
+        await Promise.resolve();
+        if (db.sessions.has(where.id)) throw Object.assign(new Error("duplicate"), { code: "P2002" });
+        const session = { ...create, revokedAt: null };
+        db.sessions.set(where.id, session);
+        return session;
+    };
+    const actors = await Promise.all(Array.from({ length: 8 }, () => provisionActor(db, identity, now)));
+    assert.equal(db.sessions.size, 1);
+    assert.ok(actors.every(actor => actor.sessionId === sessionA && actor.userId === actors[0].userId));
+    assert.equal(db.sessions.get(sessionA).createdAt, now);
+});
+test("conflito de criação não reativa sessão revogada, expirada ou pertencente a terceiro", async () => {
+    for (const patch of [{ revokedAt: now }, { createdAt: new Date(+now - DOMAIN_SESSION_MAX_AGE_MS) }, { userId: "other-user" }]) {
+        const db = database();
+        await provisionActor(db, identity, now);
+        Object.assign(db.sessions.get(sessionA), patch);
+        const before = { ...db.sessions.get(sessionA) };
+        db.domainAuthSession.upsert = async () => { throw Object.assign(new Error("duplicate"), { code: "P2002" }); };
+        await rejects401(provisionActor(db, identity, now));
+        assert.deepEqual(db.sessions.get(sessionA), before);
+    }
+});
+test("erros diferentes de conflito e conflito sem registro vencedor continuam sendo falhas", async () => {
+    for (const code of ["P2002", "P1001"]) {
+        const db = database();
+        const failure = Object.assign(new Error("isolated failure"), { code });
+        let reads = 0;
+        db.domainAuthSession.upsert = async () => { throw failure; };
+        db.domainAuthSession.findUnique = async () => { reads++; return null; };
+        await assert.rejects(provisionActor(db, identity, now), error => error === failure);
+        assert.equal(reads, code === "P2002" ? 1 : 0);
+    }
 });
 test("B altera apenas B; tentativa de enviar identificador/email de A é recusada antes da escrita", async () => {
     const db = database(); const a = await provisionActor(db, identity, now);

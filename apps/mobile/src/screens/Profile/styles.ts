@@ -44,6 +44,7 @@ export default StyleSheet.create({
     maxWidth: "100%",
   },
   statusMessage: {
+    marginTop: tokens.size.touch + space.sm,
     paddingTop: space.sm,
     textAlign: "center",
     alignSelf: "stretch",
