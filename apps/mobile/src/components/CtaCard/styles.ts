@@ -1,26 +1,27 @@
+import { tokens, colors, font, space, radius } from "../../design/tokens";
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 16,
+    borderRadius: radius.card,
     overflow: "hidden",
   },
 
   image: {},
 
   title: {
-    fontFamily: "Inter_700Bold",
+    fontFamily: font.bold,
   },
 
   subtitle: {
-    fontSize: 16,
+    fontSize: tokens.type.body,
     lineHeight: 24,
-    fontFamily: "Inter_400Regular",
+    fontFamily: font.regular,
   },
 
   button: {
-    backgroundColor: "#EBBBEB",
-    borderRadius: 999,
+    backgroundColor: colors.accent,
+    borderRadius: radius.pill,
     paddingHorizontal: 20,
     paddingVertical: 14,
     overflow: "hidden",
@@ -28,19 +29,19 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    color: "#342A2A",
-    fontSize: 16,
-    fontFamily: "Inter_700Bold",
+    color: colors.text,
+    fontSize: tokens.type.body,
+    fontFamily: font.bold,
   },
 
   buttonOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "#000",
-    borderRadius: 999,
+    backgroundColor: colors.scrim,
+    borderRadius: radius.pill,
   },
 
   heroCard: {
-    backgroundColor: "#342A2A",
+    backgroundColor: colors.text,
     minHeight: 360,
     padding: 20,
     position: "relative",
@@ -54,17 +55,17 @@ const styles = StyleSheet.create({
   },
 
   heroTitle: {
-    fontSize: 32,
+    fontSize: tokens.type.hero,
     lineHeight: 40,
-    color: "#F7EFDE",
+    color: colors.background,
     marginBottom: 2,
-    marginTop: 16,
-    fontFamily: "Inter_700Bold",
+    marginTop: space.lg,
+    fontFamily: font.bold,
   },
 
   heroSubtitle: {
-    color: "#F7EFDE",
-    fontFamily: "Inter_400Regular",
+    color: colors.background,
+    fontFamily: font.regular,
   },
 
   heroImage: {
@@ -84,12 +85,12 @@ const styles = StyleSheet.create({
   },
 
   compactCard: {
-    backgroundColor: "#F7EFDE",
+    backgroundColor: colors.background,
     flexDirection: "row",
     alignItems: "stretch",
     justifyContent: "space-between",
     paddingVertical: 20,
-    gap: 16,
+    gap: space.lg,
   },
 
   compactContent: {
@@ -100,20 +101,20 @@ const styles = StyleSheet.create({
   compactTitle: {
     fontSize: 22,
     lineHeight: 28,
-    color: "#342A2A",
-    marginBottom: 12,
-    fontFamily: "Inter_700Bold",
+    color: colors.text,
+    marginBottom: space.md,
+    fontFamily: font.bold,
   },
 
   compactSubtitle: {
-    color: "#342A2A",
-    fontFamily: "Inter_400Regular",
+    color: colors.text,
+    fontFamily: font.regular,
   },
 
   highlightText: {
     fontSize: 18,
-    color: "#342A2A",
-    fontFamily: "Inter_700Bold",
+    color: colors.text,
+    fontFamily: font.bold,
   },
 
   compactImage: {
@@ -123,7 +124,7 @@ const styles = StyleSheet.create({
 
   compactButton: {
     alignSelf: "flex-end",
-    marginTop: 24,
+    marginTop: space.xl,
   },
 });
 

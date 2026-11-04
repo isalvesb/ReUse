@@ -1,8 +1,9 @@
+import { tokens, colors, font, space, radius } from "../../design/tokens";
 import { StyleSheet } from "react-native";
 
-const DARK = "#342A2A";
-const CREAM = "#F7EFDE";
-const MUTED = "#888780";
+const DARK = colors.text;
+const CREAM = colors.background;
+const MUTED = colors.textMuted;
 
 const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: CREAM },
@@ -19,7 +20,7 @@ const s = StyleSheet.create({
     backgroundColor: DARK,
   },
   backButton: { flexDirection: "row", alignItems: "center", gap: 6 },
-  backButtonText: { color: "#FFF", fontSize: 15, fontFamily: "Inter_400Regular" },
+  backButtonText: { color: colors.surface, fontSize: 15, fontFamily: font.regular },
   placeholder: { width: 32 },
 
   // Imagem principal
@@ -43,10 +44,10 @@ const s = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: "#FFF",
+    backgroundColor: colors.surface,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000",
+    shadowColor: colors.scrim,
     shadowOpacity: 0.15,
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
@@ -55,7 +56,7 @@ const s = StyleSheet.create({
 
   // Thumbnails
   thumbsScroll: { marginTop: 10 },
-  thumbsContent: { paddingHorizontal: 16, gap: 8 },
+  thumbsContent: { paddingHorizontal: space.lg, gap: space.sm },
   thumb: {
     width: 64,
     height: 64,
@@ -68,109 +69,110 @@ const s = StyleSheet.create({
   thumbImage: { width: "100%", height: "100%" },
 
   // Informações
-  infoSection: { paddingHorizontal: 16, paddingTop: 16, paddingBottom: 8 },
+  infoSection: { paddingHorizontal: space.lg, paddingTop: space.lg, paddingBottom: space.sm },
   title: {
     fontSize: 22,
-    fontFamily: "Inter_700Bold",
+    fontFamily: font.bold,
     color: DARK,
-    marginBottom: 4,
+    marginBottom: space.xs,
   },
   condition: {
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
+    fontSize: tokens.type.label,
+    fontFamily: font.regular,
     color: MUTED,
     marginBottom: 6,
   },
   locationRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
-    marginBottom: 12,
+    gap: space.xs,
+    marginBottom: space.md,
   },
   locationText: {
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
+    fontSize: tokens.type.label,
+    fontFamily: font.regular,
     color: MUTED,
   },
   badgeRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 16,
+    marginBottom: space.lg,
   },
   typeBadge: {
     paddingHorizontal: 14,
     paddingVertical: 6,
-    borderRadius: 20,
+    borderRadius: radius.input,
   },
   typeBadgeText: {
     fontSize: 13,
-    fontFamily: "Inter_700Bold",
+    fontFamily: font.bold,
     color: DARK,
   },
   price: {
     fontSize: 18,
-    fontFamily: "Inter_700Bold",
+    fontFamily: font.bold,
     color: DARK,
   },
   description: {
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
+    fontSize: tokens.type.label,
+    fontFamily: font.regular,
     lineHeight: 22,
-    color: "#444",
-    marginBottom: 24,
+    color: colors.textMuted,
+    marginBottom: space.xl,
   },
 
   // Card do vendedor
   ownerCard: {
-    marginHorizontal: 16,
-    backgroundColor: "#FFF",
-    borderRadius: 16,
-    padding: 16,
-    shadowColor: "#000",
+    marginHorizontal: space.lg,
+    backgroundColor: colors.surface,
+    borderRadius: radius.card,
+    padding: space.lg,
+    shadowColor: colors.scrim,
     shadowOpacity: 0.05,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },
     elevation: 2,
-    marginBottom: 16,
+    marginBottom: space.lg,
   },
   ownerInfo: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: space.md,
     marginBottom: 14,
   },
   ownerAvatar: {
     width: 48,
     height: 48,
-    borderRadius: 24,
+    borderRadius: radius.control,
     borderWidth: 2,
-    borderColor: "#C9A8D4",
+    borderColor: colors.accent,
   },
   ownerText: { flex: 1 },
   ownerName: {
-    fontSize: 16,
-    fontFamily: "Inter_700Bold",
+    fontSize: tokens.type.body,
+    fontFamily: font.bold,
     color: DARK,
     marginBottom: 2,
   },
   ownerMeta: {
     fontSize: 13,
-    fontFamily: "Inter_400Regular",
+    fontFamily: font.regular,
     color: MUTED,
   },
   chatBtn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: DARK,
-    borderRadius: 12,
-    paddingVertical: 14,
+    backgroundColor: colors.accent,
+    minHeight: tokens.size.control,
+    borderRadius: radius.control,
+    paddingVertical: space.md,
   },
   chatBtnText: {
-    color: "#FFF",
+    color: colors.text,
     fontSize: 15,
-    fontFamily: "Inter_700Bold",
+    fontFamily: font.bold,
   },
 
 });

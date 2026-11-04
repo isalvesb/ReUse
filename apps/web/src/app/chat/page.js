@@ -81,7 +81,7 @@ export default async function ChatPage({ searchParams }) {
         : [],
   }));
   return (
-    <div className="min-h-screen bg-[#F9EEDC]">
+    <div className="min-h-screen bg-reuse-cream">
       <Header
         loggedIn
         avatarUrl={user.avatarUrl}

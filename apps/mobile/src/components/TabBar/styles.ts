@@ -1,3 +1,4 @@
+import { colors, font, space, radius } from "../../design/tokens";
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
@@ -11,12 +12,12 @@ const styles = StyleSheet.create({
     position: "relative",
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "hsla(0, 11%, 18%, 0.9)",
-    borderRadius: 999,
-    paddingVertical: 12,
+    backgroundColor: colors.navigation,
+    borderRadius: radius.pill,
+    paddingVertical: space.md,
     minHeight: 80,
 
-    shadowColor: "#000",
+    shadowColor: colors.scrim,
     shadowOffset: {
       width: 0,
       height: 8,
@@ -30,8 +31,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 7,
     left: 0,
-    borderRadius: 999,
-    backgroundColor: "hsla(263, 100%, 93%, 0.95)",
+    borderRadius: radius.pill,
+    backgroundColor: colors.accent,
   },
 
   tab: {
@@ -50,10 +51,10 @@ const styles = StyleSheet.create({
   tabContent: {
     width: 62,
     height: 62,
-    borderRadius: 999,
+    borderRadius: radius.pill,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 4,
+    paddingHorizontal: space.xs,
     zIndex: 1,
   },
 
@@ -61,29 +62,29 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 76,
     height: 76,
-    borderRadius: 999,
+    borderRadius: radius.pill,
     alignSelf: "center",
   },
 
   tabOverlayActive: {
-    backgroundColor: "#000",
+    backgroundColor: colors.scrim,
   },
 
   tabOverlayInactive: {
-    backgroundColor: "#F7EFDE",
+    backgroundColor: colors.background,
   },
 
   label: {
-    marginTop: 4,
+    marginTop: space.xs,
     fontSize: 11,
     lineHeight: 14,
-    color: "#F7EFDE",
-    fontFamily: "Inter_500Medium",
+    color: colors.background,
+    fontFamily: font.medium,
     textAlign: "center",
   },
 
   labelActive: {
-    color: "#342A2A",
+    color: colors.text,
   },
 });
 

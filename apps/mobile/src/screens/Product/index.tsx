@@ -1,8 +1,9 @@
+import { Text } from "../../design/Text";
+import { colors } from "../../design/tokens";
 import { startConversation } from "../../lib/chatApi";
 import React, { useCallback, useState } from "react";
 import {
   View,
-  Text,
   ScrollView,
   Image,
   Pressable,
@@ -88,7 +89,7 @@ export function ProductScreen({ route }: Props) {
       {loading ? (
         <ActivityIndicator
           accessibilityLabel="Carregando anúncio"
-          color="#342A2A"
+          color={colors.text}
         />
       ) : error ? (
         <View style={{ padding: 24 }}>
@@ -155,7 +156,7 @@ export function ProductScreen({ route }: Props) {
               {owner && (
                 <Pressable
                   accessibilityRole="button"
-                  style={{ padding: 16 }}
+                  style={styles.chatBtn}
                   onPress={() =>
                     navigation.navigate("HomeScreen", {
                       screen: "publicar",
@@ -163,12 +164,12 @@ export function ProductScreen({ route }: Props) {
                     })
                   }
                 >
-                  <Text>Editar anúncio</Text>
+                  <Text style={styles.chatBtnText}>Editar anúncio</Text>
                 </Pressable>
               )}
               {!owner && (
                 <Pressable
-                  style={{ padding: 16 }}
+                  style={styles.chatBtn}
                   accessibilityRole="button"
                   onPress={async () => {
                     try {
@@ -183,7 +184,7 @@ export function ProductScreen({ route }: Props) {
                     }
                   }}
                 >
-                  <Text>Falar com anunciante</Text>
+                  <Text style={styles.chatBtnText}>Falar com anunciante</Text>
                 </Pressable>
               )}
             </View>

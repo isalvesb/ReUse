@@ -1,7 +1,8 @@
+import { Text } from "../design/Text";
+import { colors, font } from "../design/tokens";
 import React, { useCallback, useState, useEffect } from "react";
 import {
   View,
-  Text,
   ScrollView,
   Pressable,
   ActivityIndicator,
@@ -108,11 +109,11 @@ export function SharedCatalog({
         marginRight: 8,
         borderRadius: 18,
         borderWidth: 1,
-        borderColor: "#342A2A",
-        backgroundColor: selected ? "#EBBBEB" : "#F7EFDE",
+        borderColor: colors.text,
+        backgroundColor: selected ? colors.accent : colors.background,
       }}
     >
-      <Text style={{ color: "#342A2A", fontFamily: "Inter_500Medium" }}>
+      <Text style={{ color: colors.text, fontFamily: font.medium }}>
         {label}
       </Text>
     </Pressable>
@@ -128,17 +129,18 @@ export function SharedCatalog({
             setPage(1);
             onQueryChange?.(q);
           }}
+          placeholderTextColor={colors.textMuted}
           maxLength={80}
           returnKeyType="search"
           style={{
             minHeight: 48,
             padding: 12,
-            backgroundColor: "#F3E8D2",
+            backgroundColor: colors.surfaceMuted,
             borderRadius: 20,
           }}
         />
       )}
-      <Text style={{ color: "#342A2A", fontFamily: "Inter_700Bold" }}>
+      <Text style={{ color: colors.text, fontFamily: font.bold }}>
         Categorias
       </Text>
       <ScrollView
@@ -191,7 +193,7 @@ export function SharedCatalog({
       {loading ? (
         <ActivityIndicator
           accessibilityLabel="Carregando anúncios"
-          color="#342A2A"
+          color={colors.text}
         />
       ) : error ? (
         <View>

@@ -9,7 +9,7 @@ export default function ChatList({
     nextCursor,
 }) {
     return (
-        <aside className="w-full shrink-0 border-b border-reuse-brown/20 bg-[#F9EEDC] px-5 py-6 lg:w-[390px] lg:border-b-0 lg:border-r lg:px-8 lg:pt-[54px]">
+        <aside className="w-full shrink-0 border-b border-reuse-brown/20 bg-reuse-cream px-5 py-6 lg:w-[390px] lg:border-b-0 lg:border-r lg:px-8 lg:pt-[54px]">
             <div className="flex h-full flex-col">
 
                 {/* LISTA DE CONVERSAS */}

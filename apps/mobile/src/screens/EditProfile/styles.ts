@@ -1,9 +1,10 @@
+import { tokens, colors, font, space, radius } from "../../design/tokens";
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F7EFDE",
+    backgroundColor: colors.background,
   },
 
   header: {
@@ -11,24 +12,28 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 16,
-    backgroundColor: "#342A2A",
+    padding: space.lg,
+    backgroundColor: colors.text,
     paddingTop: 50,
     paddingHorizontal: 20,
   },
 
   backText: {
-    fontSize: 16,
+    fontSize: tokens.type.body,
     alignItems: "flex-start",
-    color: "#fff",
+    color: colors.surface,
     marginLeft: 7,
+
+    fontFamily: font.regular,
   },
 
   headerTitle: {
-    color: "#fff",
+    color: colors.surface,
     fontSize: 22,
     fontWeight: "medium",
     paddingHorizontal: 35,
+
+    fontFamily: font.regular,
   },
 
   content: {
@@ -45,8 +50,8 @@ const styles = StyleSheet.create({
   avatar: {
     width: 127,
     height: 127,
-    borderRadius: 999,
-    borderColor: "#fff",
+    borderRadius: radius.pill,
+    borderColor: colors.surface,
     borderWidth: 3.54,
     shadowColor: "#0000001A",
     shadowOpacity: 0.1,
@@ -61,8 +66,8 @@ const styles = StyleSheet.create({
   cameraButton: {
     width: 35,
     height: 35,
-    borderRadius: 999,
-    backgroundColor: "#342A2A",
+    borderRadius: radius.pill,
+    backgroundColor: colors.text,
     justifyContent: "center",
     alignItems: "center",
     position: "absolute",
@@ -71,39 +76,43 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: "#FFF",
+    backgroundColor: colors.surface,
     padding: 25,
-    gap: 24,
+    gap: space.xl,
     borderRadius: 14,
-    borderColor: "#E5E7EB",
+    borderColor: colors.border,
     borderWidth: 1.18,
-    marginBottom: 16,
+    marginBottom: space.lg,
   },
 
   label: {
-    fontSize: 14,
-    color: "#4A5565",
-    marginTop: 12,
+    fontSize: tokens.type.label,
+    color: colors.textMuted,
+    marginTop: space.md,
+
+    fontFamily: font.regular,
   },
 
   inputContainer: {
     height: 50,
     borderWidth: 1,
-    borderRadius: 10,
-    backgroundColor: "#F3F3F5",
-    borderColor: "#E5E7EB",
+    borderRadius: radius.input,
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 4,
-    paddingLeft: 12,
-    paddingRight: 12,
+    paddingVertical: space.xs,
+    paddingLeft: space.md,
+    paddingRight: space.md,
   },
 
   input: {
     flex: 1,
-    fontSize: 16,
-    color: "#0A0A0A",
+    fontSize: tokens.type.body,
+    color: colors.text,
+
+    fontFamily: font.regular,
   },
 
   disabledInput: {
@@ -118,14 +127,16 @@ const styles = StyleSheet.create({
   aboutInput: {
     minHeight: 120,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
-    backgroundColor: "#F3F3F5",
-    borderRadius: 10,
-    fontSize: 16,
-    paddingVertical: 8,
-    paddingLeft: 12,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    borderRadius: radius.input,
+    fontSize: tokens.type.body,
+    paddingVertical: space.sm,
+    paddingLeft: space.md,
     paddingRight: 40,
     textAlignVertical: "top",
+
+    fontFamily: font.regular,
   },
 
   actions: {
@@ -137,11 +148,11 @@ const styles = StyleSheet.create({
   cancelButton: {
     width: 50,
     height: 48,
-    marginRight: 8,
-    borderRadius: 10,
-    borderColor: "#342A2A",
+    marginRight: space.sm,
+    borderRadius: radius.input,
+    borderColor: colors.text,
     borderWidth: 1,
-    paddingHorizontal: 12,
+    paddingHorizontal: space.md,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -149,8 +160,8 @@ const styles = StyleSheet.create({
   saveButton: {
     width: 50,
     height: 48,
-    borderRadius: 10,
-    backgroundColor: "#342A2A",
+    borderRadius: radius.input,
+    backgroundColor: colors.text,
     justifyContent: "center",
     alignItems: "center",
   },

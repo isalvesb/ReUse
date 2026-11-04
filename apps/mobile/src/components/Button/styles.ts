@@ -1,15 +1,17 @@
+import { tokens, colors, font, space, radius } from "../../design/tokens";
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: "#342A2A",
-    paddingLeft: 16,
-    paddingRight: 16,
+    backgroundColor: colors.accent,
+    minHeight: 48,
+    paddingLeft: space.lg,
+    paddingRight: space.lg,
     paddingTop: 10,
     paddingBottom: 10,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 20,
+    borderRadius: radius.input,
     overflow: "hidden",
     position: "relative",
   },
@@ -20,7 +22,7 @@ const styles = StyleSheet.create({
 
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "#000",
+    backgroundColor: colors.scrim,
     opacity: 0,
   },
 
@@ -33,9 +35,9 @@ const styles = StyleSheet.create({
   },
 
   text: {
-    fontSize: 14,
-    fontFamily: "Inter_500Medium",
-    color: "#FFFFFF",
+    fontSize: tokens.type.label,
+    fontFamily: font.medium,
+    color: colors.text,
     zIndex: 1,
   },
 });

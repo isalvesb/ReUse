@@ -160,7 +160,7 @@ export default function Login() {
                     </div>
 
                     {/* GOOGLE */}
-                    <a
+                    <button type="button" disabled
                         aria-disabled="true" title="Login social indisponível nesta etapa"
                         className="flex h-12 w-full items-center justify-center rounded-3xl border border-reuse-pink text-sm font-medium text-reuse-cream transition-all duration-200 hover:scale-105 hover:bg-reuse-brown-light"
                     >
@@ -173,10 +173,10 @@ export default function Login() {
                         />
 
                         Continuar com Google
-                    </a>
+                    </button>
 
                     {/* FACEBOOK */}
-                    <a
+                    <button type="button" disabled
                         aria-disabled="true" title="Login social indisponível nesta etapa"
                         className="mt-4 flex h-12 w-full items-center justify-center rounded-3xl border border-reuse-pink text-sm font-medium text-reuse-cream transition-all duration-200 hover:scale-105 hover:bg-reuse-brown-light"
                     >
@@ -189,7 +189,7 @@ export default function Login() {
                         />
 
                         Continuar com Facebook
-                    </a>
+                    </button>
 
                 </div>
 

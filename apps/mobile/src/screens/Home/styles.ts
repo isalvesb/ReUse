@@ -1,35 +1,36 @@
+import { tokens, colors, font, space } from "../../design/tokens";
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#F7EFDE",
+    backgroundColor: colors.background,
   },
 
   container: {
-    paddingHorizontal: 24,
+    paddingHorizontal: space.xl,
   },
 
   searchWrap: {
-    marginTop: 24,
-    marginBottom: 24,
+    marginTop: space.xl,
+    marginBottom: space.xl,
   },
 
   heroSection: {
-    marginBottom: 48,
+    marginBottom: space.section,
   },
 
   promoSection: {
-    marginBottom: 48,
+    marginBottom: space.section,
     marginRight: -24,
   },
 
   promoRow: {
-    paddingRight: 24,
+    paddingRight: space.xl,
   },
 
   promoItem: {
-    marginRight: 16,
+    marginRight: space.lg,
   },
 
   lastPromoItem: {
@@ -37,36 +38,36 @@ const styles = StyleSheet.create({
   },
 
   categorySection: {
-    marginBottom: 48,
+    marginBottom: space.section,
   },
 
   itemsSection: {
-    marginBottom: 48,
+    marginBottom: space.section,
   },
 
   sectionTitle: {
-    fontSize: 20,
-    fontFamily: "Inter_700Bold",
-    color: "#342A2A",
-    marginBottom: 8,
+    fontSize: tokens.type.subtitle,
+    fontFamily: font.bold,
+    color: colors.text,
+    marginBottom: space.sm,
   },
 
   caption: {
-    fontSize: 16,
-    fontFamily: "Inter_400Regular",
-    color: "#A0947A",
-    marginBottom: 16,
+    fontSize: tokens.type.body,
+    fontFamily: font.regular,
+    color: colors.textMuted,
+    marginBottom: space.lg,
   },
 
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    rowGap: 16,
+    rowGap: space.lg,
   },
 
   itemList: {
-    gap: 24,
+    gap: space.xl,
   },
 
   categoryAnimatedItem: {

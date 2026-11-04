@@ -1,5 +1,7 @@
+import { Text } from "../../design/Text";
+import { colors, font } from "../../design/tokens";
 import React, { useState, useCallback } from "react";
-import { View, Text, ScrollView, Pressable } from "react-native";
+import { View, ScrollView, Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { itemRequest } from "../../lib/itemWriteApi";
@@ -34,7 +36,7 @@ export function ShowcaseScreen() {
     <View
       style={{
         flex: 1,
-        backgroundColor: "#F7EFDE",
+        backgroundColor: colors.background,
         paddingBottom: Math.max(insets.bottom, 12) + 102,
       }}
     >
@@ -42,14 +44,14 @@ export function ShowcaseScreen() {
         style={{
           paddingTop: insets.top + 14,
           padding: 20,
-          backgroundColor: "#342A2A",
+          backgroundColor: colors.text,
         }}
       >
         <Text
           style={{
-            fontFamily: "Syne_800ExtraBold",
+            fontFamily: font.bold,
             fontSize: 26,
-            color: "#EBBBEB",
+            color: colors.accent,
           }}
         >
           Vitrine

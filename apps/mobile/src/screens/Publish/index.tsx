@@ -1,7 +1,8 @@
+import { Text } from "../../design/Text";
+import { colors, font, tokens, radius } from "../../design/tokens";
 import React, { useEffect, useState, useRef } from "react";
 import {
   View,
-  Text,
   TextInput,
   ScrollView,
   Image,
@@ -332,9 +333,9 @@ export function PublishScreen({ navigation, route }: any) {
               padding: 12,
               minHeight: 44,
               borderWidth: 1,
-              borderColor: "#342A2A",
-              borderRadius: 18,
-              backgroundColor: draft[name] === v ? "#EBBBEB" : "#F7EFDE",
+              borderColor: colors.text,
+              borderRadius: radius.control,
+              backgroundColor: draft[name] === v ? colors.accent : colors.background,
             }}
           >
             <Text>{text}</Text>
@@ -352,7 +353,7 @@ export function PublishScreen({ navigation, route }: any) {
   return (
     <ScrollView
       keyboardShouldPersistTaps="handled"
-      style={{ backgroundColor: "#F7EFDE" }}
+      style={{ backgroundColor: colors.background }}
       contentContainerStyle={{
         padding: 20,
         paddingTop: insets.top + 20,
@@ -362,9 +363,9 @@ export function PublishScreen({ navigation, route }: any) {
       <JourneyCard userItemCount={count} />
       <Text
         style={{
-          fontFamily: "Syne_800ExtraBold",
-          fontSize: 26,
-          color: "#342A2A",
+          fontFamily: font.bold,
+          fontSize: tokens.type.title,
+          color: colors.text,
           marginVertical: 20,
         }}
       >
@@ -430,7 +431,7 @@ export function PublishScreen({ navigation, route }: any) {
       {error && (
         <Text
           accessibilityRole="alert"
-          style={{ color: "#9B1C1C", marginVertical: 15 }}
+          style={{ color: colors.error, marginVertical: 15 }}
         >
           {error}
         </Text>
@@ -447,12 +448,12 @@ export function PublishScreen({ navigation, route }: any) {
         onPress={() => void save()}
         style={{
           padding: 20,
-          backgroundColor: "#EBBBEB",
-          borderRadius: 18,
+          backgroundColor: colors.accent,
+          borderRadius: radius.control,
           marginVertical: 20,
         }}
       >
-        <Text>
+        <Text style={{ fontFamily: font.bold, textAlign: "center" }}>
           {busy
             ? "Enviando e salvando..."
             : id

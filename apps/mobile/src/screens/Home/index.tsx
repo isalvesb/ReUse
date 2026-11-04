@@ -1,10 +1,10 @@
+import { Text } from "../../design/Text";
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import {
   Animated,
   Dimensions,
   ScrollView,
   View,
-  Text,
   Pressable,
   ActivityIndicator,
   Keyboard,

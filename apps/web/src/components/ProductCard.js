@@ -28,18 +28,18 @@ export default function ProductCard({
             <div className="flex flex-1 flex-col justify-between p-5">
                 <div>
                     <h3
-                        className="mb-3 line-clamp-2 min-h-10 text-[clamp(0.875rem,2.8vw,1rem)] font-bold leading-5 text-[#342a2a]"
+                        className="mb-3 line-clamp-2 min-h-10 text-[clamp(0.875rem,2.8vw,1rem)] font-bold leading-5 text-reuse-brown"
                         title={displayName !== name ? name : undefined}
                     >
                         {displayName}
                     </h3>
 
-                    <p className="self-stretch justify-center text-stone-600 text-sm font-medium font-['Inter']">
+                    <p className="self-stretch justify-center text-reuse-brown-light text-sm font-medium">
                         {condition}
                     </p>
 
                     <p
-                        className="self-stretch overflow-hidden whitespace-nowrap text-[clamp(0.75rem,2.4vw,0.8125rem)] font-medium text-stone-600"
+                        className="self-stretch overflow-hidden whitespace-nowrap text-[clamp(0.75rem,2.4vw,0.8125rem)] font-medium text-reuse-brown-light"
                         title={displayDistance !== distance ? distance : undefined}
                     >
                         {displayDistance}
@@ -47,7 +47,7 @@ export default function ProductCard({
                 </div>
 
                 {/* Tipo de anúncio */}
-                <span className="self-stretch justify-center text-stone-600 text-sm font-medium font-['Inter']">
+                <span className="self-stretch justify-center text-reuse-brown-light text-sm font-medium">
                     {type}
                 </span>
             </div>

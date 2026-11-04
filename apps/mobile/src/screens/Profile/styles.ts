@@ -1,30 +1,35 @@
+import { tokens, colors, font, space, radius } from "../../design/tokens";
 import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#F7EFDE",
+    backgroundColor: colors.background,
   },
 
   navBar: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 16,
-    backgroundColor: "#342A2A",
+    padding: space.lg,
+    backgroundColor: colors.text,
   },
 
   backButton: {
     fontSize: 18,
-    color: "#fff",
+    color: colors.surface,
     gap: 7,
+
+    fontFamily: font.regular,
   },
 
   backText: {
-    fontSize: 16,
+    fontSize: tokens.type.body,
     alignItems: "flex-start",
-    color: "#fff",
+    color: colors.surface,
     marginLeft: 7,
+
+    fontFamily: font.regular,
   },
 
   content: {
@@ -43,28 +48,32 @@ export default StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 100,
-    borderColor: "#FFF",
+    borderColor: colors.surface,
     borderWidth: 3.54,
   },
 
   name: {
     fontSize: 24,
-    color: "#342A2A",
+    color: colors.text,
     fontWeight: "bold",
     marginTop: 10,
+
+    fontFamily: font.regular,
   },
 
   infoRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-    marginTop: 4,
+    gap: space.md,
+    marginTop: space.xs,
   },
 
   infoText: {
-    fontSize: 16,
-    color: "#342A2A",
-    gap: 8,
+    fontSize: tokens.type.body,
+    color: colors.text,
+    gap: space.sm,
+
+    fontFamily: font.regular,
   },
 
   statsContainer: {
@@ -72,14 +81,14 @@ export default StyleSheet.create({
     backgroundColor: "#FFFFFF66",
     padding: 20,
     borderRadius: 28,
-    gap: 12,
+    gap: space.md,
     marginTop: 20,
     borderColor: "#ffffff99",
     borderWidth: 1.35,
   },
 
   statCard: {
-    backgroundColor: "#EBBBEB",
+    backgroundColor: colors.accent,
     borderColor: "#ffffff99",
     padding: 14,
     borderRadius: 14,
@@ -108,42 +117,50 @@ export default StyleSheet.create({
   statNumber: {
     fontSize: 22,
     fontWeight: "bold",
-    marginTop: 4,
+    marginTop: space.xs,
+
+    fontFamily: font.regular,
   },
 
   statLabel: {
     fontSize: 10,
-    color: "#342A2A",
+    color: colors.text,
+
+    fontFamily: font.regular,
   },
 
   icon: {
-    color: "#342A2A",
+    color: colors.text,
     backgroundColor: "#FFFFFF99",
-    borderColor: "#fff",
+    borderColor: colors.surface,
     padding: 10,
     borderRadius: 50,
   },
 
   aboutCard: {
     width: "90%",
-    backgroundColor: "#F3E8D2",
-    padding: 16,
+    backgroundColor: colors.surfaceMuted,
+    padding: space.lg,
     borderRadius: 14,
     marginTop: 20,
   },
 
   aboutTitle: {
-    fontSize: 16,
-    color: "#342A2A",
+    fontSize: tokens.type.body,
+    color: colors.text,
     fontWeight: "bold",
-    marginBottom: 8,
+    marginBottom: space.sm,
+
+    fontFamily: font.regular,
   },
 
   aboutText: {
-    fontSize: 14,
+    fontSize: tokens.type.label,
     color: "#3A2D2D",
     lineHeight: 20,
     minHeight: 40,
+
+    fontFamily: font.regular,
   },
 
   editButton: {
@@ -156,7 +173,7 @@ export default StyleSheet.create({
   },
 
   editButtonText: {
-    color: "#fff",
+    color: colors.surface,
     fontWeight: "medium",
   },
 
@@ -187,7 +204,7 @@ export default StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: "#342A2A",
+    backgroundColor: colors.text,
     alignItems: "center",
     justifyContent: "center",
     zIndex: 10,
@@ -199,15 +216,17 @@ export default StyleSheet.create({
     right: -3,
     width: 15,
     height: 15,
-    borderRadius: 8,
-    backgroundColor: "#EBBBEB",
+    borderRadius: radius.small,
+    backgroundColor: colors.accent,
     alignItems: "center",
     justifyContent: "center",
   },
 
   notificationBadgeText: {
     fontSize: 10,
-    color: "#342A2A",
+    color: colors.text,
     fontWeight: "700",
+
+    fontFamily: font.bold,
   },
 });

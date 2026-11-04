@@ -1,7 +1,8 @@
+import { Text } from "../../design/Text";
 import { notifications } from "../../lib/chatApi";
 import { useActivePolling } from "../../lib/useActivePolling";
 import React, { useCallback, useState } from "react";
-import { ActivityIndicator, Image, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Image, Pressable, View } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";

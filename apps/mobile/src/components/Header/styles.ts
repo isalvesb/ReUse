@@ -1,3 +1,4 @@
+import { colors, radius } from "../../design/tokens";
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
@@ -12,7 +13,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontFamily: "Syne_800ExtraBold",
     fontSize: 30,
-    color: "#342A2A",
+    color: colors.text,
   },
 
   iconButton: {
@@ -23,7 +24,7 @@ const styles = StyleSheet.create({
   iconWrap: {
     width: 56,
     height: 56,
-    borderRadius: 999,
+    borderRadius: radius.pill,
     overflow: "hidden",
     alignItems: "center",
     justifyContent: "center",
@@ -37,8 +38,8 @@ const styles = StyleSheet.create({
 
   iconOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "#000",
-    borderRadius: 999,
+    backgroundColor: colors.scrim,
+    borderRadius: radius.pill,
   },
 });
 

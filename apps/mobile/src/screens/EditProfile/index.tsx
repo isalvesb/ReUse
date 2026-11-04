@@ -1,8 +1,8 @@
+import { Text } from "../../design/Text";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
   View,
-  Text,
   TextInput,
   Pressable,
   Image,

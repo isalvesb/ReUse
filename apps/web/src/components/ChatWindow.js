@@ -193,7 +193,7 @@ export default function ChatWindow({
 
       <form
         action={formAction}
-        className="flex min-h-[93px] shrink-0 flex-wrap items-center gap-3 border-t border-reuse-brown/20 bg-[#FBEFE0] px-6 py-4"
+        className="flex min-h-[93px] shrink-0 flex-wrap items-center gap-3 border-t border-reuse-brown/20 bg-reuse-cream px-6 py-4"
       >
         <input
           type="hidden"

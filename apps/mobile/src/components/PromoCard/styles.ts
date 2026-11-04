@@ -1,3 +1,4 @@
+import { tokens, colors, font, space } from "../../design/tokens";
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
@@ -7,22 +8,22 @@ const styles = StyleSheet.create({
 
   title: {
     fontSize: 18,
-    fontFamily: "Inter_700Bold",
-    color: "#342A2A",
+    fontFamily: font.bold,
+    color: colors.text,
   },
 
   subtitle: {
-    marginTop: 4,
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
-    color: "#A0947A",
+    marginTop: space.xs,
+    fontSize: tokens.type.label,
+    fontFamily: font.regular,
+    color: colors.textMuted,
     lineHeight: 20,
   },
 
   imageWrapper: {
     width: "100%",
     height: 156,
-    marginTop: 12,
+    marginTop: space.md,
     borderRadius: 12,
     overflow: "hidden",
     position: "relative",
@@ -35,7 +36,7 @@ const styles = StyleSheet.create({
 
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "#000",
+    backgroundColor: colors.scrim,
     borderRadius: 12,
   },
 });

@@ -114,6 +114,9 @@ export default function TabBar({ activeTab, onTabPress }: TabBarProps) {
           return (
             <Pressable
               key={tab.name}
+              accessibilityRole="tab"
+              accessibilityLabel={tab.label}
+              accessibilityState={{selected:isActive}}
               style={styles.tab}
               onPress={() => onTabPress(tab.name)}
               onPressIn={() => handlePressIn(index)}

@@ -1,7 +1,7 @@
+import { Text } from "../../design/Text";
 import { useRef, useState } from "react";
 import {
   View,
-  Text,
   TextInput,
   StatusBar,
   ScrollView,
@@ -114,7 +114,7 @@ export function Login() {
                   style={({ pressed }) => [
                     styles.socialButton,
                     pressed && styles.buttonPressed,
-                    { opacity: 0.6 },
+                    { opacity: 0.65 },
                   ]}
                 >
                   <View style={styles.socialIconWrapper}>
@@ -132,7 +132,7 @@ export function Login() {
                   style={({ pressed }) => [
                     styles.socialButton,
                     pressed && styles.buttonPressed,
-                    isLoading && { opacity: 0.6 },
+                    { opacity: 0.65 },
                   ]}
                 >
                   <View style={styles.socialIconWrapper}>

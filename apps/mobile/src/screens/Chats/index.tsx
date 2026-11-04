@@ -1,8 +1,9 @@
+import { Text } from "../../design/Text";
+import { colors } from "../../design/tokens";
 import { mergeMessageWindow } from "../../lib/chatHistory";
 import React, { useRef, useState, useEffect } from "react";
 import {
   View,
-  Text,
   FlatList,
   TextInput,
   TouchableOpacity,
@@ -204,12 +205,12 @@ export default function Chats({ embedded = false, route }: any) {
   }
   const status = (
     <>
-      {loading && <ActivityIndicator color="#342A2A" />}
+      {loading && <ActivityIndicator color={colors.text} />}
       {error ? (
         <TouchableOpacity onPress={refresh} accessibilityRole="button">
           <Text
             accessibilityRole="alert"
-            style={{ padding: 12, color: "#8b2424" }}
+            style={{ padding: 12, color: colors.error }}
           >
             {error} Tentar novamente.
           </Text>
@@ -231,7 +232,7 @@ export default function Chats({ embedded = false, route }: any) {
         </Text>
         {status}
         <Text
-          style={{ paddingHorizontal: 24, color: "#584C4C", marginBottom: 12 }}
+          style={{ paddingHorizontal: 24, color: colors.textMuted, marginBottom: 12 }}
         >
           Atualização periódica enquanto esta tela está aberta.
         </Text>
@@ -301,7 +302,7 @@ export default function Chats({ embedded = false, route }: any) {
             onPress={back}
             accessibilityRole="button"
           >
-            <Ionicons name="arrow-back" size={24} color="#342A2A" />
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
             <Text style={styles.backText}>Voltar</Text>
           </TouchableOpacity>
           <View style={styles.userRow}>
@@ -321,7 +322,7 @@ export default function Chats({ embedded = false, route }: any) {
           </View>
         </View>
         <View style={styles.productBar}>
-          <Ionicons name="cube-outline" size={26} color="#342A2A" />
+          <Ionicons name="cube-outline" size={26} color={colors.text} />
           <Text style={[styles.productName, { flex: 1, marginLeft: 12 }]}>
             {selected?.itemTitle}
           </Text>
@@ -388,7 +389,7 @@ export default function Chats({ embedded = false, route }: any) {
             accessibilityLabel="Mensagem"
             style={styles.input}
             placeholder="Digite sua mensagem..."
-            placeholderTextColor="#8F8A84"
+            placeholderTextColor={colors.textMuted}
             value={text}
             onChangeText={(value) => {
               setText(value);
@@ -407,9 +408,9 @@ export default function Chats({ embedded = false, route }: any) {
             accessibilityState={{ disabled: sending || !text.trim() }}
           >
             {sending ? (
-              <ActivityIndicator color="#342A2A" />
+              <ActivityIndicator color={colors.text} />
             ) : (
-              <Ionicons name="paper-plane-outline" size={22} color="#342A2A" />
+              <Ionicons name="paper-plane-outline" size={22} color={colors.text} />
             )}
           </TouchableOpacity>
         </View>

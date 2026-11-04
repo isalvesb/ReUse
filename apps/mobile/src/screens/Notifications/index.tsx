@@ -1,8 +1,9 @@
+import { Text } from "../../design/Text";
+import { colors } from "../../design/tokens";
 import { useState, useRef } from "react";
 import {
   View,
   FlatList,
-  Text,
   Pressable,
   ActivityIndicator,
 } from "react-native";
@@ -98,7 +99,7 @@ export default function Notifications() {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={20} color="#fff" />
+          <Ionicons name="arrow-back" size={20} color={colors.surface} />
           <Text style={styles.backText}>Voltar</Text>
         </Pressable>
       </View>
@@ -113,7 +114,7 @@ export default function Notifications() {
             </Text>
           </Pressable>
         )}
-        {loading ? <ActivityIndicator color="#342A2A" /> : null}
+        {loading ? <ActivityIndicator color={colors.text} /> : null}
         {error ? (
           <Pressable onPress={refresh}>
             <Text accessibilityRole="alert">{error} Tentar novamente.</Text>
@@ -129,7 +130,7 @@ export default function Notifications() {
                 <Ionicons
                   name="notifications-outline"
                   size={32}
-                  color="#342A2A"
+                  color={colors.text}
                 />
                 <Text style={styles.emptyTitle}>Nenhuma notificação</Text>
                 <Text style={styles.emptyText}>
@@ -161,7 +162,7 @@ export default function Notifications() {
               <Ionicons
                 name="notifications-outline"
                 size={26}
-                color="#342A2A"
+                color={colors.text}
                 style={{ marginRight: 12 }}
               />
               <View style={styles.cardContent}>

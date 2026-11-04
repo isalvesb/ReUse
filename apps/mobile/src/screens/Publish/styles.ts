@@ -1,14 +1,15 @@
+import { tokens, colors, font, space, radius } from "../../design/tokens";
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#F7EFDE",
+    backgroundColor: colors.background,
   },
 
   container: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
+    paddingHorizontal: space.xl,
+    paddingTop: space.lg,
     paddingBottom: 96,
   },
 
@@ -16,51 +17,51 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 16,
+    paddingHorizontal: space.lg,
     paddingVertical: 14,
-    backgroundColor: "#342A2A",
+    backgroundColor: colors.text,
   },
 
   navTitle: {
-    fontSize: 16,
-    fontFamily: "Inter_700Bold",
-    color: "#FFFFFF",
+    fontSize: tokens.type.body,
+    fontFamily: font.bold,
+    color: colors.surface,
   },
 
   incentiveCard: {
     backgroundColor: "#2C2416",
-    margin: 16,
+    margin: space.lg,
     marginTop: 0,
-    borderRadius: 16,
+    borderRadius: radius.card,
     padding: 20,
     alignItems: "center",
   },
 
   incentiveTitle: {
     fontSize: 18,
-    fontFamily: "Inter_700Bold",
+    fontFamily: font.bold,
     lineHeight: 26,
-    color: "#FFFFFF",
+    color: colors.surface,
     textAlign: "center",
-    marginBottom: 8,
-    marginTop: 8,
+    marginBottom: space.sm,
+    marginTop: space.sm,
   },
 
   incentiveBody: {
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
+    fontSize: tokens.type.label,
+    fontFamily: font.regular,
     lineHeight: 24,
-    color: "#888780",
+    color: colors.onDarkMuted,
     textAlign: "center",
-    marginBottom: 16,
+    marginBottom: space.lg,
   },
 
   rewardRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: space.md,
     width: "100%",
-    gap: 12,
+    gap: space.md,
   },
 
   rewardIcon: {
@@ -73,42 +74,42 @@ const styles = StyleSheet.create({
   },
 
   rewardText: {
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
+    fontSize: tokens.type.label,
+    fontFamily: font.regular,
     lineHeight: 24,
     color: "#DDDDDD",
     flex: 1,
   },
 
   card: {
-    backgroundColor: "#FFFFFF",
-    margin: 16,
+    backgroundColor: colors.surface,
+    margin: space.lg,
     marginTop: 0,
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: radius.card,
+    padding: space.lg,
   },
 
   cardTitle: {
-    fontSize: 16,
-    fontFamily: "Inter_700Bold",
+    fontSize: tokens.type.body,
+    fontFamily: font.bold,
     lineHeight: 22,
-    color: "#342A2A",
-    marginBottom: 4,
+    color: colors.text,
+    marginBottom: space.xs,
   },
 
   cardSubtitle: {
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
+    fontSize: tokens.type.label,
+    fontFamily: font.regular,
     lineHeight: 24,
-    color: "#888780",
-    marginBottom: 4,
+    color: colors.textMuted,
+    marginBottom: space.xs,
   },
 
   photoThumb: {
     width: 80,
     height: 80,
-    marginRight: 8,
-    borderRadius: 8,
+    marginRight: space.sm,
+    borderRadius: radius.small,
     overflow: "hidden",
   },
 
@@ -127,9 +128,9 @@ const styles = StyleSheet.create({
   },
 
   coverBadgeText: {
-    color: "#FFFFFF",
+    color: colors.surface,
     fontSize: 10,
-    fontFamily: "Inter_400Regular",
+    fontFamily: font.regular,
     textAlign: "center",
   },
 
@@ -138,7 +139,7 @@ const styles = StyleSheet.create({
     top: 4,
     right: 4,
     backgroundColor: "rgba(0,0,0,0.6)",
-    borderRadius: 10,
+    borderRadius: radius.input,
     width: 20,
     height: 20,
     alignItems: "center",
@@ -148,28 +149,28 @@ const styles = StyleSheet.create({
   addPhotoBtn: {
     width: 80,
     height: 80,
-    borderRadius: 8,
+    borderRadius: radius.small,
     borderWidth: 1,
     borderColor: "#DDDDDD",
     borderStyle: "dashed",
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "column",
-    gap: 4,
+    gap: space.xs,
   },
 
   addPhotoText: {
-    color: "#888780",
-    fontSize: 12,
-    fontFamily: "Inter_400Regular",
+    color: colors.textMuted,
+    fontSize: tokens.type.caption,
+    fontFamily: font.regular,
     lineHeight: 16,
   },
 
   label: {
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
+    fontSize: tokens.type.label,
+    fontFamily: font.regular,
     lineHeight: 38,
-    color: "#342A2A",
+    color: colors.text,
     marginBottom: 6,
     marginTop: 14,
   },
@@ -179,36 +180,37 @@ const styles = StyleSheet.create({
   },
 
   input: {
+    minHeight: tokens.size.control,
     borderWidth: 1,
-    borderColor: "#E0E0E0",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
+    borderColor: colors.border,
+    borderRadius: radius.input,
+    paddingHorizontal: space.md,
+    paddingVertical: space.md,
+    fontSize: tokens.type.label,
+    fontFamily: font.regular,
     lineHeight: 20,
-    color: "#342A2A",
-    backgroundColor: "#FAFAFA",
+    color: colors.text,
+    backgroundColor: colors.surface,
   },
 
   inputRow: {
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#E0E0E0",
-    borderRadius: 10,
-    backgroundColor: "#FAFAFA",
-    paddingHorizontal: 12,
+    borderColor: colors.border,
+    borderRadius: radius.input,
+    backgroundColor: colors.surface,
+    paddingHorizontal: space.md,
   },
 
   inputRowField: {
     flex: 1,
     height: 48,
     paddingVertical: 0,
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
+    fontSize: tokens.type.label,
+    fontFamily: font.regular,
     lineHeight: 20,
-    color: "#342A2A",
+    color: colors.text,
     textAlignVertical: "center",
     includeFontPadding: false,
   },
@@ -217,51 +219,53 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#E0E0E0",
-    borderRadius: 10,
-    backgroundColor: "#FAFAFA",
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    borderColor: colors.border,
+    borderRadius: radius.input,
+    backgroundColor: colors.surface,
+    paddingHorizontal: space.md,
+    paddingVertical: space.md,
   },
 
   inputDropdownField: {
     flex: 1,
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
+    fontSize: tokens.type.label,
+    fontFamily: font.regular,
     lineHeight: 24,
-    color: "#342A2A",
+    color: colors.text,
   },
 
   inputDropdownIcon: {
-    fontSize: 16,
-    color: "#888780",
+    fontSize: tokens.type.body,
+    color: colors.textMuted,
+
+    fontFamily: font.regular,
   },
 
   charCount: {
-    fontSize: 12,
-    fontFamily: "Inter_400Regular",
+    fontSize: tokens.type.caption,
+    fontFamily: font.regular,
     lineHeight: 18,
-    color: "#888780",
-    marginTop: 4,
+    color: colors.textMuted,
+    marginTop: space.xs,
     textAlign: "right",
   },
 
   conditionGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
+    gap: space.sm,
   },
 
   conditionBtn: {
     borderWidth: 1,
-    borderColor: "#E0E0E0",
-    borderRadius: 10,
+    borderColor: colors.border,
+    borderRadius: radius.input,
     paddingVertical: 10,
     paddingHorizontal: 14,
     width: "47%",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     minHeight: 56,
   },
 
@@ -271,8 +275,8 @@ const styles = StyleSheet.create({
   },
 
   conditionText: {
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
+    fontSize: tokens.type.label,
+    fontFamily: font.regular,
     lineHeight: 20,
     color: "#555555",
     textAlign: "center",
@@ -283,52 +287,52 @@ const styles = StyleSheet.create({
   },
 
   tipBox: {
-    marginHorizontal: 16,
-    marginBottom: 16,
+    marginHorizontal: space.lg,
+    marginBottom: space.lg,
     backgroundColor: "#FFFBEB",
     borderColor: "#FEE685",
     borderWidth: 2,
     borderRadius: 12,
-    padding: 12,
+    padding: space.md,
   },
 
   tip: {
-    marginHorizontal: 16,
-    marginBottom: 16,
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
+    marginHorizontal: space.lg,
+    marginBottom: space.lg,
+    fontSize: tokens.type.label,
+    fontFamily: font.regular,
     lineHeight: 24,
     color: "#7B3306",
   },
 
   tipBold: {
-    fontFamily: "Inter_700Bold",
+    fontFamily: font.bold,
     color: "#7B3306",
   },
 
   publishBtn: {
-    backgroundColor: "#342A2A",
-    margin: 16,
+    backgroundColor: colors.text,
+    margin: space.lg,
     marginTop: 0,
     borderRadius: 14,
-    paddingVertical: 16,
+    paddingVertical: space.lg,
     alignItems: "center",
   },
 
   publishBtnText: {
-    color: "#FFFFFF",
-    fontFamily: "Inter_700Bold",
-    fontSize: 16,
+    color: colors.surface,
+    fontFamily: font.bold,
+    fontSize: tokens.type.body,
     lineHeight: 22,
   },
 
   terms: {
     textAlign: "center",
-    fontSize: 12,
-    fontFamily: "Inter_400Regular",
+    fontSize: tokens.type.caption,
+    fontFamily: font.regular,
     lineHeight: 18,
-    color: "#888780",
-    marginBottom: 8,
+    color: colors.textMuted,
+    marginBottom: space.sm,
   },
 
   termsLink: {
@@ -343,10 +347,10 @@ const styles = StyleSheet.create({
   },
 
   modalSheet: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    paddingHorizontal: 16,
+    paddingHorizontal: space.lg,
     paddingBottom: 40,
     maxHeight: "70%",
   },
@@ -357,16 +361,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#E0E0E0",
     borderRadius: 2,
     alignSelf: "center",
-    marginTop: 12,
-    marginBottom: 16,
+    marginTop: space.md,
+    marginBottom: space.lg,
   },
 
   modalTitle: {
-    fontSize: 16,
-    fontFamily: "Inter_700Bold",
+    fontSize: tokens.type.body,
+    fontFamily: font.bold,
     lineHeight: 22,
-    color: "#342A2A",
-    marginBottom: 8,
+    color: colors.text,
+    marginBottom: space.sm,
   },
 
   modalItem: {
@@ -381,19 +385,19 @@ const styles = StyleSheet.create({
   modalItemActive: {
     backgroundColor: "#F5FBF0",
     marginHorizontal: -16,
-    paddingHorizontal: 16,
+    paddingHorizontal: space.lg,
   },
 
   modalItemText: {
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
+    fontSize: tokens.type.label,
+    fontFamily: font.regular,
     lineHeight: 24,
-    color: "#342A2A",
+    color: colors.text,
   },
 
   modalItemTextActive: {
     color: "#4A6741",
-    fontFamily: "Inter_700Bold",
+    fontFamily: font.bold,
   },
 
   cameraControls: {
@@ -407,13 +411,13 @@ const styles = StyleSheet.create({
   },
 
   camBtn: {
-    padding: 12,
+    padding: space.md,
   },
 
   camBtnText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontFamily: "Inter_700Bold",
+    color: colors.surface,
+    fontSize: tokens.type.body,
+    fontFamily: font.bold,
     lineHeight: 22,
   },
 
@@ -421,16 +425,16 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 36,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     borderWidth: 4,
     borderColor: "rgba(255,255,255,0.5)",
   },
 
   title: {
     fontSize: 36,
-    fontFamily: "Inter_700Bold",
+    fontFamily: font.bold,
     lineHeight: 48,
-    color: "#342A2A",
+    color: colors.text,
     textAlign: "center",
   },
 
@@ -438,13 +442,13 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
   },
 
   sideBtn: {
     width: 48,
     height: 48,
-    borderRadius: 24,
+    borderRadius: radius.control,
     backgroundColor: "rgba(0,0,0,0.4)",
     alignItems: "center",
     justifyContent: "center",
@@ -458,23 +462,23 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-around",
-    paddingHorizontal: 32,
+    paddingHorizontal: space.xxl,
   },
 
 pricePrefix: {
-  fontSize: 14,
-  fontFamily: "Inter_400Regular",
-  color: "#342A2A",
-  marginRight: 4,
-  paddingVertical: 12,
+  fontSize: tokens.type.label,
+  fontFamily: font.regular,
+  color: colors.text,
+  marginRight: space.xs,
+  paddingVertical: space.md,
 },
 
 priceInput: {
   flex: 1,
   height: 48,
-  fontSize: 14,
-  fontFamily: "Inter_400Regular",
-  color: "#342A2A",
+  fontSize: tokens.type.label,
+  fontFamily: font.regular,
+  color: colors.text,
   paddingVertical: 0,
   textAlignVertical: "center",
   includeFontPadding: false,
@@ -483,7 +487,7 @@ priceInput: {
 typeModalItem: {
   flexDirection: "row",
   alignItems: "center",
-  gap: 12,
+  gap: space.md,
   paddingVertical: 14,
   borderBottomWidth: 1,
   borderBottomColor: "#F0F0F0",
@@ -492,7 +496,7 @@ typeModalItem: {
 typeModalItemActive: {
   backgroundColor: "#F5FBF0",
   marginHorizontal: -16,
-  paddingHorizontal: 16,
+  paddingHorizontal: space.lg,
 },
 
 typeModalBadge: {
@@ -504,10 +508,10 @@ typeModalBadge: {
 },
 
 typeModalLabel: {
-  fontSize: 14,
-  fontFamily: "Inter_700Bold",
+  fontSize: tokens.type.label,
+  fontFamily: font.bold,
   lineHeight: 20,
-  color: "#342A2A",
+  color: colors.text,
 },
 
 typeModalLabelActive: {
@@ -515,10 +519,10 @@ typeModalLabelActive: {
 },
 
 typeModalDesc: {
-  fontSize: 12,
-  fontFamily: "Inter_400Regular",
+  fontSize: tokens.type.caption,
+  fontFamily: font.regular,
   lineHeight: 18,
-  color: "#888780",
+  color: colors.textMuted,
   marginTop: 2,
 },
 

@@ -11,7 +11,7 @@ export default function Button({
 }) {
     const variants = {
         primary:
-            "bg-reuse-pink text-reuse-brown hover:bg-[#DDA6DD]",
+            "bg-reuse-pink text-reuse-brown hover:bg-[var(--ds-colors-accent-pressed)]",
 
         secondary:
             "bg-reuse-brown text-white hover:bg-[#4A3A3A]",
@@ -24,7 +24,7 @@ export default function Button({
     };
 
     const baseClasses =
-        "inline-flex items-center justify-center rounded-3xl px-5 py-3 text-sm font-medium transition-all duration-200 hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98] active:brightness-95 disabled:hover:scale-100 disabled:active:scale-100";
+        "inline-flex items-center justify-center min-h-[var(--ds-size-control)] rounded-[var(--ds-radius-control)] px-5 py-3 text-sm font-medium transition-all duration-200 hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98] active:brightness-95 disabled:hover:scale-100 disabled:active:scale-100";
 
     const classes = `${baseClasses} ${variants[variant]} ${className}`;
 

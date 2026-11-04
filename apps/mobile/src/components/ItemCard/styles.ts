@@ -1,3 +1,4 @@
+import { tokens, colors, font, space, radius } from "../../design/tokens";
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
@@ -5,15 +6,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     width: "100%",
     alignItems: "center",
-    gap: 12,
-    borderRadius: 12,
+    gap: space.md,
+    padding: space.md,
+    backgroundColor: colors.surface,
+    marginBottom: space.md,
+    borderRadius: radius.card,
     overflow: "hidden",
     position: "relative",
   },
 
   imageWrap: {
-    width: 170,
-    height: 96,
+    width: 112,
+    height: 112,
     borderRadius: 10,
     overflow: "hidden",
   },
@@ -26,25 +30,25 @@ const styles = StyleSheet.create({
   info: {
     flex: 1,
     justifyContent: "center",
-    gap: 4,
+    gap: space.xs,
   },
 
   title: {
-    fontSize: 16,
-    fontFamily: "Inter_700Bold",
-    color: "#342A2A",
+    fontSize: tokens.type.body,
+    fontFamily: font.bold,
+    color: colors.text,
   },
 
   caption: {
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
-    color: "#A0947A",
+    fontSize: tokens.type.label,
+    fontFamily: font.regular,
+    color: colors.textMuted,
   },
 
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "#000",
-    borderRadius: 12,
+    backgroundColor: colors.scrim,
+    borderRadius: radius.card,
   },
 });
 

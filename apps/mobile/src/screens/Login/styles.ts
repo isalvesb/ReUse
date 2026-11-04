@@ -1,9 +1,10 @@
+import { tokens, colors, font, space, radius } from "../../design/tokens";
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#342A2A",
+    backgroundColor: colors.text,
   },
 
   keyboardContainer: {
@@ -25,14 +26,14 @@ const styles = StyleSheet.create({
     fontSize: 56,
     lineHeight: 80,
     textAlign: "center",
-    color: "#EBBBEB",
+    color: colors.accent,
     fontFamily: "Syne_800ExtraBold",
     marginBottom: 44,
     letterSpacing: -2,
   },
 
   socialContainer: {
-    gap: 16,
+    gap: space.lg,
     marginBottom: 30,
   },
 
@@ -43,8 +44,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: "#F7EFDE",
-    borderRadius: 20,
+    borderColor: colors.accent,
+    borderRadius: radius.input,
     paddingHorizontal: 20,
     backgroundColor: "transparent",
   },
@@ -57,9 +58,9 @@ const styles = StyleSheet.create({
   },
 
   socialButtonText: {
-    color: "#F7EFDE",
-    fontSize: 16,
-    fontFamily: "Inter_500Medium",
+    color: colors.background,
+    fontSize: tokens.type.body,
+    fontFamily: font.medium,
   },
 
   dividerContainer: {
@@ -76,9 +77,9 @@ const styles = StyleSheet.create({
   },
 
   dividerText: {
-    color: "#A79797",
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
+    color: colors.onDarkMuted,
+    fontSize: tokens.type.label,
+    fontFamily: font.regular,
     marginHorizontal: 14,
   },
 
@@ -87,10 +88,10 @@ const styles = StyleSheet.create({
   },
 
   inputLabel: {
-    color: "#F7EFDE",
+    color: colors.background,
     marginBottom: 10,
-    fontSize: 14,
-    fontFamily: "Inter_500Medium",
+    fontSize: tokens.type.label,
+    fontFamily: font.medium,
   },
 
   inputWrapper: {
@@ -98,9 +99,9 @@ const styles = StyleSheet.create({
     height: 50,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F3F3F5",
-    borderRadius: 20,
-    paddingHorizontal: 16,
+    backgroundColor: colors.surface,
+    borderRadius: radius.input,
+    paddingHorizontal: space.lg,
     marginBottom: 18,
   },
 
@@ -111,9 +112,9 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: "100%",
-    color: "#342A2A",
-    fontSize: 16,
-    fontFamily: "Inter_400Regular",
+    color: colors.text,
+    fontSize: tokens.type.body,
+    fontFamily: font.regular,
     paddingVertical: 0,
     textAlignVertical: "center",
     includeFontPadding: false,
@@ -136,25 +137,25 @@ const styles = StyleSheet.create({
   },
 
   forgotPasswordText: {
-    color: "#F7EFDE",
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
+    color: colors.background,
+    fontSize: tokens.type.label,
+    fontFamily: font.regular,
   },
 
   loginButton: {
     width: "100%",
     height: 50,
-    backgroundColor: "#EBBBEB",
-    borderRadius: 20,
+    backgroundColor: colors.accent,
+    borderRadius: radius.input,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 22,
   },
 
   loginButtonText: {
-    color: "#342A2A",
-    fontSize: 16,
-    fontFamily: "Inter_500Medium",
+    color: colors.text,
+    fontSize: tokens.type.body,
+    fontFamily: font.medium,
   },
 
   footer: {
@@ -165,15 +166,15 @@ const styles = StyleSheet.create({
   },
 
   footerText: {
-    color: "#F7EFDE",
-    fontSize: 16,
-    fontFamily: "Inter_400Regular",
+    color: colors.background,
+    fontSize: tokens.type.body,
+    fontFamily: font.regular,
   },
 
   signUpText: {
-    color: "#EBBBEB",
-    fontSize: 16,
-    fontFamily: "Inter_500Medium",
+    color: colors.accent,
+    fontSize: tokens.type.body,
+    fontFamily: font.medium,
   },
 
   buttonPressed: {
@@ -213,7 +214,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     left: 0,
-    backgroundColor: "#342A2A",
+    backgroundColor: colors.text,
   },
 
   loadingOverlay: {

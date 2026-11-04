@@ -1,10 +1,11 @@
+import { tokens, colors, font, space, radius } from "../../design/tokens";
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   journeyCard: {
     backgroundColor: "#3A2E24",
-    margin: 16,
-    borderRadius: 16,
+    margin: space.lg,
+    borderRadius: radius.card,
     padding: 14,
     height: 230,
   },
@@ -17,24 +18,24 @@ export const styles = StyleSheet.create({
   },
 
   journeyTitle: {
-    fontSize: 16,
-    fontFamily: "Inter_700Bold",
-    color: "#FFFFFF",
+    fontSize: tokens.type.body,
+    fontFamily: font.bold,
+    color: colors.surface,
   },
 
   journeySubtitle: {
     fontSize: 13,
-    fontFamily: "Inter_400Regular",
+    fontFamily: font.regular,
     color: "#CFCAC4",
-    marginTop: 4,
+    marginTop: space.xs,
   },
 
   milestoneRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    paddingHorizontal: 4,
-    marginTop: 4,
+    paddingHorizontal: space.xs,
+    marginTop: space.xs,
   },
 
   milestoneItem: {
@@ -48,11 +49,11 @@ export const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 8,
+    paddingVertical: space.sm,
   },
 
   milestoneIconDone: {
-    backgroundColor: "#F7EFDE",
+    backgroundColor: colors.background,
     borderWidth: 2,
     borderColor: "#FFFFFF20",
   },
@@ -65,19 +66,21 @@ export const styles = StyleSheet.create({
 
   milestoneEmoji: {
     fontSize: 22,
+
+    fontFamily: font.regular,
   },
 
   milestoneLabelInside: {
-    fontSize: 12,
-    marginTop: 12,
+    fontSize: tokens.type.caption,
+    marginTop: space.md,
     textAlign: "center",
-    fontFamily: "Inter_400Regular",
+    fontFamily: font.regular,
     fontWeight: 400,
     height: 16,
   },
 
   milestoneLabelInsideDone: {
-    color: "#342A2A",
+    color: colors.text,
     fontFamily: "Inter_600SemiBold",
   },
 
