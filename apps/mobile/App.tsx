@@ -33,6 +33,7 @@ import { ProfileScreen } from "./src/screens/Profile";
 import { ProductScreen } from "./src/screens/Product";
 import Notifications from "./src/screens/Notifications";
 import { EditProfileScreen } from "./src/screens/EditProfile";
+import { AssistantScreen } from "./src/screens/Assistant";
 
 type TabName = "home" | "publicar" | "vitrine" | "chats";
 
@@ -55,6 +56,7 @@ type RootStackParamList = {
 
   Profile: undefined;
   EditProfile: undefined;
+  Assistant: undefined;
   Notifications: undefined;
 
   Product: {
@@ -172,6 +174,7 @@ function AppNavigator() {
             <Stack.Screen name="HomeScreen" component={MainScreen} />
             <Stack.Screen name="Profile" component={RenderProfileScreen} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+            <Stack.Screen name="Assistant" component={AssistantScreen} />
             <Stack.Screen name="Product" component={ProductScreen} />
             <Stack.Screen name="Notifications" component={Notifications} />
             <Stack.Screen name="Chats" component={Chats} />

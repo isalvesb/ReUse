@@ -268,6 +268,11 @@ export function ProfileScreen({ onLogoutComplete }: ProfileScreenProps) {
               <Text style={styles.editButtonText}>Editar</Text>
             </Pressable>
 
+            <Pressable accessibilityRole="button" style={styles.editButton}
+              onPress={() => navigation.navigate("Assistant")}>
+              <Text style={styles.editButtonText}>Assistente ReUse</Text>
+            </Pressable>
+
             <Pressable
               onPress={handleLogout}
               disabled={isLogoutDisabled}

@@ -127,6 +127,10 @@ async function runAllowedIntent({ intent, userId, confirmed, origin, watsonText 
 }
 
 export async function POST(request) {
+    if (process.env.REUSE_IBM_ENABLED === "true") {
+        return Response.json({ error: "Utilize o assistente IBM em /api/v1/assistant/messages." },
+            { status: 410, headers: { "Cache-Control": "no-store" } });
+    }
     const userId = await getCurrentUserId();
 
     if (!userId) {
