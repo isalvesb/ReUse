@@ -17,7 +17,7 @@ import CatalogUnavailable from "@/components/CatalogUnavailable";
 export const dynamic = "force-dynamic";
 
 export default async function Vitrine({ searchParams }) {
-  const user = await getCurrentUser();
+  const userRead = getCurrentUser();
   const params = await searchParams;
   const raw = new URLSearchParams();
   for (const key of ["q", "categoria", "tipo", "page", "curadoria"]) {
@@ -32,17 +32,19 @@ export default async function Vitrine({ searchParams }) {
   }
   const { q: query, categoria: category, tipo: type, curadoria } = filters;
   const isRarePiecesCuration = curadoria === "pecas-raras";
-  const catalogRead = await readCatalog(() => listCatalog(prisma, filters));
+  const [user, catalogRead, categories, unreadCount] = await Promise.all([
+    userRead,
+    readCatalog(() => listCatalog(prisma, filters)),
+    listCategories(prisma).catch(() => []),
+    userRead.then((user) => user ? getUnreadNotificationCount(user.id) : 0),
+  ]);
   const result = catalogRead.available
     ? catalogRead.items
     : { items: [], pagination: { page: 1, total: 0, totalPages: 0 } };
   const catalog = { available: catalogRead.available };
-  const categories = await listCategories(prisma).catch(() => []);
   const cards = result.items.map((item) =>
     formatItemForCard({ ...item, images: item.images.map((url) => ({ url })) }),
   );
-
-  const unreadCount = user ? await getUnreadNotificationCount(user.id) : 0;
 
   return (
     <>

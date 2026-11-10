@@ -35,7 +35,7 @@ export default async function DetalheProduto({ params }) {
   if (!result.available)
     return (
       <>
-        <Header loggedIn={!!viewer} />
+        <Header loggedIn={!!viewer} avatarKey={viewer?.id} />
         <main className="mx-auto max-w-6xl px-6 py-12">
           <CatalogUnavailable />
         </main>

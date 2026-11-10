@@ -126,7 +126,7 @@ export async function listCatalog(db, query) {
       take: query.pageSize,
     }),
     db.item.count({ where }),
-  ]);
+  ], { isolationLevel: "RepeatableRead" });
   return {
     items: items.map(catalogItemDto),
     pagination: {

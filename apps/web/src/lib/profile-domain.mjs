@@ -42,15 +42,26 @@ export async function provisionActor(db, identity, now = new Date()) {
     if (!identity?.subject || !identity.sessionId || !identity.email) {
         throw new IntegrationError(401, "UNAUTHENTICATED", "Entre novamente.");
     }
-    const user = await db.user.upsert({
+    // Existing sessions only need reads. Unique-key upserts remain the fallback
+    // for first access, including concurrent requests, without resetting age/revocation.
+    const [existingUser, existingSession] = await Promise.all([
+        db.user.findUnique({ where: { authSubject: identity.subject }, select: PROFILE_SELECT }),
+        db.domainAuthSession.findUnique({ where: { id: identity.sessionId } }),
+    ]);
+    let user = existingUser;
+    if (!user) try { user = await db.user.upsert({
         where: { authSubject: identity.subject }, update: {},
         create: { authSubject: identity.subject, email: identity.email.toLowerCase(),
             name: typeof identity.name === "string" && identity.name.trim()
                 ? identity.name.trim().slice(0, FIELD_LIMITS.name) : "Conta de teste" },
         select: PROFILE_SELECT,
-    });
-    let session;
-    try {
+    }); } catch (error) {
+        if (error?.code !== "P2002") throw error;
+        user = await db.user.findUnique({ where: { authSubject: identity.subject }, select: PROFILE_SELECT });
+        if (!user) throw error;
+    }
+    let session = existingSession;
+    if (!session) try {
         session = await db.domainAuthSession.upsert({
             where: { id: identity.sessionId }, update: {},
             create: { id: identity.sessionId, userId: user.id, createdAt: now },

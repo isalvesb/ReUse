@@ -1,7 +1,10 @@
 "use client";
 import UnreadCount from "./UnreadCount";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { readNotificationSnapshot } from "@/app/notificacoes/actions";
+import useNotificationPolling from "./useNotificationPolling";
 import Link from "next/link";
 import Image from "next/image";
 import SpriteImage from "@/components/SpriteImage";
@@ -48,7 +51,15 @@ export default function Header({
     avatarUrl,
     avatarKey,
     unreadCount = 0,
+    pollNotifications = true,
 }) {
+    const router = useRouter();
+    const readCount = useCallback(async () => {
+        const snapshot = await readNotificationSnapshot(avatarKey);
+        if (!snapshot) { router.refresh(); return 0; }
+        return snapshot.unreadCount;
+    }, [avatarKey, router]);
+    const currentUnreadCount = useNotificationPolling({ userId: avatarKey, initial: unreadCount, read: readCount, enabled: loggedIn && pollNotifications });
     const [profileOpen, setProfileOpen] = useState(false);
     const profileRef = useRef(null);
     const profileButtonRef = useRef(null);
@@ -155,7 +166,7 @@ export default function Header({
                         >
                             <Bell size={22} strokeWidth={1.8} />
 
-                            <UnreadCount initial={unreadCount}/>
+                            <UnreadCount initial={currentUnreadCount}/>
                         </Link>
 
                         {/* Sacola */}
@@ -259,7 +270,7 @@ export default function Header({
                                             <Bell size={18} />
                                             <span>Notificações</span>
 
-                                            <UnreadCount initial={unreadCount} menu/>
+                                            <UnreadCount initial={currentUnreadCount} menu/>
                                         </Link>
                                     </div>
 

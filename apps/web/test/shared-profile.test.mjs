@@ -28,7 +28,7 @@ function database() {
                 if (!user) { user = { id: `domain-${users.size + 1}`, ...create, location: null, bio: null, avatarUrl: null, rating: 0, createdAt: now, updatedAt: now, passwordHash: "must-never-leak" }; users.set(user.id, user); }
                 return user;
             },
-            findUnique: async ({ where }) => users.get(where.id),
+            findUnique: async ({ where }) => where.authSubject ? [...users.values()].find(u => u.authSubject === where.authSubject) ?? null : users.get(where.id),
             update: async ({ where, data }) => { updates++; const user = users.get(where.id); Object.assign(user, data); return user; },
         },
         domainAuthSession: {
@@ -92,8 +92,26 @@ test("erros diferentes de conflito e conflito sem registro vencedor continuam se
         db.domainAuthSession.upsert = async () => { throw failure; };
         db.domainAuthSession.findUnique = async () => { reads++; return null; };
         await assert.rejects(provisionActor(db, identity, now), error => error === failure);
-        assert.equal(reads, code === "P2002" ? 1 : 0);
+        assert.equal(reads, code === "P2002" ? 2 : 1);
     }
+});
+test("sessões existentes usam somente duas leituras, sem provisionar ou prolongar sua idade", async () => {
+    const db = database();
+    const actor = await provisionActor(db, identity, now);
+    const before = { ...db.sessions.get(sessionA) };
+    db.user.upsert = db.domainAuthSession.upsert = async () => { throw Error("unexpected provisioning"); };
+    assert.equal((await provisionActor(db, identity, new Date(+now + 1000))).userId, actor.userId);
+    assert.deepEqual(db.sessions.get(sessionA), before);
+    await revokeOwnSession(db, actor, now);
+    await rejects401(provisionActor(db, identity, now));
+});
+test("conflito na criação do usuário relê apenas o subject vencedor, sem sobrescrever dados", async () => {
+    const db = database();
+    const original = db.user.upsert;
+    db.user.upsert = async args => { await original(args); throw Object.assign(new Error("race"), { code: "P2002" }); };
+    const actor = await provisionActor(db, identity, now);
+    assert.equal(actor.profile.email, identity.email);
+    assert.equal(db.users.size, 1);
 });
 test("B altera apenas B; tentativa de enviar identificador/email de A é recusada antes da escrita", async () => {
     const db = database(); const a = await provisionActor(db, identity, now);

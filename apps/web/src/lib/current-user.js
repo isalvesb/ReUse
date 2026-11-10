@@ -1,16 +1,13 @@
-import { PROFILE_SELECT } from "./profile-domain.mjs";
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUserId } from "@/lib/session";
+import { getSession } from "@/lib/session";
 
-export async function getCurrentUser() {
-    const userId = await getCurrentUserId();
-
-    if (!userId) {
-        return null;
-    }
-
-    return prisma.user.findUnique({ where: { id: userId }, select: PROFILE_SELECT });
-}
+export const getCurrentUser = cache(async function getCurrentUser() {
+    const session = await getSession();
+    if (!session) return null;
+    // The verified actor already contains the selected database profile.
+    return { ...session.profile, createdAt: new Date(session.profile.createdAt), updatedAt: new Date(session.profile.updatedAt) };
+});
 
 export async function getUnreadNotificationCount(userId) {
     if (!userId) {

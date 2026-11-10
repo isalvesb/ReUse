@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/session";
+import { notificationSnapshot } from "@/lib/notification-snapshot.mjs";
 import {
   markAllNotificationsRead,
   markNotificationRead,
@@ -37,4 +38,8 @@ export async function unreadNotifications() {
   return userId
     ? prisma.notification.count({ where: { userId, read: false } })
     : 0;
+}
+export async function readNotificationSnapshot(expectedUserId, cursor = null, includeItems = false) {
+  const userId = await getCurrentUserId();
+  return notificationSnapshot(prisma, userId ? { userId } : null, expectedUserId, cursor, includeItems);
 }
