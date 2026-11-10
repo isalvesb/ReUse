@@ -68,6 +68,19 @@ test("notificações: uma leitura fornece lista e contador somente da identidade
   assert.deepEqual(b.items, []);assert.equal(b.unreadCount, 0);
   await assert.rejects(notificationSnapshot(db, { userId: "A" }, "A", "invalid-cursor", true), e => e.status === 400);
 });
+test("notificações: atualização de página posterior valida cursor opaco e conserva o limite da página", async () => {
+  const cursor = Buffer.from(JSON.stringify({ id: "fixture-page", at: "2026-11-01T00:00:00.000Z" })).toString("base64url");
+  let boundary;
+  const db = { notification: {
+    findMany: async ({ where, take }) => { boundary = where;assert.equal(take, 31);return []; },
+    count: async ({ where }) => { assert.equal(where.userId, "A");return 4; },
+  } };
+  const result = await notificationSnapshot(db, { userId: "A" }, "A", cursor, true);
+  assert.equal(boundary.userId, "A");
+  assert.equal(boundary.OR[1].id.lt, "fixture-page");
+  assert.equal(boundary.OR[0].createdAt.lt.toISOString(), "2026-11-01T00:00:00.000Z");
+  assert.deepEqual(result, { items: [], unreadCount: 4, nextCursor: null });
+});
 
 function environment() {
   const window = new EventTarget(), document = new EventTarget();

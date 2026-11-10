@@ -11,15 +11,17 @@ export default async function Notificacoes({ searchParams }) {
   }
   const params = await searchParams;
   let query;
+  let cursor = params?.cursor ? String(params.cursor) : null;
   try {
     query = chatQuery(
       new URLSearchParams(
-        params?.cursor ? { cursor: String(params.cursor) } : {},
+        cursor ? { cursor } : {},
       ),
     );
   } catch {
     query = {};
+    cursor = null;
   }
   const snapshot = await listNotifications(prisma, { userId: user.id }, query);
-  return <NotificationRefresh user={{ id: user.id, avatarUrl: user.avatarUrl }} initial={snapshot} cursor={query.cursor ?? null} />;
+  return <NotificationRefresh user={{ id: user.id, avatarUrl: user.avatarUrl }} initial={snapshot} cursor={cursor} />;
 }

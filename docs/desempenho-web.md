@@ -25,7 +25,7 @@ Na amostra HTTP de três autorizações da mesma fotografia pública, a mediana 
 
 A build webpack de produção passou em fonte isolada, sem executar o prebuild do Prisma ou alterar os artefatos originais. Bibliotecas existentes foram referenciadas para leitura, com escrita no repositório original explicitamente negada ao processo; fontes, cliente gerado copiado e caches da build ficaram na pasta temporária. As cinco navegações autenticadas aquecidas de produção levaram 1.311 / 749 / 868 / 1.273 / 814 ms no servidor, mediana de **868 ms**, excluindo RSC e prefetch. A primeira abertura do processo levou 2.654 ms. A comparação usou a sessão preexistente, sem novo login; não homologa renovação de cookies Secure por HTTPS.
 
-Passaram 122 testes Web, 47 Mobile, lint Web, TypeScript Mobile, tokens de design e `git diff --check`. Um erro intermediário na renderização anônima foi identificado pela regressão HTTP, corrigido e coberto por novo teste antes da validação final.
+Passaram 123 testes Web, 47 Mobile, lint Web, TypeScript Mobile, tokens de design e `git diff --check`. Um erro intermediário na renderização anônima e o reenvio indevido do cursor decodificado no polling de páginas posteriores foram identificados na regressão/revisão, corrigidos e cobertos antes do encerramento.
 
 As medições e evidências completas ficam fora do Git, em `PRODUTO/outputs/reuse-work2-02-desempenho-20261110/`. O relatório final dessa pasta registra checks, build, limitações e commits efetivamente concluídos.
 
