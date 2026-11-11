@@ -9,6 +9,8 @@ Contrato `data`: `totalItems`, `activeItems`, `pausedItems`, `donationItems`, `t
 - Pausados: estado `INATIVO`.
 - Por modalidade: anúncios `DOACAO`, `TROCA` e `VENDA`, em todos os estados. Na Web, os números “Trocas” e “Vendas” já tinham esse significado; não representam negócios concluídos.
 
+Na Work 2.07, somente os rótulos Web passaram a **Anúncios para troca**, **Anúncios à venda** e **Nota cadastrada**, sem alteração de cálculos ou valores. A nota é um campo legado do perfil; não equivale à quantidade de avaliações ou a reputação verificada. A jornada informa explicitamente que seus marcos contam anúncios cadastrados em todos os estados, sem medir transações concluídas ou impacto ambiental. Os limiares de 1, 3, 5 e 10 permanecem iguais. Os rótulos Mobile **Anúncios / Ativos / Pausados** continuam corretos e não foram alterados.
+
 O total pode ser maior que ativos + pausados quando houver registros `RESERVADO` ou `CONCLUIDO`. Nenhum fluxo desses estados foi criado ou alterado. A função pura `itemStatistics` é reutilizada pela consulta agregada do servidor e pelo resumo já existente na Web, preservando seu comportamento.
 
 No Mobile, os cartões locais “Trocas / Itens / Avaliação” foram substituídos por **Anúncios / Ativos / Pausados**, mantendo os mesmos componentes e estilos. Não foi inventada reputação. O campo legado de avaliação permanece no domínio/Web sem uma nova implementação; não é apresentado como estatística funcional no Mobile.

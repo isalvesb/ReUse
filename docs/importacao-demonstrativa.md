@@ -1,5 +1,9 @@
 # Lote demonstrativo — Work 1.18
 
+## Curadoria posterior — Work 2.07
+
+Em 11/11/2026, os 84 IDs deste conjunto receberam somente 84 ajustes de localização, 84 de descrição e seis de título, preservando datas, propriedade, modalidades, estados, preços, imagens e relacionamentos. O aviso repetido nas descrições foi retirado; o caráter demonstrativo e a origem IA permanecem documentados em [Demonstração acadêmica](demonstracao-academica.md). Os outros 20 anúncios não foram alterados. O texto abaixo registra a importação original, anterior à curadoria; não reutilizar os manifestos antigos para sobrescrever os conteúdos atuais. Backup privado, diferenças e reversão estão nas evidências externas da Work 2.07, fora do Git.
+
 Estado consolidado em 06/11/2026: **84 anúncios demonstrativos e 86 imagens**, somando o lote principal de 80 ao complemento de quatro da prancha 01. Os 20 anúncios anteriores foram preservados: **104 no laboratório, 97 públicos**. Cada conta fictícia recebeu 42 anúncios do conjunto novo.
 
 Importação administrativa local, separada dos fluxos de publicação do produto. Não executa migrations, reset, atualização de registros anteriores, limpeza global ou alteração de contas. Nenhuma execução ocorre em builds.
