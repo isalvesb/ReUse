@@ -12,7 +12,7 @@ function load(statuses = [200], fail = false) {
     exports: {},
     process: { env: { EXPO_PUBLIC_REUSE_API_URL: "http://127.0.0.1:4330" } },
     require: (name) =>
-      name === "./fetchWithTimeout"
+      name === "./profileApi" ? { apiBase: () => "http://127.0.0.1:4330" } : name === "./fetchWithTimeout"
         ? {
             fetchWithTimeout: async (url, init) => {
               calls.push({ url, init });

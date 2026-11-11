@@ -2,9 +2,8 @@ import { supabase } from "./supabase";
 import { fetchWithTimeout } from "./fetchWithTimeout";
 import * as FileSystem from "expo-file-system/legacy";
 import { decode } from "base64-arraybuffer";
-import { readMyProfile } from "./profileApi";
+import { readMyProfile, apiBase } from "./profileApi";
 export { readMyProfile };
-const base = () => process.env.EXPO_PUBLIC_REUSE_API_URL!;
 export async function itemRequest(
   path: string,
   method = "GET",
@@ -14,7 +13,7 @@ export async function itemRequest(
   if (!session) throw Error("Entre novamente.");
   const run = () =>
     fetchWithTimeout(
-      `${base()}/api/v1${path}`,
+      `${apiBase()}/api/v1${path}`,
       {
         method,
         headers: {

@@ -7,7 +7,7 @@ export type SharedProfile = {
 export class ProfileApiError extends Error {
   constructor(public status: number, message: string) { super(message); }
 }
-function apiBase() {
+export function apiBase() {
   const value = process.env.EXPO_PUBLIC_REUSE_API_URL;
   if (!value) throw new Error("Configure o endereço da API do laboratório.");
   const url = new URL(value);

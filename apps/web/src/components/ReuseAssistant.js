@@ -42,9 +42,17 @@ export default function ReuseAssistant() {
     const clean = text.trim();
     if (!clean || busy) return;
     await run(async () => {
-      const data = await request("messages", { message: clean });
-      setConversation(current => [...current, { role: "user", text: clean }, { role: "assistant", origin: "ibm", text: data.text }]);
-      setOrigin("ibm"); setMessage(""); setProposal(data.proposal); setConfirmation(null);
+      const question = { role: "user", text: clean, status: "pending" };
+      setConversation(current => [...current, question]);
+      try {
+        const data = await request("messages", { message: clean });
+        setConversation(current => [...current.map(entry => entry === question ? { ...entry, status: "sent" } : entry), { role: "assistant", origin: "ibm", text: data.text }]);
+        setOrigin("ibm"); setMessage(""); setProposal(data.proposal); setConfirmation(null);
+      } catch (failure) {
+        setMessage(clean);
+        setConversation(current => current.map(entry => entry === question ? { ...entry, status: "failed" } : entry));
+        throw failure;
+      }
     });
   }
   async function select(itemId) {
@@ -78,6 +86,8 @@ export default function ReuseAssistant() {
         {conversation.map((entry, index) => <div key={index} className={`flex ${entry.role === "user" ? "justify-end" : "justify-start"}`}>
           <p className={`max-w-[90%] whitespace-pre-wrap break-words rounded-[14px] px-4 py-3 text-sm leading-6 ${entry.role === "user" ? "bg-reuse-brown text-reuse-white" : "border border-reuse-pink/70 bg-reuse-white text-reuse-brown-light"}`}>
             <span className="mb-1 block text-xs font-semibold">{entry.role === "user" ? "Você" : entry.origin === "ibm" ? "IBM watsonx Orchestrate" : "ReUse"}</span>{entry.text}
+            {entry.status === "pending" && <span className="mt-1 block text-xs">Enviando…</span>}
+            {entry.status === "failed" && <span className="mt-1 block text-xs">Falha no envio. Tente novamente pelo campo de mensagem.</span>}
           </p>
         </div>)}
         {busy && <p className="text-sm text-reuse-brown-light">Aguarde…</p>}

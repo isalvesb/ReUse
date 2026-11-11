@@ -1,5 +1,6 @@
 import { supabase, signOutLocally } from "./supabase";
 import { fetchWithTimeout } from "./fetchWithTimeout";
+import { apiBase } from "./profileApi";
 export type Conversation = {
   id: string;
   itemId: string;
@@ -51,7 +52,7 @@ export async function chatRequest(
   if (!session)
     throw new ChatApiError(401, "Sessão encerrada. Entre novamente.");
   const response = await fetchWithTimeout(
-    `${process.env.EXPO_PUBLIC_REUSE_API_URL}/api/v1${path}`,
+    `${apiBase()}/api/v1${path}`,
     {
       method,
       headers: {

@@ -7,7 +7,7 @@ import { Text } from "../../design/Text";
 import { colors, font, radius, size, space, tokens } from "../../design/tokens";
 import { AssistantApiError, AssistantConfirmation, AssistantItem, AssistantProposal, assistantRequest } from "../../lib/assistantApi";
 
-type Entry = { role: "user" | "assistant"; origin?: "ibm" | "reuse"; text: string };
+type Entry = { role: "user" | "assistant"; origin?: "ibm" | "reuse"; text: string; status?: "pending" | "sent" | "failed" };
 const suggestions = ["Como publicar uma doação?", "Quero pausar um anúncio meu", "Quero reativar um anúncio meu"];
 export function AssistantScreen() {
   const navigation = useNavigation<any>(), insets = useSafeAreaInsets();
@@ -34,9 +34,17 @@ export function AssistantScreen() {
     const clean = text.trim();
     if (!clean) return;
     await run(async () => {
-      const result = await assistantRequest<{ text: string; origin: "ibm"; proposal: AssistantProposal | null }>("messages", { message: clean });
-      setEntries(current => [...current, { role: "user", text: clean }, { role: "assistant", origin: "ibm", text: result.text }]);
-      setMessage(""); setOrigin("ibm"); setProposal(result.proposal); setConfirmation(null);
+      const question: Entry = { role: "user", text: clean, status: "pending" };
+      setEntries(current => [...current, question]);
+      try {
+        const result = await assistantRequest<{ text: string; origin: "ibm"; proposal: AssistantProposal | null }>("messages", { message: clean });
+        setEntries(current => [...current.map(entry => entry === question ? { ...entry, status: "sent" as const } : entry), { role: "assistant", origin: "ibm", text: result.text }]);
+        setMessage(""); setOrigin("ibm"); setProposal(result.proposal); setConfirmation(null);
+      } catch (failure) {
+        setMessage(clean);
+        setEntries(current => current.map(entry => entry === question ? { ...entry, status: "failed" } : entry));
+        throw failure;
+      }
     });
   }
   async function select(itemId: string) {
@@ -70,6 +78,8 @@ export function AssistantScreen() {
       {entries.map((entry, index) => <View key={index} style={[styles.bubble, entry.role === "user" && styles.mine]}>
         <Text style={[styles.label, entry.role === "user" && styles.inverse]}>{entry.role === "user" ? "Você" : entry.origin === "ibm" ? "IBM watsonx Orchestrate" : "ReUse"}</Text>
         <Text selectable style={[styles.body, entry.role === "user" && styles.inverse]}>{entry.text}</Text>
+        {entry.status === "pending" && <Text style={styles.inverse}>Enviando…</Text>}
+        {entry.status === "failed" && <Text style={styles.inverse}>Falha no envio. Tente novamente pelo campo de mensagem.</Text>}
       </View>)}
       {busy && <ActivityIndicator accessibilityLabel="Aguarde a resposta" color={colors.text} />}
       {!!error && <Text accessibilityRole="alert" accessibilityLiveRegion="polite" style={styles.error}>{error}</Text>}

@@ -1,5 +1,6 @@
 import { supabase, signOutLocally } from "./supabase";
 import { fetchWithTimeout } from "./fetchWithTimeout";
+import { apiBase } from "./profileApi";
 
 export type AssistantItem = { id: string; title: string; status: string; updatedAt: string };
 export type AssistantProposal = { intent: "PAUSAR" | "RETOMAR"; proposalToken: string; items: AssistantItem[] };
@@ -10,7 +11,7 @@ export class AssistantApiError extends Error {
 export async function assistantRequest<T>(path: "messages" | "selection" | "confirm", input: unknown, retry = true): Promise<T> {
   const session = (await supabase.auth.getSession()).data.session;
   if (!session) throw new AssistantApiError(401, "Sessão encerrada. Entre novamente.");
-  const response = await fetchWithTimeout(`${process.env.EXPO_PUBLIC_REUSE_API_URL}/api/v1/assistant/${path}`, {
+  const response = await fetchWithTimeout(`${apiBase()}/api/v1/assistant/${path}`, {
     method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
     body: JSON.stringify(input),
   }, 45000);

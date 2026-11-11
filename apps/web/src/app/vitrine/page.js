@@ -53,6 +53,7 @@ export default async function Vitrine({ searchParams }) {
         avatarUrl={user?.avatarUrl}
         avatarKey={user?.id}
         unreadCount={unreadCount}
+        catalogFilters={filters}
       />
 
       <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
@@ -130,7 +131,7 @@ export default async function Vitrine({ searchParams }) {
         </div>
 
         {!catalog.available && <CatalogUnavailable />}
-        <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-6">
+        <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-6 [&>a]:min-w-0 [&>a]:w-full [&_article]:max-w-full">
           {cards.map((product, index) => (
             <ProfileItemCard
               key={product.id}

@@ -36,3 +36,13 @@ test("native network failure preserves the typed draft and presents a clear erro
   const alert=f.elements(tree).find(x=>x.props?.accessibilityRole==='alert');
   assert.match(alert.props.children,/Falha de conexão/);assert.equal(f.calls.length,1);
 });
+test("suggested question is visible while pending and settles once without duplicate user messages",async()=>{
+  let resolve;const f=screen(()=>new Promise(r=>{resolve=r;}));
+  f.find(f.render(),"Como publicar uma doação?").props.onPress();
+  let entries=f.elements(f.render()).filter(x=>x.type==='Text'&&x.props.selectable&&x.props.children==='Como publicar uma doação?');
+  assert.equal(entries.length,1);
+  assert.ok(f.elements(f.render()).some(x=>x.props?.children==='Enviando…'));
+  resolve({text:'Resposta isolada',origin:'ibm',proposal:null});await f.flush();
+  assert.ok(!f.elements(f.render()).some(x=>x.props?.children==='Enviando…'));
+  assert.equal(f.calls.length,1);
+});

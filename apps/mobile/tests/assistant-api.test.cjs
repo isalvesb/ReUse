@@ -4,7 +4,7 @@ function load(statuses = [200], offline = false) {
   let session = { access_token: "fictional-session" }, refreshed = 0, loggedOut = 0;
   const calls = [];
   const scope = { exports: {}, Error, JSON, Promise, process: {env:{EXPO_PUBLIC_REUSE_API_URL:"http://127.0.0.1:4330"}},
-    require: name => name === "./fetchWithTimeout" ? {fetchWithTimeout: async (url, init, timeout) => {
+    require: name => name === "./profileApi" ? {apiBase:()=>"http://127.0.0.1:4330"} : name === "./fetchWithTimeout" ? {fetchWithTimeout: async (url, init, timeout) => {
       calls.push({url,init,timeout}); if (offline) throw new Error("Network");
       const status = statuses.shift() ?? 200;
       return {status,ok:status===200,json:async()=>({data:{cancelled:false,item:{status:"INATIVO"}},error:{message:"Assistente indisponível"}})};
