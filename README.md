@@ -1,6 +1,6 @@
 # ReUse Lab
 
-Laboratório privado que reúne ReUse Web e ReUse Mobile em npm workspaces. A fundação preserva os históricos dos dois projetos. A Work 1.3 integrou identidade e perfil: Supabase Auth, PostgreSQL novo e backend Next.js/Prisma; a Work 1.4 verificou sua execução nativa iOS. A Work 1.5 compartilha a leitura do catálogo, categorias, busca, filtros e detalhes. Expo/React Native e a identidade visual são preservados. A Work 1.6 integra publicação/edição e imagens em Storage privado. Chat compartilhado permanece pendente.
+Laboratório privado que reúne ReUse Web e ReUse Mobile em npm workspaces, preservando os históricos dos dois projetos. As aplicações compartilham Supabase Auth, perfis, catálogo, publicação/edição, imagens privadas, conversas e notificações pelo backend Next.js/Prisma. A assistência IBM utiliza seleção e confirmação de anúncios próprios. Expo/React Native e a identidade visual são preservados. Consulte os [limites e condições de pré-publicação](docs/pre-publicacao.md) antes de transferir ou hospedar.
 
 ```text
 apps/web/       Next.js e Prisma
@@ -15,7 +15,7 @@ package-lock.json
 Validado com Node 24.13.1 e npm 11.8.0. Instale pela raiz:
 
 ```sh
-npm ci --ignore-scripts
+npm ci --install-strategy=nested --ignore-scripts
 npm run generate:web
 ```
 
