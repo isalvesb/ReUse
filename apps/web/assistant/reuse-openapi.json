@@ -1,0 +1,156 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ReUse — ferramentas do assistente",
+    "description": "Ações que o assistente virtual pode executar de verdade na plataforma ReUse (pausar/reativar ofertas, listar itens, marcar notificações como lidas).",
+    "version": "2.0.0"
+  },
+  "servers": [
+    { "url": "https://re-use-web-bay.vercel.app" }
+  ],
+  "security": [
+    { "apiKeyAuth": [] }
+  ],
+  "paths": {
+    "/api/assistant/pausar-ofertas": {
+      "post": {
+        "operationId": "pausarOfertas",
+        "summary": "Pausa as ofertas ativas do usuário",
+        "description": "Na primeira chamada, prepara uma confirmação de uso único sem alterar dados. Depois da confirmação explícita do usuário, repita a chamada com o confirmationToken devolvido.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/DelegatedToolRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado da ação",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/MessageResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/assistant/reativar-ofertas": {
+      "post": {
+        "operationId": "reativarOfertas",
+        "summary": "Reativa as ofertas pausadas do usuário",
+        "description": "Na primeira chamada, prepara uma confirmação de uso único sem alterar dados. Depois da confirmação explícita do usuário, repita a chamada com o confirmationToken devolvido.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/DelegatedToolRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado da ação",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/MessageResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/assistant/listar-ofertas": {
+      "post": {
+        "operationId": "listarOfertas",
+        "summary": "Lista os itens do usuário",
+        "description": "Lista os itens publicados pelo usuário, com tipo, preço quando houver e status.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/DelegatedToolRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Lista dos itens",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/MessageResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/assistant/marcar-notificacoes-lidas": {
+      "post": {
+        "operationId": "marcarNotificacoesLidas",
+        "summary": "Marca as notificações do usuário como lidas",
+        "description": "Na primeira chamada, prepara uma confirmação de uso único sem alterar dados. Depois da confirmação explícita do usuário, repita a chamada com o confirmationToken devolvido.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/DelegatedToolRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado da ação",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/MessageResponse" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
+    },
+    "schemas": {
+      "DelegatedToolRequest": {
+        "type": "object",
+        "required": ["delegationToken"],
+        "additionalProperties": false,
+        "properties": {
+          "delegationToken": {
+            "type": "string",
+            "description": "Token curto e assinado fornecido pelo servidor ReUse no contexto da conversa."
+          },
+          "confirmationToken": {
+            "type": "string",
+            "description": "Token de uso único devolvido pela primeira chamada de uma ação mutável. Não informar em consultas."
+          }
+        }
+      },
+      "MessageResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "requiresConfirmation": {
+            "type": "boolean"
+          },
+          "confirmationToken": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

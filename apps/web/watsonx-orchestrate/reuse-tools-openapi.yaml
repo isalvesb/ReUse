@@ -1,0 +1,124 @@
+openapi: 3.0.1
+info:
+  title: ReUse — ferramentas do assistente
+  description: >
+    Ações que o agente da ReUse no watsonx Orchestrate pode executar de
+    verdade na plataforma (pausar/reativar oferta, listar itens, marcar
+    notificação como lida).
+  version: "2.0.0"
+servers:
+  - url: https://re-use-web-bay.vercel.app/api/orchestrate/tools
+security:
+  - toolsApiKey: []
+paths:
+  /pausar-ofertas:
+    post:
+      operationId: pausar_ofertas
+      summary: Pausa ofertas ativas
+      description: >
+        Na primeira chamada, prepara uma confirmação de uso único sem alterar
+        dados. Depois da confirmação explícita do usuário, repita a chamada
+        com o confirmationToken devolvido.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DelegatedToolRequest"
+      responses:
+        "200":
+          description: Resultado da ação
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MensagemResponse"
+  /reativar-ofertas:
+    post:
+      operationId: reativar_ofertas
+      summary: Reativa ofertas pausadas
+      description: >
+        Na primeira chamada, prepara uma confirmação de uso único sem alterar
+        dados. Depois da confirmação explícita do usuário, repita a chamada
+        com o confirmationToken devolvido.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DelegatedToolRequest"
+      responses:
+        "200":
+          description: Resultado da ação
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MensagemResponse"
+  /listar-ofertas:
+    post:
+      operationId: listar_ofertas
+      summary: Lista os itens do usuário
+      description: >
+        Lista os itens publicados pelo usuário na ReUse e o status de cada
+        um (ativo, pausado, etc). Use quando o usuário quiser ver o que ele
+        tem anunciado.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DelegatedToolRequest"
+      responses:
+        "200":
+          description: Lista dos itens
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MensagemResponse"
+  /marcar-notificacoes-lidas:
+    post:
+      operationId: marcar_notificacoes_lidas
+      summary: Marca notificações como lidas
+      description: >
+        Na primeira chamada, prepara uma confirmação de uso único sem alterar
+        dados. Depois da confirmação explícita do usuário, repita a chamada
+        com o confirmationToken devolvido.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DelegatedToolRequest"
+      responses:
+        "200":
+          description: Resultado da ação
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MensagemResponse"
+components:
+  securitySchemes:
+    toolsApiKey:
+      type: apiKey
+      in: header
+      name: x-api-key
+  schemas:
+    DelegatedToolRequest:
+      type: object
+      additionalProperties: false
+      required: [delegationToken]
+      properties:
+        delegationToken:
+          type: string
+          description: Token curto e assinado fornecido pelo servidor ReUse no contexto da conversa.
+        confirmationToken:
+          type: string
+          description: Token de uso único devolvido pela primeira chamada de uma ação mutável.
+    MensagemResponse:
+      type: object
+      properties:
+        mensagem:
+          type: string
+        requiresConfirmation:
+          type: boolean
+        confirmationToken:
+          type: string

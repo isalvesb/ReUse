@@ -1,0 +1,69 @@
+// Generated from design/tokens.json; npm run design:tokens.
+export const tokens = {
+  "colors": {
+    "background": "#F7EFDE",
+    "surface": "#FFFFFF",
+    "surfaceMuted": "#F3E8D2",
+    "text": "#342A2A",
+    "textMuted": "#584C4C",
+    "navigation": "#342A2A",
+    "inverse": "#F7EFDE",
+    "accent": "#EBBBEB",
+    "accentPressed": "#DDA6DD",
+    "border": "#8F817D",
+    "error": "#8B2424",
+    "onDarkMuted": "#D8CFC2",
+    "disabled": "#E7E1D8",
+    "scrim": "#000000"
+  },
+  "space": {
+    "xs": 4,
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 24,
+    "xxl": 32,
+    "section": 48
+  },
+  "radius": {
+    "small": 8,
+    "input": 20,
+    "card": 16,
+    "control": 24,
+    "pill": 999
+  },
+  "size": {
+    "touch": 44,
+    "control": 48,
+    "icon": 22
+  },
+  "type": {
+    "caption": 12,
+    "label": 14,
+    "body": 16,
+    "subtitle": 20,
+    "title": 26,
+    "hero": 32
+  },
+  "font": {
+    "body": "Inter",
+    "display": "Syne",
+    "regular": "Inter_400Regular",
+    "medium": "Inter_500Medium",
+    "bold": "Inter_700Bold",
+    "brand": "Syne_800ExtraBold"
+  },
+  "motion": {
+    "feedback": 120,
+    "transition": 200
+  },
+  "opacity": {
+    "disabled": 0.65
+  },
+  "elevation": {
+    "opacity": 0.08,
+    "radius": 6,
+    "offset": 2
+  }
+} as const;
+export const { colors, space, radius, size, font } = tokens;

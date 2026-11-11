@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@import "./design-tokens.css";
+
+
+/* Tailwind CSS v4 directive; suppress false positives from generic CSS linters. */
+/* stylelint-disable-next-line at-rule-no-unknown */
+@theme {
+  --color-reuse-brown: var(--reuse-brown);
+  --color-reuse-brown-light: var(--reuse-brown-light);
+  --color-reuse-cream: var(--reuse-cream);
+  --color-reuse-pink: var(--reuse-pink);
+  --color-reuse-beige: var(--reuse-beige);
+  --color-reuse-white: var(--reuse-white);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--reuse-cream);
+  color: var(--reuse-brown);
+  font-family: var(--font-inter), sans-serif;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+a {
+  text-decoration: none;
+}
+
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 3px solid var(--reuse-pink);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px var(--reuse-brown);
+}
+
+.reuse-hero.swiper-horizontal > .swiper-pagination-bullets {
+  bottom: 12px;
+  left: 50%;
+  display: flex;
+  width: auto;
+  align-items: center;
+  gap: 7px;
+  transform: translateX(-50%);
+  border: 1px solid rgb(247 239 222 / 75%);
+  border-radius: 9999px;
+  background: rgb(52 42 42 / 94%);
+  padding: 7px 10px;
+  box-shadow: 0 2px 8px rgb(52 42 42 / 45%);
+  backdrop-filter: blur(4px);
+}
+
+.reuse-hero .swiper-pagination-bullet {
+  display: block;
+  width: 8px;
+  height: 8px;
+  margin: 0;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--reuse-cream);
+  padding: 0;
+  opacity: 0.6;
+}
+
+.reuse-hero .swiper-pagination-bullet-active {
+  background: var(--reuse-pink);
+  opacity: 1;
+}
+
+.reuse-hero .swiper-pagination-bullet:focus-visible {
+  outline: 2px solid var(--reuse-cream);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 2px var(--reuse-brown);
+}
+
+/* Shared control roles; platform-specific markup remains intact. */
+:where(input[type="text"], input[type="email"], input[type="password"], input[type="search"], input[type="number"], select) {
+  min-height: var(--ds-size-control);
+}
+textarea { line-height: 1.5; }
+button:disabled, [aria-disabled="true"] { cursor: not-allowed; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

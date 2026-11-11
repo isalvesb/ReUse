@@ -1,0 +1,36 @@
+# Estatísticas próprias de anúncios
+
+Work 1.12. `GET /api/v1/me/stats` exige a sessão Supabase verificada pelo backend e não aceita parâmetros de titular. Usa `actor.userId` para agrupar os próprios anúncios no PostgreSQL e responde com `Cache-Control: private, no-store`.
+
+Contrato `data`: `totalItems`, `activeItems`, `pausedItems`, `donationItems`, `tradeItems`, `saleItems`, todos inteiros não negativos. A resposta não contém e-mails, tokens, listas de anúncios ou dados de terceiros. Falta de sessão gera 401, parâmetros geram 400, indisponibilidade gera 503; não existe escrita nesse endpoint.
+
+- Total: todos os anúncios do proprietário, em todos os estados existentes.
+- Ativos: estado `ATIVO`.
+- Pausados: estado `INATIVO`.
+- Por modalidade: anúncios `DOACAO`, `TROCA` e `VENDA`, em todos os estados. Na Web, os números “Trocas” e “Vendas” já tinham esse significado; não representam negócios concluídos.
+
+Na Work 2.07, somente os rótulos Web passaram a **Anúncios para troca**, **Anúncios à venda** e **Nota cadastrada**, sem alteração de cálculos ou valores. A nota é um campo legado do perfil; não equivale à quantidade de avaliações ou a reputação verificada. A jornada informa explicitamente que seus marcos contam anúncios cadastrados em todos os estados, sem medir transações concluídas ou impacto ambiental. Os limiares de 1, 3, 5 e 10 permanecem iguais. Os rótulos Mobile **Anúncios / Ativos / Pausados** continuam corretos e não foram alterados.
+
+O total pode ser maior que ativos + pausados quando houver registros `RESERVADO` ou `CONCLUIDO`. Nenhum fluxo desses estados foi criado ou alterado. A função pura `itemStatistics` é reutilizada pela consulta agregada do servidor e pelo resumo já existente na Web, preservando seu comportamento.
+
+No Mobile, os cartões locais “Trocas / Itens / Avaliação” foram substituídos por **Anúncios / Ativos / Pausados**, mantendo os mesmos componentes e estilos. Não foi inventada reputação. O campo legado de avaliação permanece no domínio/Web sem uma nova implementação; não é apresentado como estatística funcional no Mobile.
+
+O Mobile lê as contagens ao abrir/retomar o perfil e ao voltar do segundo plano. Não há promessa de atualização instantânea enquanto a tela continua aberta. Retornar ao perfil após publicação/edição consulta o banco novamente. Uma nova tentativa manual repete a leitura. Durante carregamento aparecem reticências; em erro aparecem traços e mensagem de indisponibilidade com nova tentativa, nunca zeros substitutos. Zero é exibido apenas após resposta válida para uma conta realmente sem anúncios. Respostas tardias de uma tela/conta anterior são ignoradas. O conteúdo do perfil permite rolagem para acomodar avisos e manter os controles acessíveis; mensagens de falha ficam dentro da área de conteúdo, abaixo do cabeçalho seguro.
+
+## Verificação reproduzível
+
+Com backend local em 127.0.0.1:4330 e o ambiente privado já configurado:
+
+```sh
+REUSE_TEST_CREDENTIALS_FILE=/caminho/privado/contas-ficticias.json node --env-file=apps/web/.env.local scripts/check-profile-statistics.mjs
+```
+
+Por padrão, compara A/B com SQL independente, recusa seleção de outro titular, simula a limpeza e confere inventário de imagens sem remoção. `--exercise-status` é opção explícita para pausar e reativar um anúncio fictício próprio existente, sem upload; só usar com autorização para esse teste. O estado original é restaurado inclusive na saída de erro, quando a conexão permite, e eventual falha de restauração é informada. O `updatedAt` do anúncio avança como numa edição normal. Não usar contas, banco ou objetos históricos.
+
+Publicação nova e vazio legítimo são cobertos em testes isolados. A verificação real usa as duas contas já existentes e uma mudança reversível de estado; não cria anúncios ou imagens.
+
+## Fechamento nativo
+
+Na conferência iOS, o primeiro acesso simultâneo ao perfil e às estatísticas revelou uma disputa no `upsert` da sessão de domínio. Somente o conflito de unicidade `P2002` é recuperado por leitura da sessão vencedora. Titular, expiração e revogação são novamente validados pelas mesmas regras; nenhuma sessão é reativada e outros erros continuam como falhas. O script reproduz leituras iniciais concorrentes com as duas contas. Não foi alterado schema, prazo de sessão nem provedor.
+
+Falhas de transporte do perfil recebem orientação em português, sem exibir a mensagem técnica nativa. O aviso respeita o espaço ocupado pelo sino de notificações. A nova tentativa das estatísticas também recarrega o perfil, permitindo recuperar a tela sem sair da sessão.
