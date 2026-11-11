@@ -1,6 +1,6 @@
-# ReUse Lab
+# ReUse — Web e Mobile
 
-Laboratório privado que reúne ReUse Web e ReUse Mobile em npm workspaces, preservando os históricos dos dois projetos. As aplicações compartilham Supabase Auth, perfis, catálogo, publicação/edição, imagens privadas, conversas e notificações pelo backend Next.js/Prisma. A assistência IBM utiliza seleção e confirmação de anúncios próprios. Expo/React Native e a identidade visual são preservados. Consulte os [limites e condições de pré-publicação](docs/pre-publicacao.md) antes de transferir ou hospedar.
+Monorepo integrado de ReUse Web e ReUse Mobile em npm workspaces, preparado no ReUse Lab e preservando os históricos dos dois projetos. As aplicações compartilham Supabase Auth, perfis, catálogo, publicação/edição, imagens privadas, conversas e notificações pelo backend Next.js/Prisma. A assistência IBM utiliza seleção e confirmação de anúncios próprios. Expo/React Native e a identidade visual são preservados. Consulte os [limites e condições de pré-publicação](docs/pre-publicacao.md) e o [plano de transferência acadêmica](docs/transferencia-academica.md) antes de transferir ou hospedar.
 
 ```text
 apps/web/       Next.js e Prisma
@@ -12,7 +12,7 @@ package-lock.json
 
 ## Preparação
 
-Validado com Node 24.13.1 e npm 11.8.0. Instale pela raiz:
+Node 24.x fixado nos manifests de execução; validado com Node 24.13.1 e npm 11.8.0. Instale pela raiz:
 
 ```sh
 npm ci --install-strategy=nested --ignore-scripts
@@ -42,7 +42,7 @@ Cada aplicação possui seu próprio `.env.example`. Configure somente o projeto
 
 Também é possível executar scripts de cada aplicação com `npm run <script> --workspace=@reuse/web` ou `--workspace=@reuse/mobile`. Os identificadores Expo/nativos não foram renomeados. A configuração Metro existente foi preservada.
 
-O comando Web da raiz usa a opção Webpack suportada pelo Next existente: o build Turbopack não concluiu nos limites do ambiente isolado. O script original `build` dentro da Web permanece disponível sem alteração. A verificação offline de compilação usou fontes locais fictícias; o build habitual continua dependendo das fontes Google declaradas no aplicativo.
+O comando Web da raiz usa a opção Webpack suportada pelo Next existente: o build Turbopack não concluiu nos limites do ambiente isolado. O script original `build` dentro da Web permanece disponível sem alteração. A verificação offline inicial usou fontes locais fictícias; o build de produção isolado da Work 2.04 passou com as fontes Google reais declaradas no aplicativo. O build habitual depende da disponibilidade dessas fontes.
 
 As pastas nativas locais ignoradas não foram incluídas no Git. As fontes existentes foram preservadas em backup externo ao laboratório; há uma divergência conhecida entre o AppDelegate local antigo e o plugin de cenas versionado. A development build local iOS foi compilada e executada na Work 1.4; consulte [procedimento e limites nativos](docs/homologacao-ios.md). Distribuição e aparelhos físicos continuam fora da validação.
 
