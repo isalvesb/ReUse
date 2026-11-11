@@ -38,7 +38,7 @@ export default function ProfileInfo({
                     </strong>
 
                     <span className='mt-2 text-[10px] text-reuse-brown/80'>
-                        Trocas
+                        Anúncios para troca
                     </span>
                 </div>
 
@@ -56,7 +56,7 @@ export default function ProfileInfo({
                     </strong>
 
                     <span className='mt-2 text-[10px] text-reuse-brown/80'>
-                        Vendas
+                        Anúncios à venda
                     </span>
                 </div>
 
@@ -74,7 +74,7 @@ export default function ProfileInfo({
                     </strong>
 
                     <span className='mt-2 text-[10px] text-reuse-brown/80'>
-                        Avaliações
+                        Nota cadastrada
                     </span>
                 </div>
             </div>}

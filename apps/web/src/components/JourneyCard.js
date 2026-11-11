@@ -10,8 +10,8 @@ const MILESTONES = [
 
 export default function JourneyCard({ itemCount = 0 }) {
     const subtitle = itemCount === 0
-        ? "Publique seu primeiro item!"
-        : `Você já publicou ${itemCount} ${itemCount === 1 ? "item" : "itens"}. Continue assim!`;
+        ? "Publique seu primeiro anúncio!"
+        : `Você tem ${itemCount} ${itemCount === 1 ? "anúncio cadastrado" : "anúncios cadastrados"}, considerando todos os estados.`;
 
     return (
         <section className="mt-15 rounded-[14px] bg-linear-to-br from-reuse-brown to-reuse-brown-light p-6 text-reuse-white">
@@ -23,6 +23,9 @@ export default function JourneyCard({ itemCount = 0 }) {
 
                     <p className="mt-1 text-sm text-reuse-white/80">
                         {subtitle}
+                    </p>
+                    <p className="mt-1 text-sm text-reuse-white/80">
+                        Os marcos representam anúncios, sem medir negociações concluídas ou impacto ambiental.
                     </p>
                 </div>
 

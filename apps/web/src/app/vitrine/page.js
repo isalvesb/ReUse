@@ -83,6 +83,7 @@ export default async function Vitrine({ searchParams }) {
 
             <div className="relative">
               <select
+                key={category}
                 name="categoria"
                 defaultValue={category}
                 aria-label="Filtrar por categoria"
@@ -104,6 +105,7 @@ export default async function Vitrine({ searchParams }) {
 
             <div className="relative">
               <select
+                key={type}
                 name="tipo"
                 defaultValue={type}
                 aria-label="Filtrar por modalidade"
@@ -131,7 +133,7 @@ export default async function Vitrine({ searchParams }) {
         </div>
 
         {!catalog.available && <CatalogUnavailable />}
-        <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-6 [&>a]:min-w-0 [&>a]:w-full [&_article]:max-w-full">
+        <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 [&>a]:min-w-0 [&>a]:w-full [&_article]:w-full [&_article]:max-w-full">
           {cards.map((product, index) => (
             <ProfileItemCard
               key={product.id}
@@ -142,7 +144,7 @@ export default async function Vitrine({ searchParams }) {
         </div>
 
         {catalog.available && result.pagination.totalPages > 1 && (
-          <nav aria-label="Paginação" className="mt-6 flex gap-4">
+          <nav aria-label="Paginação" className="mt-6 flex flex-wrap gap-2">
             {Array.from(
               { length: result.pagination.totalPages },
               (_, i) => i + 1,
@@ -150,6 +152,7 @@ export default async function Vitrine({ searchParams }) {
               <Link
                 key={page}
                 aria-current={page === filters.page ? "page" : undefined}
+                className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border px-3 text-sm text-reuse-brown focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-reuse-brown ${page === filters.page ? "border-reuse-brown bg-reuse-pink font-bold" : "border-reuse-brown/25 hover:bg-reuse-cream"}`}
                 href={`/vitrine?${new URLSearchParams({ ...Object.fromEntries(raw), page: String(page) })}`}
               >
                 {page}
@@ -158,9 +161,15 @@ export default async function Vitrine({ searchParams }) {
           </nav>
         )}
         {catalog.available && cards.length === 0 && (
-          <p className="text-sm text-reuse-brown-light">
-            Nenhum item disponível na vitrine ainda.
-          </p>
+          <div className="mt-6 space-y-3 text-sm text-reuse-brown-light">
+            <p>{query || category || type || curadoria
+              ? "Nenhum anúncio corresponde à sua busca ou aos filtros selecionados."
+              : "Ainda não há anúncios disponíveis na vitrine."}</p>
+            {(query || category || type || curadoria) && <>
+              <p>Revise os critérios ou limpe os filtros para ver todos os anúncios.</p>
+              <Link href="/vitrine" className="inline-flex min-h-11 items-center rounded-xl border border-reuse-brown/30 px-4 text-reuse-brown hover:bg-reuse-cream focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-reuse-brown">Limpar busca e filtros</Link>
+            </>}
+          </div>
         )}
       </main>
     </>

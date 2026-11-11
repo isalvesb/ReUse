@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Bot, Check, Send, X } from "lucide-react";
+import { Bot, Check, LoaderCircle, Send, X } from "lucide-react";
 
 const SUGGESTIONS = ["Como publicar uma doação?", "Quero pausar um anúncio meu", "Quero reativar um anúncio meu"];
 const WELCOME = { role: "assistant", origin: "reuse", text: "Olá! Faça uma pergunta sobre o ReUse ou peça para pausar ou reativar um anúncio próprio. Você escolherá o anúncio e confirmará antes de qualquer alteração." };
@@ -90,13 +90,12 @@ export default function ReuseAssistant() {
             {entry.status === "failed" && <span className="mt-1 block text-xs">Falha no envio. Tente novamente pelo campo de mensagem.</span>}
           </p>
         </div>)}
-        {busy && <p className="text-sm text-reuse-brown-light">Aguarde…</p>}
-      </div>
-      {error && <p role="alert" className="mt-4 rounded-[var(--ds-radius-small)] border border-[var(--ds-colors-error)] p-3 text-sm text-[var(--ds-colors-error)]">{error}</p>}
+        {busy && <p role="status" className="flex items-center gap-2 text-sm text-reuse-brown-light"><LoaderCircle aria-hidden="true" size={16} className="shrink-0 animate-spin motion-reduce:animate-none" />Aguarde…</p>}
+      {error && <p role="alert" className="rounded-[var(--ds-radius-small)] border border-[var(--ds-colors-error)] p-3 text-sm text-[var(--ds-colors-error)]">{error}</p>}
       {proposal && <div className="mt-4 space-y-2" aria-label="Escolha um anúncio próprio">
         <p className="text-sm font-medium text-reuse-brown">Escolha um anúncio para {proposal.intent === "PAUSAR" ? "pausar" : "reativar"}:</p>
         {!proposal.items.length && <p className="text-sm">Nenhum anúncio próprio elegível.</p>}
-        <div className="max-h-48 space-y-2 overflow-y-auto">{proposal.items.map(item => <button type="button" key={item.id} disabled={busy} onClick={() => void select(item.id)} className={`${control} block w-full text-left`}>{item.title}</button>)}</div>
+        <div className="space-y-2">{proposal.items.map(item => <button type="button" key={item.id} disabled={busy} onClick={() => void select(item.id)} className={`${control} block w-full break-words text-left`}>{item.title}</button>)}</div>
       </div>}
       {confirmation && <div className="mt-4 rounded-[var(--ds-radius-small)] border border-reuse-pink bg-reuse-cream p-4">
         <p className="text-sm font-medium text-reuse-brown">{confirmation.intent === "PAUSAR" ? "Pausar" : "Reativar"} somente “{confirmation.item.title}”?</p>
@@ -106,6 +105,7 @@ export default function ReuseAssistant() {
           <button type="button" disabled={busy} onClick={() => void decide("cancel")} className={`${control} inline-flex items-center gap-2`}><X aria-hidden="true" size={16} />Cancelar</button>
         </div>
       </div>}
+      </div>
       <div className="mt-4 flex flex-wrap gap-2" aria-label="Sugestões de mensagem">{SUGGESTIONS.map(text => <button key={text} type="button" disabled={busy} onClick={() => void send(text)} className={control}>{text}</button>)}</div>
       <form onSubmit={event => { event.preventDefault(); void send(message); }} className="mt-4 flex gap-3">
         <label htmlFor="reuse-assistant-message" className="sr-only">Mensagem para o assistente</label>
