@@ -26,5 +26,10 @@
     "test:integration": "node scripts/check-shared-profile.mjs",
     "design:tokens": "node scripts/design-tokens.mjs",
     "design:check": "node scripts/design-tokens.mjs --check"
+  },
+  "overrides": {
+    "shell-quote": "1.11.0",
+    "websocket-driver": "0.7.5",
+    "source-map-js": "1.2.2"
   }
 }
