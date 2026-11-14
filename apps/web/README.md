@@ -46,7 +46,7 @@ Arquitetura, limitações e componentes: [documentação do monorepo](../../docs
 
 ## Como executar
 
-Execute **a partir da raiz do repositório**, com Node.js 24.x, npm 11.x e os ambientes de desenvolvimento autorizados configurados em `.env.example`.
+Execute **a partir da raiz do repositório**, com Node.js 24.x e npm 11.x. Use os arquivos `apps/web/.env.example` e `apps/mobile/.env.example` somente como **modelos**: defina os valores autorizados em arquivos locais ignorados pelo Git. **Não inclua credenciais nos `.env.example` nem as versione.**
 
 ```bash
 npm ci --install-strategy=nested --ignore-scripts
