@@ -2,8 +2,6 @@
 
 <img src="apps/web/public/images/logo/ReUse-marrom.png" alt="Logotipo ReUse" width="260" />
 
-# ReUse
-
 ### Mais vida para o que já existe.
 
 **Um marketplace de compra, venda, troca e doação que aproxima pessoas e incentiva o consumo consciente.**
