@@ -1,5 +1,8 @@
 # Transferência acadêmica e hospedagem controlada
 
+**Registro histórico (10/11/2026).** Os passos de transferência relatados abaixo foram planejados antes da integração do monorepo à `main`. Para conhecer a estrutura atual, consulte o [README principal](../README.md) e o [índice da documentação](README.md). Este registro não deve ser seguido como roteiro de publicação atual.
+
+
 Preparação local em 10/11/2026. Destino definido: `isalvesb/ReUse`; base remota conferida `5f34ae22b9d061baae4408bec6fc8807c5e90b14`. Branch proposta: `integracao/reuse-monorepo-20261110`. Nenhum push, PR, merge ou deploy foi executado nesta preparação.
 
 ## Histórico e estrutura

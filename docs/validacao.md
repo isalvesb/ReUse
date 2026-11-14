@@ -1,5 +1,8 @@
 # Validação da fundação — 03/11/2026
 
+**Registro histórico de validação (03/11/2026).** Os resultados abaixo correspondem à fundação do monorepo, antes da integração dos serviços e da publicação acadêmica. Não representam os testes mais recentes nem certificam o deployment atual. Consulte o [índice da documentação](README.md) para outras evidências.
+
+
 As aplicações foram verificadas de forma independente no mesmo monorepo, com Node 24.13.1 e npm 11.8.0. Não foram usados arquivos `.env` ou credenciais das fontes. Os checks receberam variáveis sintéticas e destinos locais; a saída de rede dos processos Node foi bloqueada durante testes e builds. A obtenção de pacotes e binários oficiais foi uma etapa separada da execução das aplicações.
 
 | Verificação | Resultado |

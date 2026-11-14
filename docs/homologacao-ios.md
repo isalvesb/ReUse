@@ -1,5 +1,8 @@
 # Work 1.4 — homologação iOS nativa
 
+**Registro histórico de homologação em simulador (2026).** Os resultados documentam as condições e versões testadas naquela sessão, não certificam distribuição em lojas, dispositivos físicos ou o ambiente Web hospedado. Veja o [índice da documentação](README.md) para o panorama atual.
+
+
 Ambiente: Xcode 27.2 (27B52), iPhone 16 simulado, iOS 27.2. Development build própria Expo/React Native, compilada por Xcode, instalada por CoreSimulator e executada com Hermes/Metro. Sem Expo Go, React Native Web, EAS, publicação ou conta Apple paga.
 
 ## Procedimento local validado
