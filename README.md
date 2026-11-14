@@ -110,6 +110,12 @@ Mobile: React Native ─────┘                        └─ Auth, Post
 
 As integrações externas dependem de credenciais e permissões próprias. A demonstração do assistente IBM ocorreu em contexto acadêmico de trial, não como serviço comercial permanente. Consulte [a documentação do assistente](docs/ibm-assistant.md) e [os limites de validação](docs/validacao.md).
 
+## 📣 Plano de marketing digital
+
+A comunicação do ReUse também foi planejada como parte do projeto acadêmico. O [Plano de Marketing Digital](docs/plano-marketing-digital.md) reúne diagnóstico SWOT, personas hipotéticas, estratégia pelos 8 Ps, calendário editorial de 30 dias e indicadores de acompanhamento.
+
+O plano é **uma proposta documental**, não uma campanha executada. As metas são hipóteses de planejamento, sem resultados de aquisição, transações ou impacto ambiental atribuídos ao projeto.
+
 ## 🗂️ Organização do repositório
 
 ```text
