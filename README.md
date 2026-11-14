@@ -1,6 +1,16 @@
 <div align="center">
 
-<img src="apps/web/public/images/logo/ReUse-marrom.png" alt="Logotipo ReUse" width="260" />
+<picture>
+  <source
+    media="(prefers-color-scheme: dark)"
+    srcset="apps/web/public/images/logo/ReUse-creme.png"
+  />
+  <img
+    src="apps/web/public/images/logo/ReUse-marrom.png"
+    alt="ReUse"
+    width="180"
+  />
+</picture>
 
 ### Mais vida para o que já existe.
 
