@@ -1,5 +1,8 @@
 # Conclusão técnica local — 24/10/2026
 
+**Registro histórico (24/10/2026).** Este documento descreve o estágio anterior à integração Web/Mobile, ao novo README e à hospedagem acadêmica. Não representa o funcionamento atual da branch `main`. Para informações atuais, consulte o [README principal](../../../../README.md) e o [índice da documentação](../../../../docs/README.md).
+
+
 ## Escopo autorizado
 
 Marketing Digital e área administrativa Low-Code não ocorreram: foram citados por erro no enunciado final e não integram esta entrega. Mobile e web preservam suas arquiteturas independentes. Nenhum push, PR, deploy ou mudança de serviço remoto foi autorizado nesta execução.

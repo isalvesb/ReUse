@@ -1,5 +1,8 @@
 # Preparação técnica — Work 2.04
 
+**Registro histórico (10/11/2026).** As etapas de transferência e publicação descritas abaixo eram propostas ou verificações naquele momento. O monorepo foi posteriormente integrado ao repositório acadêmico. Consulte o [README principal](../README.md) e o [índice da documentação](README.md) antes de interpretar instruções antigas como ações pendentes.
+
+
 Estado de 10/11/2026. Nenhuma transferência ou publicação executada. Destino acadêmico definido pelo usuário: `isalvesb/ReUse`.
 
 ## Dependências e reprodução

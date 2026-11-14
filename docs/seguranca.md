@@ -1,5 +1,8 @@
 # Conteúdo autorizado do laboratório
 
+**Registro histórico de segurança e sanitização (03/11/2026).** Este texto documenta a importação inicial do código; não é uma auditoria atual de vulnerabilidades, segredos ou serviços externos. Consulte o [índice da documentação](README.md) e o [guia de pré-publicação](pre-publicacao.md) para o contexto e os limites das verificações posteriores.
+
+
 A publicação contém somente a branch `main` do monorepo, os históricos de aplicação importados e os arquivos estruturais revisados. Backups integrais, stashes, refs de preservação, reflogs, arquivos locais de ambiente, configurações Google e material de assinatura ficam fora da publicação.
 
 Foi autorizada especificamente a manutenção histórica das configurações públicas de cliente Firebase API key, Supabase `anon` key e Facebook client token já identificadas. Seus valores não são reproduzidos nesta documentação. Identificadores públicos de projeto e OAuth existentes continuam como parte da configuração histórica. Nenhuma configuração histórica foi usada para acessar serviços.
