@@ -1,0 +1,41 @@
+name: ReUse | Verificações
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Testes, lint, TypeScript e tokens
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: "true"
+      NEXT_TELEMETRY_DISABLED: "1"
+      EXPO_NO_TELEMETRY: "1"
+
+    steps:
+      - name: Obter código
+        uses: actions/checkout@v4
+
+      - name: Preparar Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Instalar dependências fixadas
+        run: npm ci --install-strategy=nested --ignore-scripts --no-audit --no-fund
+
+      - name: Gerar Prisma Client sem alterar o banco
+        run: npm run generate:web
+
+      - name: Executar testes, lint e TypeScript
+        run: npm run check
+
+      - name: Validar tokens compartilhados
+        run: npm run design:check
