@@ -132,7 +132,7 @@ Não divulgar identidades ou mensagens de participantes sem autorização. Utili
 
 ## Referências e rastreabilidade
 
-As referências abaixo são os materiais didáticos efetivamente identificados no ZIP caps.zip fornecido pelo usuário. A numeração indicada é a página absoluta do PDF agregado, contada a partir de 1, e não a paginação interna de cada capítulo. Os textos deste plano são aplicação e síntese dos conceitos, não transcrição das apostilas.
+As referências abaixo identificam os materiais didáticos da FIAP consultados para o planejamento. Os textos deste plano são aplicações e sínteses dos conceitos ao contexto do ReUse, não transcrições das apostilas.
 
 [F1] FIAP. Planejando o Digital. In: Automatizando Experiências, Consulta dirigida: diagnóstico e SWOT; objetivos e SMART; orçamento e cronograma; mensuração.
 
