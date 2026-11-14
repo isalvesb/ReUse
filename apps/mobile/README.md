@@ -64,7 +64,7 @@ npm run dev:web
 npm run dev:mobile
 ```
 
-Configure apenas as variáveis de desenvolvimento autorizadas de `apps/web/.env.example` e `apps/mobile/.env.example`. O endereço `127.0.0.1:4330` é adequado ao simulador local nas condições documentadas, **não a um celular físico remoto**. O Expo Go não substitui uma development build para os módulos nativos deste projeto.
+Use `apps/web/.env.example` e `apps/mobile/.env.example` apenas como **modelos**. Configure as variáveis autorizadas em arquivos locais ignorados pelo Git, sem inserir credenciais nos `.env.example`. O endereço `127.0.0.1:4330` é adequado ao simulador local nas condições documentadas, **não a um celular físico remoto**. O Expo Go não substitui uma development build para os módulos nativos deste projeto.
 
 ### Qualidade
 
