@@ -134,17 +134,17 @@ Não divulgar identidades ou mensagens de participantes sem autorização. Utili
 
 As referências abaixo são os materiais didáticos efetivamente identificados no ZIP caps.zip fornecido pelo usuário. A numeração indicada é a página absoluta do PDF agregado, contada a partir de 1, e não a paginação interna de cada capítulo. Os textos deste plano são aplicação e síntese dos conceitos, não transcrição das apostilas.
 
-[F1] FIAP. Planejando o Digital. In: Automatizando Experiências, caps-6.pdf, pp. 406-429. Consulta dirigida: diagnóstico e SWOT, pp. 411-412; objetivos e SMART, pp. 416-418; orçamento e cronograma, pp. 418-420; mensuração, pp. 420-422. Material didático fornecido, sem data editorial única identificada.
+[F1] FIAP. Planejando o Digital. In: Automatizando Experiências, Consulta dirigida: diagnóstico e SWOT; objetivos e SMART; orçamento e cronograma; mensuração.
 
-[F2] FIAP. D1G1T4L MKT. In: Automatizando Experiências, caps-6.pdf, pp. 403-404. Personas, escolha de canais, KPIs e adequação da linguagem. Material didático fornecido.
+[F2] FIAP. D1G1T4L MKT. In: Automatizando Experiências. Personas, escolha de canais, KPIs e adequação da linguagem.
 
-[F3] FIAP. D1G1T4L MKT. In: Automatizando Experiências, caps-6.pdf, pp. 388-391. Os 8 Ps do Marketing Digital, apresentados pela apostila a partir de Conrado Adolpho. Não confundir com os 8 Ps gerais de marketing também apresentados no capítulo.
+[F3] FIAP. D1G1T4L MKT. In: Automatizando Experiências. Os 8 Ps do Marketing Digital, apresentados pela apostila a partir de Conrado Adolpho. Não confundir com os 8 Ps gerais de marketing também apresentados no capítulo.
 
-[F4] FIAP. Marketing Content. In: Final Step, caps-7.pdf, pp. 333-352. Consulta dirigida sobre conteúdo relevante, atração, conversão, relacionamento e acompanhamento. Método adaptado ao contexto acadêmico, sem implantar CRM ou automação.
+[F4] FIAP. Marketing Content. In: Final Step. Consulta dirigida sobre conteúdo relevante, atração, conversão, relacionamento e acompanhamento. Método adaptado ao contexto acadêmico, sem implantar CRM ou automação.
 
-[F5] FIAP. Marketing Content. In: Final Step, caps-7.pdf, pp. 354-355. Os 3 Cs do Marketing de Conteúdo, apresentados a partir de Paulo Faustino, e orientações de linguagem e editorias.
+[F5] FIAP. Marketing Content. In: Final Step. Os 3 Cs do Marketing de Conteúdo, apresentados a partir de Paulo Faustino, e orientações de linguagem e editorias.
 
-[F6] FIAP. SEO além do óbvio. In: Final Step, caps-7.pdf, pp. 626-632. Distinção entre métricas e indicadores e discussão de origem de tráfego, cliques e impressões. O plano evita tratar exibição como usuário único ou intenção como venda.
+[F6] FIAP. SEO além do óbvio. In: Final Step. Distinção entre métricas e indicadores e discussão de origem de tráfego, cliques e impressões. O plano evita tratar exibição como usuário único ou intenção como venda.
 
 [P1] ReUse. Repositório acadêmico integrado isalvesb/ReUse. Fonte sobre funcionalidades e arquitetura existentes. https://github.com/isalvesb/ReUse
 
